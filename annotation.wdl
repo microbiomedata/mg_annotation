@@ -1,5 +1,3 @@
-#import "https://portal.nersc.gov/project/m3408/wdl/structural-annotation.wdl" as sa
-#import "https://portal.nersc.gov/project/m3408/wdl/functional-annotation.wdl" as fa
 import "structural-annotation.wdl" as sa
 import "functional-annotation.wdl" as fa
 
