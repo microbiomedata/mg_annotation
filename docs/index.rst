@@ -95,3 +95,21 @@ Requirements for Execution
 
 - Docker or other Container Runtime
 - Cromwell or other WDL-capable Workflow Execution Tool
+
+
+Running Workflow in Cromwell on Cori
+------------------------------------
+
+TBD
+
+Version History
+---------------
+
+- 1.0.0
+
+Point of contact
+----------------
+
+Package maintainer: Shane Canon <scanon@lbl.gov>
+
+
