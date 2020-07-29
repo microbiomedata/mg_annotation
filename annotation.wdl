@@ -35,8 +35,15 @@ workflow annotation {
        functional_gffs=f_annotate.gff,
        ko_tsvs = f_annotate.ko_tsv,
        ec_tsvs = f_annotate.ec_tsv,
-       phylo_tsvs =  f_annotate.phylo_tsv
+       phylo_tsvs =  f_annotate.phylo_tsv,
+       proteins = s_annotate.proteins
 
+  }
+  call final_stats {
+    input:
+       project_id = imgap_project_id,
+       structural_gff = merge_outputs.structural_gff,
+       input_fasta = imgap_input_file
   }
 
 }
@@ -86,6 +93,7 @@ task merge_outputs {
   Array[File] ko_tsvs
   Array[File] ec_tsvs
   Array[File] phylo_tsvs
+  Array[File?] proteins
 
   command {
       cat ${sep=" " structural_gffs} > "${project_id}_structural_annotation.gff"
@@ -93,6 +101,7 @@ task merge_outputs {
       cat ${sep=" " ko_tsvs} >  "${project_id}_ko.tsv"
       cat ${sep=" " ec_tsvs} >  "${project_id}_ec.tsv"
       cat ${sep=" " phylo_tsvs} > "${project_id}_gene_phylogeny.tsv"
+      cat ${sep=" " proteins} > "${project_id}.faa"
   }
   output {
     File functional_gff = "${project_id}_structural_annotation.gff"
@@ -100,7 +109,31 @@ task merge_outputs {
     File ko_tsv = "${project_id}_ko.tsv"
     File ec_tsv = "${project_id}_ec.tsv"
     File phylo_tsv = "${project_id}_gene_phylogeny.tsv"
+    File protein_faa = "${project_id}.faa"
   }
 
+}
+
+task final_stats {
+
+  String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
+  File   input_fasta
+  String project_id
+  File   structural_gff
+
+  command {
+    ${bin} ${input_fasta} ${structural_gff}
+    sleep 1
+    mv ../inputs/*/assembly_structural_annotation_stats.tsv .
+  }
+
+  output {
+    File tsv = "assembly_structural_annotation_stats.tsv"
+  }
+
+  runtime {
+    time: "0:10:00"
+    mem: "86G"
+  }
 }
 
