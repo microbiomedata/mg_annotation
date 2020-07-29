@@ -11,7 +11,7 @@ workflow trnascan {
       bin = trnascan_se_bin,
       input_fasta = imgap_input_fasta,
       project_id = imgap_project_id,
-      threads = additional_threads,
+      threads = 16,
   }
   call pick_and_transform_to_gff {
     input:
@@ -31,10 +31,18 @@ task trnascan_ba {
   File input_fasta
   String project_id
   Int    threads
+  String index="{#}"
 
   command {
-    ${bin} -B --thread ${threads} ${input_fasta} &> ${project_id}_trnascan_bacterial.out
-    ${bin} -A --thread ${threads} ${input_fasta} &> ${project_id}_trnascan_archaeal.out
+    rm -f bacterial.out.*
+    rm -f archaeal.out.*
+    cat ${input_fasta} | parallel -j ${threads} --pipe --recstart '>' --block 100k \
+         "cat > split.faa.${index} && \
+          ${bin} -Q -B split.faa.${index}  > bacterial.out.${index} 2>&1 && \
+          ${bin} -Q -A split.faa.${index}  > archaeal.out.${index} 2>&1 && \
+          rm split.faa.${index}"
+    cat bacterial.out.* > ${project_id}_trnascan_bacterial.out
+    cat archaeal.out.* > ${project_id}_trnascan_archaeal.out
   }
 
   runtime {
