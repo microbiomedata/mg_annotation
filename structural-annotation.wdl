@@ -9,58 +9,45 @@ workflow s_annotate {
   File    imgap_input_fasta
   String  imgap_project_id
   Int     additional_threads
-  Boolean pre_qc_execute=true
-  Boolean trnascan_se_execute=false
-  Boolean rfam_execute=false
-  Boolean crt_execute=true
-  Boolean prodigal_execute=true
-  Boolean genemark_execute=true
-  Boolean gff_and_fasta_stats_execute=true
 
-  if(pre_qc_execute) {
-    call pre_qc {
-      input:
-        input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id
-    }
+  call pre_qc {
+    input:
+      input_fasta = imgap_input_fasta,
+      project_id = imgap_project_id
   }
-  if(trnascan_se_execute) {
-    call trnascan.trnascan {
-      input:
-        imgap_input_fasta = imgap_input_fasta,
-        imgap_project_id = imgap_project_id,
-        additional_threads = additional_threads
-    }
+
+  call trnascan.trnascan {
+    input:
+      imgap_input_fasta = imgap_input_fasta,
+      imgap_project_id = imgap_project_id,
+      additional_threads = additional_threads
   }
-  if(rfam_execute) {
-    call rfam.rfam {
-      input:
-        imgap_input_fasta = imgap_input_fasta,
-        imgap_project_id = imgap_project_id,
-        additional_threads = additional_threads
-    }
+
+  call rfam.rfam {
+    input:
+      imgap_input_fasta = imgap_input_fasta,
+      imgap_project_id = imgap_project_id,
+      additional_threads = additional_threads
   }
-  if(crt_execute) {
-    call crt.crt {
-      input:
-        imgap_input_fasta = imgap_input_fasta,
-        imgap_project_id = imgap_project_id
-    }
+
+  call crt.crt {
+    input:
+      imgap_input_fasta = imgap_input_fasta,
+      imgap_project_id = imgap_project_id
   }
-  if(prodigal_execute) {
-    call prodigal.prodigal {
-      input:
-        imgap_input_fasta = imgap_input_fasta,
-        imgap_project_id = imgap_project_id
-    }
+
+  call prodigal.prodigal {
+    input:
+      imgap_input_fasta = imgap_input_fasta,
+      imgap_project_id = imgap_project_id
   }
-  if(genemark_execute) {
-    call genemark.genemark {
-      input:
-        imgap_input_fasta = imgap_input_fasta,
-        imgap_project_id = imgap_project_id
-    }
+
+  call genemark.genemark {
+    input:
+      imgap_input_fasta = imgap_input_fasta,
+      imgap_project_id = imgap_project_id
   }
+
   call gff_merge {
     input:
       input_fasta = imgap_input_fasta,
@@ -73,26 +60,18 @@ workflow s_annotate {
       genemark_gff = genemark.gff,
       prodigal_gff = prodigal.gff
   }
-  if(prodigal_execute || genemark_execute) {
-    call fasta_merge {
-      input:
-        input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id,
-        final_gff = gff_merge.final_gff,
-        genemark_genes = genemark.genes,
-        genemark_proteins = genemark.proteins,
-        prodigal_genes = prodigal.genes,
-        prodigal_proteins = prodigal.proteins
-    }
+
+  call fasta_merge {
+    input:
+      input_fasta = imgap_input_fasta,
+      project_id = imgap_project_id,
+      final_gff = gff_merge.final_gff,
+      genemark_genes = genemark.genes,
+      genemark_proteins = genemark.proteins,
+      prodigal_genes = prodigal.genes,
+      prodigal_proteins = prodigal.proteins
   }
-  if(gff_and_fasta_stats_execute) {
-    call gff_and_fasta_stats {
-      input:
-        input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id,
-        final_gff = gff_merge.final_gff
-    }
-  }
+
   output {
     File  gff = gff_merge.final_gff
     File? proteins = fasta_merge.final_proteins 
@@ -208,6 +187,11 @@ task gff_and_fasta_stats {
 
   command {
     ${bin} ${input_fasta} ${final_gff} && sleep 2
+    mv ../inputs/*/assembly_structural_annotation_stats.tsv .
+  }
+
+  output {
+    File tsv = "assembly_structural_annotation_stats.tsv"
   }
 
   runtime {

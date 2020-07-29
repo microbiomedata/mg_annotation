@@ -5,130 +5,60 @@ workflow f_annotate {
   Int     additional_threads
   File    input_fasta
   File    sa_gff
-  # Defaults
-  String  ko_ec_img_nr_db="/refdata/img/IMG-NR/20190607/img_nr"
-  String  ko_ec_md5_mapping="/refdata/img/IMG-NR/20190607/md5Hash2Data.txt"
-  String  ko_ec_taxon_to_phylo_mapping="/refdata/img/IMG-NR/20190607/taxonOid2Taxonomy.txt"
-  String  lastal_bin = "/opt/omics/bin/lastal"
-  String  selector_bin = "/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
-  Boolean smart_execute=true
-  Int?    par_hmm_inst
-  Int?    approx_num_proteins
-  String  smart_db="/refdata/img/SuperFamily/v1.75/supfam.hmm"
-  String  hmmsearch_bin = "/opt/omics/bin/hmmsearch"
-  String  frag_hits_filter_bin = "/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
-  Boolean cog_execute=true
-  String  cog_db="/refdata/img/COG/HMMs/2003/COG.hmm"
-  Boolean tigrfam_execute=true
-  String  tigrfam_db="/refdata/img/TIGRFAM/v15.0/TIGRFAM.hmm"
-  String  hit_selector_bin = "/opt/omics/bin/functional_annotation/hmmsearch_hit_selector.py"
-  Boolean superfam_execute=true
-  String  superfam_db="/refdata/img/SMART/01_06_2016/SMART.hmm"
-  Boolean pfam_execute=true
-  String  pfam_db="/refdata/img/Pfam/Pfam-A-30.0/Pfam-A.hmm"
-  String  pfam_claninfo_tsv="/refdata/img/Pfam/Pfam-A-30.0/Pfam-A.clans.tsv"
-  String  pfam_clan_filter = "/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
-  Boolean cath_funfam_execute=true
-  String  cath_funfam_db="/refdata/img/Cath-FunFam/v4.1.0/funfam.hmm"
-  String  product_assign_bin = "/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
-  String  product_names_mapping_dir="/refdata/img/Product_Name_Mappings/1.0"
 
   call ko_ec {
     input:
       project_id = imgap_project_id,
       input_fasta = input_fasta,
-      threads = additional_threads,
-      nr_db = ko_ec_img_nr_db,
-      md5 = ko_ec_md5_mapping,
-      phylo = ko_ec_taxon_to_phylo_mapping,
-      lastal = lastal_bin,
-      selector = selector_bin
+      threads = additional_threads
   }
-  if(smart_execute) {
-    call smart {
-      input:
-        project_id = imgap_project_id,
-        input_fasta = input_fasta,
-        threads = additional_threads,
-        par_hmm_inst = par_hmm_inst,
-        approx_num_proteins = approx_num_proteins,
-        smart_db = smart_db,
-        hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin
-    }
+
+  call smart {
+    input:
+      project_id = imgap_project_id,
+      input_fasta = input_fasta,
+      threads = additional_threads
   }
-  if(cog_execute) {
-    call cog {
-      input:
-        project_id = imgap_project_id,
-        input_fasta = input_fasta,
-        threads = additional_threads,
-        par_hmm_inst = par_hmm_inst,
-        approx_num_proteins = approx_num_proteins,
-        cog_db = cog_db,
-        hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin
-    }
+
+  call cog {
+    input:
+      project_id = imgap_project_id,
+      input_fasta = input_fasta,
+      threads = additional_threads
   }
-  if(tigrfam_execute) {
-    call tigrfam {
-      input:
-        project_id = imgap_project_id,
-        input_fasta = input_fasta,
-        threads = additional_threads,
-        par_hmm_inst = par_hmm_inst,
-        approx_num_proteins = approx_num_proteins,
-        tigrfam_db = tigrfam_db,
-        hmmsearch = hmmsearch_bin,
-        hit_selector = hit_selector_bin
-    }
+
+  call tigrfam {
+    input:
+      project_id = imgap_project_id,
+      input_fasta = input_fasta,
+      threads = additional_threads
   }
-  if(superfam_execute) {
-    call superfam {
-      input:
-        project_id = imgap_project_id,
-        input_fasta = input_fasta,
-        threads = additional_threads,
-        par_hmm_inst = par_hmm_inst,
-        approx_num_proteins = approx_num_proteins,
-        superfam_db = superfam_db,
-        hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin
-    }
+
+  call superfam {
+    input:
+      project_id = imgap_project_id,
+      input_fasta = input_fasta,
+      threads = additional_threads
   }
-  if(pfam_execute) {
-    call pfam {
-      input:
-        project_id = imgap_project_id,
-        input_fasta = input_fasta,
-        threads = additional_threads,
-        par_hmm_inst = par_hmm_inst,
-        approx_num_proteins = approx_num_proteins,
-        pfam_db = pfam_db,
-        pfam_claninfo_tsv = pfam_claninfo_tsv,
-        pfam_clan_filter = pfam_clan_filter,
-        hmmsearch = hmmsearch_bin
-    }
+
+  call pfam {
+    input:
+      project_id = imgap_project_id,
+      input_fasta = input_fasta,
+      threads = additional_threads
   }
-  if(cath_funfam_execute) {
-    call cath_funfam {
-      input:
-        project_id = imgap_project_id,
-        input_fasta = input_fasta,
-        threads = additional_threads,
-        par_hmm_inst = par_hmm_inst,
-        approx_num_proteins = approx_num_proteins,
-        cath_funfam_db = cath_funfam_db,
-        hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin
-    }
+
+  call cath_funfam {
+    input:
+      project_id = imgap_project_id,
+      input_fasta = input_fasta,
+      threads = additional_threads
   }
+
   call product_name {
     input:
       project_id = imgap_project_id,
       sa_gff = sa_gff,
-      product_assign = product_assign_bin,
-      map_dir = product_names_mapping_dir,
       ko_ec_gff = ko_ec.gff,
       smart_gff = smart.gff,
       cog_gff = cog.gff,
@@ -139,9 +69,10 @@ workflow f_annotate {
   }
   output {
     File gff = product_name.gff
+    File product_name_tsv = product_name.tsv
     File ko_tsv = ko_ec.ko_tsv
     File ec_tsv = ko_ec.ec_tsv
-    File phylo_tsv = ko_ec.ec_tsv
+    File phylo_tsv = ko_ec.phylo_tsv
   }
 
 }
@@ -152,14 +83,14 @@ task ko_ec {
   String project_type = "metagenome"
   Int    threads = 2
   File   input_fasta
-  String nr_db
-  String   md5
-  String   phylo
+  String nr_db = "/refdata/img/IMG-NR/20190607/img_nr"
+  String   md5 = "/refdata/img/IMG-NR/20190607/md5Hash2Data.txt"
+  String   phylo = "/refdata/img/IMG-NR/20190607/taxonOid2Taxonomy.txt"
   Int    top_hits = 5
   Int    min_ko_hits = 2
   Float  aln_length_ratio = 0.7
-  String lastal
-  String selector
+  String lastal = "/opt/omics/bin/lastal"
+  String selector = "/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
 
   command {
     ${lastal} -f blasttab+ -P ${threads} ${nr_db} ${input_fasta} 1> ${project_id}_proteins.img_nr.last.blasttab
@@ -188,15 +119,15 @@ task smart {
   
   String project_id
   File   input_fasta
-  String   smart_db
+  String smart_db = "/refdata/img/SuperFamily/v1.75/supfam.hmm"
   Int    threads = 2
   Int    par_hmm_inst = 1
   Int    approx_num_proteins = 0
   Float  min_domain_eval_cutoff = 0.01
   Float  aln_length_ratio = 0.7
   Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String frag_hits_filter
+  String hmmsearch = "/opt/omics/bin/hmmsearch"
+  String frag_hits_filter = "/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
 
   command <<<
     if [[ ${threads} -gt ${par_hmm_inst} ]]
@@ -287,15 +218,15 @@ task cog {
   
   String project_id
   File   input_fasta
-  String   cog_db
+  String cog_db = "/refdata/img/COG/HMMs/2003/COG.hmm"
   Int    threads = 2
   Int    par_hmm_inst = 1
   Int    approx_num_proteins = 0
   Float  min_domain_eval_cutoff = 0.01
   Float  aln_length_ratio = 0.7
   Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String frag_hits_filter
+  String hmmsearch = "/opt/omics/bin/hmmsearch"
+  String frag_hits_filter = "/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
 
   command <<<
     if [[ ${threads} -gt ${par_hmm_inst} ]]
@@ -388,14 +319,14 @@ task tigrfam {
   
   String project_id
   File   input_fasta
-  String   tigrfam_db
+  String tigrfam_db = "/refdata/img/TIGRFAM/v15.0/TIGRFAM.hmm"
   Int    threads = 2
   Int    par_hmm_inst = 1
   Int    approx_num_proteins = 0
   Float  aln_length_ratio = 0.7
   Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String hit_selector
+  String hmmsearch = "/opt/omics/bin/hmmsearch"
+  String hit_selector = "/opt/omics/bin/functional_annotation/hmmsearch_hit_selector.py"
 
   command <<<
     if [[ ${threads} -gt ${par_hmm_inst} ]]
@@ -487,15 +418,15 @@ task superfam {
 
   String project_id
   File   input_fasta
-  String   superfam_db
+  String superfam_db = "/refdata/img/SMART/01_06_2016/SMART.hmm"
   Int    threads = 2
   Int    par_hmm_inst = 1
   Int    approx_num_proteins = 0
   Float  min_domain_eval_cutoff = 0.01
   Float  aln_length_ratio = 0.7
   Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String frag_hits_filter
+  String hmmsearch = "/opt/omics/bin/hmmsearch"
+  String frag_hits_filter = "/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
 
   command <<<
     if [[ ${threads} -gt ${par_hmm_inst} ]]
@@ -586,13 +517,13 @@ task pfam {
   
   String project_id
   File   input_fasta
-  String   pfam_db
-  String   pfam_claninfo_tsv
+  String pfam_db = "/refdata/img/Pfam/Pfam-A-30.0/Pfam-A.hmm"
+  String pfam_claninfo_tsv = "/refdata/img/Pfam/Pfam-A-30.0/Pfam-A.clans.tsv"
   Int    threads = 2
   Int    par_hmm_inst = 1
   Int    approx_num_proteins = 0
-  String hmmsearch
-  String pfam_clan_filter
+  String hmmsearch = "/opt/omics/bin/hmmsearch"
+  String pfam_clan_filter = "/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
 
   command <<<
     if [[ ${threads} -gt ${par_hmm_inst} ]]
@@ -682,15 +613,15 @@ task cath_funfam {
   
   String project_id
   File   input_fasta
-  String   cath_funfam_db
+  String cath_funfam_db = "/refdata/img/Cath-FunFam/v4.1.0/funfam.hmm"
   Int    threads = 2
   Int    par_hmm_inst = 1
   Int    approx_num_proteins = 0
   Float  min_domain_eval_cutoff = 0.01
   Float  aln_length_ratio = 0.7
   Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String frag_hits_filter
+  String hmmsearch = "/opt/omics/bin/hmmsearch"
+  String frag_hits_filter = "/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
 
   command <<<
     if [[ ${threads} -gt ${par_hmm_inst} ]]
@@ -782,15 +713,15 @@ task product_name {
   
   String project_id
   File   sa_gff
-  String product_assign
-  String map_dir
-  File?  ko_ec_gff
-  File?  smart_gff
-  File?  cog_gff
-  File?  tigrfam_gff
-  File?  supfam_gff
-  File?  pfam_gff
-  File?  cath_funfam_gff
+  String product_assign = "/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
+  String map_dir = "/refdata/img/Product_Name_Mappings/1.0"
+  File  ko_ec_gff
+  File  smart_gff
+  File  cog_gff
+  File  tigrfam_gff
+  File  supfam_gff
+  File  pfam_gff
+  File  cath_funfam_gff
 
   command {
     ${product_assign} ${"-k " + ko_ec_gff} ${"-s " + smart_gff} ${"-c " + cog_gff} \
@@ -798,6 +729,7 @@ task product_name {
                       ${"-f " + cath_funfam_gff} \
                       ${map_dir} ${sa_gff}
     mv ../inputs/*/*.gff .
+    mv ../inputs/*/*.tsv .
   }
 
   runtime {
@@ -807,5 +739,6 @@ task product_name {
 
   output {
     File gff = "${project_id}_functional_annotation.gff"
+    File tsv = "${project_id}_product_names.tsv"
   }
 }
