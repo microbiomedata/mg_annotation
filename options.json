@@ -1,0 +1,5 @@
+{
+    "default_runtime_attributes": {
+        "docker": "microbiomedata/mg-annotation:0.1.2"
+    }
+}
