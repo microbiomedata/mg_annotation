@@ -37,8 +37,8 @@ Multiple GFF files.  More details to come.
  - TMHMM 2.0 (Academic)
 
 #### Databases used (+ their licenses):
- - Rfam (public domain/CC 0 1.0; [more info](http://reusabledata.org/rfam)
- - KEGG (paid Ssbscription, getting KOs/ECs indirectly via IMG NR; [more info](http://reusabledata.org/kegg-ftp)
+ - Rfam (public domain/CC0 1.0; [more info](http://reusabledata.org/rfam)
+ - KEGG (paid subscription, getting KOs/ECs indirectly via IMG NR; [more info](http://reusabledata.org/kegg-ftp)
  - SMART (restrictive license/custom); [more info](http://reusabledata.org/smart)
  - COG (copyright/unlicensed); [more info](http://reusabledata.org/cogs)
  - TIGRFAM (copyleft/LGPL 2.0 or later); [more info](http://reusabledata.org/tigrfams)
