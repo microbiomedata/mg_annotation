@@ -1,5 +1,5 @@
 {
   "default_runtime_attributes": {
-    "docker": "microbiomedata/mg-annotation:0.1.2"
+    "docker": "bfoster1/img-omics:0.1.6"
   }
 }
