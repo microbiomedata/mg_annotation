@@ -8,46 +8,67 @@ workflow s_annotate {
 
   File    imgap_input_fasta
   String  imgap_project_id
+  String  imgap_project_type
   Int     additional_threads
+  Boolean pre_qc_execute=false
+  Boolean trnascan_se_execute=true
+  Boolean rfam_execute=true
+  Boolean crt_execute=true
+  Boolean prodigal_execute=true
+  Boolean genemark_execute=true
+  Boolean gff_and_fasta_stats_execute=true
+  String  database_location
 
-  call pre_qc {
-    input:
-      input_fasta = imgap_input_fasta,
-      project_id = imgap_project_id
+  if(pre_qc_execute) {
+    call pre_qc {
+      input:
+        project_type = imgap_project_type,
+        input_fasta = imgap_input_fasta,
+        project_id = imgap_project_id,
+    }
   }
-
-  call trnascan.trnascan {
-    input:
-      imgap_input_fasta = imgap_input_fasta,
-      imgap_project_id = imgap_project_id,
-      additional_threads = additional_threads
+  if(trnascan_se_execute) {
+    call trnascan.trnascan {
+      input:
+        imgap_input_fasta = imgap_input_fasta,
+        imgap_project_id = imgap_project_id,
+        imgap_project_type = imgap_project_type,
+        additional_threads = additional_threads
+    }
   }
-
-  call rfam.rfam {
-    input:
-      imgap_input_fasta = imgap_input_fasta,
-      imgap_project_id = imgap_project_id,
-      additional_threads = additional_threads
+  if(rfam_execute) {
+    call rfam.rfam {
+      input:
+        imgap_input_fasta = imgap_input_fasta,
+        imgap_project_id = imgap_project_id,
+        imgap_project_type = imgap_project_type,
+        database_location = database_location,
+        additional_threads = additional_threads
+    }
   }
-
-  call crt.crt {
-    input:
-      imgap_input_fasta = imgap_input_fasta,
-      imgap_project_id = imgap_project_id
+  if(crt_execute) {
+    call crt.crt {
+      input:
+        imgap_input_fasta = imgap_input_fasta,
+        imgap_project_id = imgap_project_id
+    }
   }
-
-  call prodigal.prodigal {
-    input:
-      imgap_input_fasta = imgap_input_fasta,
-      imgap_project_id = imgap_project_id
+  if(prodigal_execute) {
+    call prodigal.prodigal {
+      input:
+        imgap_input_fasta = imgap_input_fasta,
+        imgap_project_id = imgap_project_id,
+        imgap_project_type = imgap_project_type
+    }
   }
-
-  call genemark.genemark {
-    input:
-      imgap_input_fasta = imgap_input_fasta,
-      imgap_project_id = imgap_project_id
+  if(genemark_execute) {
+    call genemark.genemark {
+      input:
+        imgap_input_fasta = imgap_input_fasta,
+        imgap_project_id = imgap_project_id,
+        imgap_project_type = imgap_project_type
+    }
   }
-
   call gff_merge {
     input:
       input_fasta = imgap_input_fasta,
@@ -60,27 +81,46 @@ workflow s_annotate {
       genemark_gff = genemark.gff,
       prodigal_gff = prodigal.gff
   }
-
-  call fasta_merge {
-    input:
-      input_fasta = imgap_input_fasta,
-      project_id = imgap_project_id,
-      final_gff = gff_merge.final_gff,
-      genemark_genes = genemark.genes,
-      genemark_proteins = genemark.proteins,
-      prodigal_genes = prodigal.genes,
-      prodigal_proteins = prodigal.proteins
+  if(prodigal_execute || genemark_execute) {
+    call fasta_merge {
+      input:
+        input_fasta = imgap_input_fasta,
+        project_id = imgap_project_id,
+        final_gff = gff_merge.final_gff,
+        genemark_genes = genemark.genes,
+        genemark_proteins = genemark.proteins,
+        prodigal_genes = prodigal.genes,
+        prodigal_proteins = prodigal.proteins
+    }
   }
-
+  if(gff_and_fasta_stats_execute) {
+    call gff_and_fasta_stats {
+      input:
+        input_fasta = imgap_input_fasta,
+        project_id = imgap_project_id,
+        final_gff = gff_merge.final_gff
+    }
+  }
+  if(imgap_project_type == "isolate") {
+    call post_qc {
+      input:
+        input_fasta = imgap_input_fasta,
+        project_id = imgap_project_id
+    }
+  }
   output {
-    File  gff = gff_merge.final_gff
+	#File  gff = "${output_dir}"+"/"+"${imgap_project_id}_structural_annotation.gff"
+	#File  gff = gff_merge.final_gff
+	#File  gff = post_qc.out
+        File?  gff = fasta_merge.final_modified_gff
+    File? crisprs = crt.crisprs 
     File? proteins = fasta_merge.final_proteins 
   }
 }
 
 task pre_qc {
-
   String bin="/opt/omics/bin/qc/pre-annotation/fasta_sanity.py"
+  String project_type
   File   input_fasta
   String project_id
   String rename = "yes"
@@ -102,11 +142,29 @@ task pre_qc {
         exit 1
     fi
 
+    if [[ ${project_type} == "isolate" ]]
+    then
+        seq_count=`grep -c '^>' $tmp_fasta`
+        bp_count=`grep -v '^>' $tmp_fasta | tr -d '\n' | wc -m`
+        seqs_per_million_bp=$seq_count
+        if (( $bp_count > 1000000 ))
+        then
+            divisor=$(echo $bp_count | awk '{printf "%.f", $1 / 1000000}')
+            seqs_per_million_bp=$(echo $seq_count $divisor | \
+                                  awk '{printf "%.2f", $1 / $2}')
+        fi
+        if (( $(echo "$seqs_per_million_bp > ${seqs_per_million_bp_cutoff}" | bc) ))
+        then
+            rm $tmp_fasta
+            exit 1
+        fi
+    fi
+
     fasta_sanity_cmd="${bin} $tmp_fasta $qced_fasta"
     if [[ ${rename} == "yes" ]]
     then
         fasta_sanity_cmd="$fasta_sanity_cmd -p ${project_id}"
-    fi
+	fi
     fasta_sanity_cmd="$fasta_sanity_cmd -l ${min_seq_length}"
     $fasta_sanity_cmd
     rm $tmp_fasta
@@ -114,9 +172,9 @@ task pre_qc {
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
-
+	
   output {
     File fasta = "${project_id}_contigs.fna"
   }
@@ -143,7 +201,7 @@ task gff_merge {
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
 
   output {
@@ -153,7 +211,7 @@ task gff_merge {
 
 task fasta_merge {
 
-  String bin = "/opt/omics/bin/structural_annotation/fasta_files_merger.py"
+  String bin="/opt/omics/bin/structural_annotation/fasta_files_merger.py"
   File   input_fasta
   String project_id
   File   final_gff
@@ -161,20 +219,24 @@ task fasta_merge {
   File?  genemark_proteins
   File?  prodigal_genes
   File?  prodigal_proteins
+  String dollar="$"
 
   command {
     ${bin} ${final_gff} ${genemark_genes} ${prodigal_genes} 1> ${project_id}_genes.fna
     ${bin} ${final_gff} ${genemark_proteins} ${prodigal_proteins} 1> ${project_id}_proteins.faa
+    cp ${final_gff} ${dollar}(basename ${final_gff}) 
+    echo ${dollar}(basename ${final_gff}) > final_gff_file.txt
   }
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
-
+	
   output {
     File final_genes = "${project_id}_genes.fna"
     File final_proteins = "${project_id}_proteins.faa"
+    File final_modified_gff = read_string("final_gff_file.txt")
   }
 }
 
@@ -186,17 +248,32 @@ task gff_and_fasta_stats {
   File   final_gff
 
   command {
-    ${bin} ${input_fasta} ${final_gff} && sleep 2
-    mv ../inputs/*/assembly_structural_annotation_stats.tsv .
-  }
-
-  output {
-    File tsv = "assembly_structural_annotation_stats.tsv"
+    ${bin} ${input_fasta} ${final_gff}
   }
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
+	
 }
 
+task post_qc {
+
+  String qc_bin="/opt/omics/bin/qc/post-annotation/genome_structural_annotation_sanity.py"
+  File   input_fasta
+  String project_id
+
+  command {
+    ${qc_bin} ${input_fasta} "${project_id}_structural_annotation.gff"
+  }
+
+  runtime {
+    time: "1:00:00"
+    memory: "86G"
+  }
+	
+  output {
+    File out = "${project_id}_structural_annotation.gff"
+  }
+}

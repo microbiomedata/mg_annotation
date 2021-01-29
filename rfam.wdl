@@ -2,17 +2,16 @@ workflow rfam {
 
   String imgap_input_fasta
   String imgap_project_id
+  String imgap_project_type
   Int    additional_threads
-  String   cmsearch_bin =  "/opt/omics/bin/cmsearch"
-  String   cm="/refdata/img/Rfam/13.0/Rfam.cm"
-  String   claninfo_tsv="/refdata/img/Rfam/13.0/Rfam.claninfo"
-  String   feature_lookup_tsv="/refdata/img/Rfam/13.0/Rfam_feature_lookup.tsv"
-  String clan_filter_bin = "/opt/omics/bin/structural_annotation/rfam_clan_filter.py"
+  String database_location="/refdata/database"
+  String cm="${database_location}"+"Rfam/13.0/Rfam.cm"
+  String claninfo_tsv="${database_location}"+"Rfam/13.0/Rfam.claninfo"
+  String feature_lookup_tsv="${database_location}"+"Rfam/13.0/Rfam_feature_lookup.tsv"
 
 
   call cmsearch {
     input:
-      bin = cmsearch_bin,
       input_fasta = imgap_input_fasta,
       project_id = imgap_project_id,
       cm = cm,
@@ -21,10 +20,8 @@ workflow rfam {
 
   call clan_filter {
     input:
-      clan_filter_bin = clan_filter_bin,
       project_id = imgap_project_id,
       tbl = cmsearch.tbl,
-      cmsearch_bin = cmsearch_bin,
       claninfo_tsv = claninfo_tsv,
       feature_lookup_tsv = feature_lookup_tsv
   }
@@ -56,7 +53,8 @@ workflow rfam {
 
 task cmsearch {
 
-  String bin
+  String bin="/opt/omics/bin/cmsearch"
+
   File   input_fasta
   String project_id
   String   cm
@@ -68,7 +66,7 @@ task cmsearch {
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
 
   output {
@@ -78,15 +76,15 @@ task cmsearch {
 
 task clan_filter {
 
-  String clan_filter_bin
+  String clan_filter_bin="/opt/omics/bin/structural_annotation/rfam_clan_filter.py"
   String project_id
   File   tbl
-  String cmsearch_bin
+  String cmsearch_bin="/opt/omics/bin/cmsearch"
   String   claninfo_tsv
   String   feature_lookup_tsv
 
   command <<<
-    tool_and_version=$(${cmsearch_bin} -h | grep INFERNAL | cut -d' ' -f3)
+    tool_and_version=$(${cmsearch_bin} -h | grep INFERNAL | perl -pne 's/^.*INFERNAL/INFERNAL/' )
     grep -v '^#' ${tbl} | \
     awk '$17 == "!" {print $1,$3,$4,$6,$7,$8,$9,$10,$11,$15,$16}' | \
     sort -k1,1 -k10,10nr -k11,11n | \
@@ -96,7 +94,7 @@ task clan_filter {
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
 
   output {
@@ -116,7 +114,7 @@ task misc_and_regulatory {
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
 
   output {
@@ -135,7 +133,7 @@ task rrna {
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
 
   output {
@@ -155,7 +153,7 @@ task ncrna_tmrna {
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
 
   output {

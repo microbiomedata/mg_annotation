@@ -2,20 +2,15 @@ workflow crt {
 
   String imgap_input_fasta
   String imgap_project_id
-  String crt_cli_jar = "java -Xmx1536m -jar /opt/omics/bin/CRT-CLI.jar"
-  String crt_transform_bin =  "/opt/omics/bin/structural_annotation/transform_crt_output.py"
 
   call run {
     input:
-      jar = crt_cli_jar,
       input_fasta = imgap_input_fasta,
       project_id = imgap_project_id
   }
 
   call transform {
     input:
-      jar = crt_cli_jar,
-      transform_bin = crt_transform_bin,
       project_id = imgap_project_id,
       crt_out = run.out
   }
@@ -28,7 +23,7 @@ workflow crt {
 
 task run {
 
-  String jar
+  String jar="java -Xmx1536m -jar /opt/omics/bin/CRT-CLI.jar"
   File   input_fasta
   String project_id
 
@@ -39,7 +34,7 @@ task run {
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
 
   output {
@@ -49,8 +44,8 @@ task run {
 
 task transform {
 
-  String jar
-  String transform_bin
+  String jar="java -Xmx1536m -jar /opt/omics/bin/CRT-CLI.jar"
+  String transform_bin="/opt/omics/bin/structural_annotation/transform_crt_output.py"
   File   crt_out
   String project_id
   String crt_out_local = basename(crt_out)
@@ -63,7 +58,7 @@ task transform {
 
   runtime {
     time: "1:00:00"
-    mem: "86G"
+    memory: "86G"
   }
 
   output{
