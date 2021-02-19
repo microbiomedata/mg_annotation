@@ -72,7 +72,7 @@ of the full metadata JSON file.
   :language: JSON
 
 
-**Version History:** 1.0.0 (release data 
+**Version History:** 1.0.0 (release data)
 
 Point of contact
 ----------------
