@@ -29,9 +29,6 @@ Hardware Requirements:
 Workflow Dependencies
 ---------------------
 
-Third party software
-~~~~~~~~~~~~~~~~~~~~
-
 - Third party software (This is included in the Docker image.)  
    - Conda (3-clause BSD)
    - tRNAscan-SE >= 2.0 (GNU GPL v3)
