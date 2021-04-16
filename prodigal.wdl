@@ -3,6 +3,7 @@ workflow prodigal {
   String imgap_input_fasta
   String imgap_project_id
   String imgap_project_type
+  String container
 
   if(imgap_project_type == "isolate") {
     call fasta_len {
@@ -14,21 +15,24 @@ workflow prodigal {
     call iso_big {
       input:
         input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id
+        project_id = imgap_project_id,
+        container=container
     }
   }
   if(imgap_project_type == "isolate" && fasta_len.wc < 20000) {
     call iso_small {
       input:
         input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id
+        project_id = imgap_project_id,
+        container=container
     }
   }
   if(imgap_project_type == "metagenome") {
     call metag {
       input:
         input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id
+        project_id = imgap_project_id,
+        container=container
     }
   }
 
@@ -43,7 +47,8 @@ workflow prodigal {
       iso_big_gff = iso_big.gff,
       iso_small_gff = iso_small.gff,
       meta_gff = metag.gff,
-      project_id = imgap_project_id
+      project_id = imgap_project_id,
+      container=container
   }
 
   output {
@@ -78,8 +83,10 @@ task iso_big {
   Int?   translation_table = 11
   String project_id
   File   train = "${project_id}_prodigal.trn"
+  String container
 
   command {
+    set -euo pipefail
     ${bin} -i ${input_fasta} -t ${train} -g ${translation_table} -q
     ${bin} -f gff -g ${translation_table} -p single -m -i ${input_fasta} \
     -t ${train} -o ${project_id}_prodigal.gff \
@@ -89,6 +96,7 @@ task iso_big {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -103,6 +111,7 @@ task iso_small {
   String bin="/opt/omics/bin/prodigal"
   File   input_fasta
   String project_id
+  String container
 
   command {
     ${bin} -f gff -p meta -m -i ${input_fasta} \
@@ -113,6 +122,7 @@ task iso_small {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -127,6 +137,7 @@ task metag {
   String bin="/opt/omics/bin/prodigal"
   File   input_fasta
   String project_id
+  String container
 
   command {
     ${bin} -f gff -p meta -m -i ${input_fasta} \
@@ -137,6 +148,7 @@ task metag {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -159,6 +171,7 @@ task clean_and_unify {
   File?  meta_gff
   String unify_bin="/opt/omics/bin/structural_annotation/unify_gene_ids.py"
   String project_id
+  String container
 
   command {
     sed -i 's/\*$//g' ${iso_big_proteins_fasta} ${iso_small_proteins_fasta} ${meta_proteins_fasta}
@@ -180,6 +193,7 @@ task clean_and_unify {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {

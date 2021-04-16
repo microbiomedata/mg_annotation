@@ -3,19 +3,22 @@ workflow genemark {
   String imgap_input_fasta
   String imgap_project_id
   String imgap_project_type
+  String container
 
   if(imgap_project_type == "isolate") {
     call gm_isolate {
       input:
         input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id
+        project_id = imgap_project_id,
+        container=container
     }
   }
   if(imgap_project_type == "metagenome") {
     call gm_meta {
       input:
         input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id
+        project_id = imgap_project_id,
+        container=container
     }
   }
   call clean_and_unify {
@@ -26,7 +29,8 @@ workflow genemark {
       meta_proteins_fasta = gm_meta.proteins,
       iso_gff = gm_isolate.gff,
       meta_gff = gm_meta.gff,
-      project_id = imgap_project_id
+      project_id = imgap_project_id,
+      container=container
   }
 
   output {
@@ -41,8 +45,10 @@ task gm_isolate {
   String bin="/opt/omics/bin/gms2.pl"
   File   input_fasta
   String project_id
+  String container
 
   command {
+    set -euo pipefail
     ${bin} --seq ${input_fasta} --genome-type auto \
            --output ${project_id}_genemark.gff --format gff \
            --fnn ${project_id}_genemark_genes.fna \
@@ -52,6 +58,7 @@ task gm_isolate {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -68,8 +75,10 @@ task gm_meta {
   String model="/opt/omics/programs/GeneMark/GeneMarkS-2/v1.07/mgm_11.mod"
   File   input_fasta
   String project_id
+  String container
 
   command {
+    set -euo pipefail
     ${bin} --Meta ${model} --incomplete_at_gaps 30 \
            -o ${project_id}_genemark.gff \
            --format gff --NT ${project_id}_genemark_genes.fna \
@@ -79,6 +88,7 @@ task gm_meta {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -97,8 +107,10 @@ task clean_and_unify {
   File?  meta_gff
   String unify_bin="/opt/omics/bin/structural_annotation/unify_gene_ids.py"
   String project_id
+  String container
   
   command {
+    set -uo pipefail
     sed -i 's/\*/X/g' ${iso_proteins_fasta} ${meta_proteins_fasta}
     ${unify_bin} ${iso_gff} ${meta_gff} \
                  ${iso_genes_fasta} ${meta_genes_fasta} \
@@ -114,6 +126,7 @@ task clean_and_unify {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {

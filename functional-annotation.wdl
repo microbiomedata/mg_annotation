@@ -40,7 +40,9 @@ workflow f_annotate {
   File    sa_gff
   String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
   String  product_names_mapping_dir="${database_location}"+"Product_Name_Mappings/latest"
-
+  String  container
+  String  hmm_container="scanon/im-hmmsearch:v0.0.0"
+  String  last_container="scanon/im-last:v0.0.1"
 
   if(ko_ec_execute) {
     call ko_ec {
@@ -53,7 +55,8 @@ workflow f_annotate {
         md5 = ko_ec_md5_mapping,
         phylo = ko_ec_taxon_to_phylo_mapping,
         lastal = lastal_bin,
-        selector = selector_bin
+        selector = selector_bin,
+        container=last_container
     }
   }
   if(smart_execute) {
@@ -66,7 +69,8 @@ workflow f_annotate {
         approx_num_proteins = approx_num_proteins,
         smart_db = smart_db,
         hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin
+        frag_hits_filter = frag_hits_filter_bin,
+        container=hmm_container
     }
   }
   if(cog_execute) {
@@ -79,7 +83,8 @@ workflow f_annotate {
         approx_num_proteins = approx_num_proteins,
         cog_db = cog_db,
         hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin
+        frag_hits_filter = frag_hits_filter_bin,
+        container=hmm_container
     }
   }
   if(tigrfam_execute) {
@@ -92,7 +97,8 @@ workflow f_annotate {
         approx_num_proteins = approx_num_proteins,
         tigrfam_db = tigrfam_db,
         hmmsearch = hmmsearch_bin,
-        hit_selector = hit_selector_bin
+        hit_selector = hit_selector_bin,
+        container=hmm_container
     }
   }
   if(superfam_execute) {
@@ -105,7 +111,8 @@ workflow f_annotate {
         approx_num_proteins = approx_num_proteins,
         superfam_db = superfam_db,
         hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin
+        frag_hits_filter = frag_hits_filter_bin,
+        container=hmm_container
     }
   }
   if(pfam_execute) {
@@ -119,7 +126,8 @@ workflow f_annotate {
         pfam_db = pfam_db,
         pfam_claninfo_tsv = pfam_claninfo_tsv,
         pfam_clan_filter = pfam_clan_filter,
-        hmmsearch = hmmsearch_bin
+        hmmsearch = hmmsearch_bin,
+        container=hmm_container
     }
   }
   if(cath_funfam_execute) {
@@ -132,7 +140,8 @@ workflow f_annotate {
         approx_num_proteins = approx_num_proteins,
         cath_funfam_db = cath_funfam_db,
         hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin
+        frag_hits_filter = frag_hits_filter_bin,
+        container=hmm_container
     }
   }
   if(imgap_project_type == "isolate" && signalp_execute) {
@@ -141,7 +150,8 @@ workflow f_annotate {
         project_id = imgap_project_id,
         input_fasta = input_fasta,
         gram_stain = signalp_gram_stain,
-        signalp = signalp_bin
+        signalp = signalp_bin,
+        container=container
     }
   }
   if(imgap_project_type == "isolate" && tmhmm_execute) {
@@ -151,7 +161,8 @@ workflow f_annotate {
         input_fasta = input_fasta,
         model = tmhmm_model,
         decode = tmhmm_decode,
-        decode_parser = tmhmm_decode_parser
+        decode_parser = tmhmm_decode_parser,
+        container=container
     }
   }
   if(true){
@@ -169,7 +180,8 @@ workflow f_annotate {
         pfam_gff = pfam.gff,
         cath_funfam_gff = cath_funfam.gff,
         signalp_gff = signalp.gff,
-        tmhmm_gff = tmhmm.gff
+        tmhmm_gff = tmhmm.gff,
+        container=container
     }
   }
   output {
@@ -209,8 +221,10 @@ task ko_ec {
   Float  aln_length_ratio = 0.7
   String lastal
   String selector
+  String container
 
   command {
+    set -euo pipefail
     ${lastal} -f blasttab+ -P ${threads} ${nr_db} ${input_fasta} 1> ${project_id}_proteins.img_nr.last.blasttab
     ${selector} -l ${aln_length_ratio} -m ${min_ko_hits} -n ${top_hits} \
                 ${project_type} ${md5} ${phylo} \
@@ -222,6 +236,7 @@ task ko_ec {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -246,11 +261,13 @@ task smart {
   Float  max_overlap_ratio = 0.1
   String hmmsearch
   String frag_hits_filter
-  String dollar="$"
+  String base=basename(input_fasta)
+  String container
+
   command <<<
-     base=${dollar}(basename ${input_fasta})
-     cp ${input_fasta} ${dollar}base
-     /opt/omics/bin/functional_annotation/hmmsearch_smart.sh ${dollar}base \
+     set -euo pipefail
+     cp ${input_fasta} ${base}
+     /opt/omics/bin/functional_annotation/hmmsearch_smart.sh ${base} \
      ${smart_db} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
@@ -259,6 +276,7 @@ task smart {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -280,11 +298,13 @@ task cog {
   Float  max_overlap_ratio = 0.1
   String hmmsearch
   String frag_hits_filter
-  String dollar="$"
+  String base=basename(input_fasta)
+  String container
+
   command <<<
-     base=${dollar}(basename ${input_fasta})
-     cp ${input_fasta} ${dollar}base
-     /opt/omics/bin/functional_annotation/hmmsearch_cogs.sh ${dollar}base \
+     set -euo pipefail
+     cp ${input_fasta} ${base}
+     /opt/omics/bin/functional_annotation/hmmsearch_cogs.sh ${base} \
      ${cog_db} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
@@ -293,6 +313,7 @@ task cog {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -313,11 +334,13 @@ task tigrfam {
   Float  max_overlap_ratio = 0.1
   String hmmsearch
   String hit_selector
-  String dollar="$"
+  String base=basename(input_fasta)
+  String container
+
   command <<<
-     base=${dollar}(basename ${input_fasta})
-     cp ${input_fasta} ${dollar}base
-     /opt/omics/bin/functional_annotation/hmmsearch_tigrfams.sh ${dollar}base \
+     set -euo pipefail
+     cp ${input_fasta} ${base}
+     /opt/omics/bin/functional_annotation/hmmsearch_tigrfams.sh ${base} \
      ${tigrfam_db} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${aln_length_ratio} ${max_overlap_ratio} 
@@ -326,6 +349,7 @@ task tigrfam {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -347,13 +371,15 @@ task superfam {
   Float  max_overlap_ratio = 0.1
   String hmmsearch
   String frag_hits_filter
-  String dollar="$"
+  String base=basename(input_fasta)
+  String container
+
   command <<<
-     base=${dollar}(basename ${input_fasta})
-     cp ${input_fasta} ${dollar}base
+     set -euo pipefail
+     cp ${input_fasta} ${base}
     #Usage: hmmsearch_supfams.sh <proteins_fasta> <supfam_hmm_db> <number_of_additional_threads (default: 0)> <number_of_parallel_hmmsearch_instances (default: 0)> <approximate_number_of_total_proteins (default: 0)> <min_domain_evalue_cutoff (default 0.01)> <min_aln_length_ratio (default 0.7)> <max_overlap_ratio (default 0.1)> 
 
-     /opt/omics/bin/functional_annotation/hmmsearch_supfams.sh ${dollar}base \
+     /opt/omics/bin/functional_annotation/hmmsearch_supfams.sh ${base} \
      ${superfam_db} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
@@ -362,6 +388,7 @@ task superfam {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -371,6 +398,7 @@ task superfam {
 }
 
 task pfam {
+
   String project_id
   File   input_fasta
   String   pfam_db
@@ -380,13 +408,15 @@ task pfam {
   Int    approx_num_proteins = 0
   String hmmsearch
   String pfam_clan_filter
-  String dollar="$"
+  String base=basename(input_fasta)
+  String container
+
   command <<<
-     base=${dollar}(basename ${input_fasta})
-     cp ${input_fasta} ${dollar}base
+     set -euo pipefail
+     cp ${input_fasta} ${base}
      
     #Usage: hmmsearch_pfams.sh <proteins_fasta> <pfam_hmm_db> <pfam_claninfo_tsv> <number_of_additional_threads (default: 0)>
-     /opt/omics/bin/functional_annotation/hmmsearch_pfams.sh ${dollar}base \
+     /opt/omics/bin/functional_annotation/hmmsearch_pfams.sh ${base} \
      ${pfam_db} ${pfam_claninfo_tsv} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins}
   >>>
@@ -394,6 +424,7 @@ task pfam {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -415,14 +446,22 @@ task cath_funfam {
   Float  max_overlap_ratio = 0.1
   String hmmsearch
   String frag_hits_filter
-  String dollar="$"
+  String base=basename(input_fasta)
+  String container
+
   command <<<
-     base=${dollar}(basename ${input_fasta})
-     cp ${input_fasta} ${dollar}base
-     /opt/omics/bin/functional_annotation/hmmsearch_cath_funfams.sh  ${dollar}base \
+     set -euo pipefail
+     cp ${input_fasta} ${base}
+     /opt/omics/bin/functional_annotation/hmmsearch_cath_funfams.sh  ${base} \
      ${cath_funfam_db} ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
   >>>
+
+  runtime {
+    time: "1:00:00"
+    memory: "86G"
+    docker: container
+  }
   
   output {
       File gff = "${project_id}_cath_funfam.gff"
@@ -436,8 +475,10 @@ task signalp {
   File   input_fasta
   String gram_stain
   String signalp
+  String container
 
   command <<<
+    set -euo pipefail
     signalp_version=$(${signalp} -V)
     ${signalp} -t ${gram_stain} -f short ${input_fasta} | \
     grep -v '^#' | \
@@ -449,6 +490,7 @@ task signalp {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -463,8 +505,10 @@ task tmhmm {
   String model
   String decode
   String decode_parser
+  String container
 
   command <<<
+    set -euo pipefail
     tool_and_version=$(${decode} -v 2>&1 | head -1)
     background="0.081 0.015 0.054 0.061 0.040 0.068 0.022 0.057 0.056 0.093 0.025"
     background="$background 0.045 0.049 0.039 0.057 0.068 0.058 0.067 0.013 0.032"
@@ -476,6 +520,7 @@ task tmhmm {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
@@ -498,8 +543,10 @@ task product_name {
   File?  cath_funfam_gff
   File?  signalp_gff
   File?  tmhmm_gff
+  String container
 
   command {
+    set -euo pipefail
     ${product_assign} ${"-k " + ko_ec_gff} ${"-s " + smart_gff} ${"-c " + cog_gff} \
                       ${"-t " + tigrfam_gff} ${"-u " + supfam_gff} ${"-p " + pfam_gff} \
                       ${"-f " + cath_funfam_gff} ${"-e " + signalp_gff} ${"-r " + tmhmm_gff} \
@@ -511,6 +558,7 @@ task product_name {
   runtime {
     time: "1:00:00"
     memory: "86G"
+    docker: container
   }
 
   output {
