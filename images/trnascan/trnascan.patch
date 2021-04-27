@@ -1,0 +1,11 @@
+--- tRNAscan-SE.orig	2021-04-06 04:56:35.415642000 +0000
++++ tRNAscan-SE	2021-04-06 04:56:50.443218000 +0000
+@@ -594,7 +594,7 @@
+ # clean up temp files
+ sub cleanup
+ {                       
+-    system("rm -f ".$global_constants->get("temp_dir")."/tscan$$".'*');
++    system("rm -f ".$global_constants->get("temp_dir")."/tscan$$".'[_.]*');
+     system("rm -f ".$opts->fafile().".pid");
+ }
+ 
