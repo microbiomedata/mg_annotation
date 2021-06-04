@@ -8,12 +8,15 @@ workflow annotation {
   String  imgap_project_type="metagenome"
   Int     additional_threads=16
   String  container="bfoster1/img-omics:0.1.7"
+  String?  outdir
 
   # structural annotation
   Boolean sa_execute=true
 
   # functional annotation
   Boolean fa_execute=true
+
+  Boolean copy_outputs=false
 
   call split {
     input: infile=imgap_input_fasta,
@@ -82,6 +85,18 @@ workflow annotation {
        input_fasta = imgap_input_fasta,
        container=container
   }
+
+  if (copy_outputs) {
+    call make_output {
+      input:
+        OUTPATH = outdir,
+        stats = final_stats.tsv,
+        gff = merge_outputs.functional_gff,
+        projectName = imgap_project_type,
+        container = container
+    }
+  }
+
   output {
     File? proteins_faa = merge_outputs.proteins_faa
     File? structural_gff = merge_outputs.structural_gff
@@ -263,3 +278,30 @@ task final_stats {
   }
 }
 
+task make_output {
+    String OUTPATH
+    String stats
+    String gff
+    String projectName
+    String container
+
+    command <<<
+        echo ${OUTPATH}
+
+        mkdir -p ${OUTPATH}
+		Statspath=`dirname ${stats}`
+        echo $Statspath
+		GFFPath=`dirname ${gff}`
+        echo $GFFPath
+		cp $Statspath/* ${OUTPATH}/
+		cp $GFFPath/* ${OUTPATH}/
+        ls ${OUTPATH}
+		chmod 764 -R ${OUTPATH}
+    >>>
+
+    runtime{
+        mem: "1GB"
+        cpu: 1
+        docker: container
+    }
+}
