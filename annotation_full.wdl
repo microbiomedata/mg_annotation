@@ -80,7 +80,7 @@ workflow annotation {
        project_id = imgap_project_id,
        structural_gff = merge_outputs.structural_gff,
        input_fasta = imgap_input_fasta,
-       container=container
+       container="bfoster1/img-omics:0.1.9"
   }
   output {
     File? proteins_faa = merge_outputs.proteins_faa
@@ -254,6 +254,7 @@ task final_stats {
 
   output {
     File tsv = "${project_id}_structural_annotation_stats.tsv"
+    File json = "${project_id}_structural_annotation_stats.json"
   }
 
   runtime {
