@@ -7,7 +7,7 @@ workflow annotation {
   String  database_location="/cromwell_root/database"
   String  imgap_project_type="metagenome"
   Int     additional_threads=16
-  String  container="bfoster1/img-omics:0.1.7"
+  String  container="bfoster1/img-omics:0.1.9"
 
   # structural annotation
   Boolean sa_execute=true
@@ -80,7 +80,7 @@ workflow annotation {
        project_id = imgap_project_id,
        structural_gff = merge_outputs.structural_gff,
        input_fasta = imgap_input_fasta,
-       container="bfoster1/img-omics:0.1.9"
+       container=container
   }
   output {
     File? proteins_faa = merge_outputs.proteins_faa
