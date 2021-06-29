@@ -91,6 +91,7 @@ workflow annotation {
     File? ko_tsv = merge_outputs.ko_tsv
     File? ec_tsv = merge_outputs.ec_tsv
     File? stats_tsv = final_stats.tsv
+    File? stats_json = final_stats.json
     File? cog_gff = merge_outputs.cog_gff
     File? pfam_gff = merge_outputs.pfam_gff
     File? tigrfam_gff = merge_outputs.tigrfam_gff
