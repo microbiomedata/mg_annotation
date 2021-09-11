@@ -248,9 +248,9 @@ task fasta_merge {
   }
 
   runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
+    time: "2:00:00"
+    memory: "40G"
+    docker: "doejgi/img-annotation-pipeline:5.0.25"
   }
     
   output {
