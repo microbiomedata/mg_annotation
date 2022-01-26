@@ -7,7 +7,7 @@ workflow annotation {
   String  database_location="/cromwell_root/database"
   String  imgap_project_type="metagenome"
   Int     additional_threads=16
-  String  container="bfoster1/img-omics:0.1.7"
+  String  container="bfoster1/img-omics:0.1.9"
 
   # structural annotation
   Boolean sa_execute=true
@@ -91,6 +91,7 @@ workflow annotation {
     File? ko_tsv = merge_outputs.ko_tsv
     File? ec_tsv = merge_outputs.ec_tsv
     File? stats_tsv = final_stats.tsv
+    File? stats_json = final_stats.json
     File? cog_gff = merge_outputs.cog_gff
     File? pfam_gff = merge_outputs.pfam_gff
     File? tigrfam_gff = merge_outputs.tigrfam_gff
@@ -254,6 +255,7 @@ task final_stats {
 
   output {
     File tsv = "${project_id}_structural_annotation_stats.tsv"
+    File json = "${project_id}_structural_annotation_stats.json"
   }
 
   runtime {
