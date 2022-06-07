@@ -47,11 +47,15 @@ task run {
     set -euo pipefail
     ${bin} --notextw --cut_tc --cpu ${threads} -Z ${cmzscore} --tblout ${project_id}_rfam.tbl ${cm} ${input_fasta}
     tool_and_version=$(${bin} -h | grep INFERNAL | perl -pne 's/^.*INFERNAL/INFERNAL/' )
-    grep -v '^#' ${project_id}_rfam.tbl | \
-        awk '$17 == "!" {print $1,$3,$4,$6,$7,$8,$9,$10,$11,$15,$16}' | \
-        sort -k1,1 -k10,10nr -k11,11n | \
-        ${clan_filter_bin} "$tool_and_version" \
-        ${claninfo_tsv} ${feature_lookup_tsv} > ${project_id}_rfam.gff
+    if [ $(grep -c -v \# ${project_id}_rfam.tbl) -eq 0 ] ; then
+        touch ${project_id}_rfam.gff
+    else
+        grep -v '^#' ${project_id}_rfam.tbl | \
+            awk '$17 == "!" {print $1,$3,$4,$6,$7,$8,$9,$10,$11,$15,$16}' | \
+            sort -k1,1 -k10,10nr -k11,11n | \
+            ${clan_filter_bin} "$tool_and_version" \
+            ${claninfo_tsv} ${feature_lookup_tsv} > ${project_id}_rfam.gff
+    fi
     awk -F'\t' '$3 == "misc_bind" || $3 == "misc_feature" || $3 == "regulatory" {print $0}' \
         ${project_id}_rfam.gff > ${project_id}_rfam_misc_bind_misc_feature_regulatory.gff
     awk -F'\t' '$3 == "rRNA" {print $0}' ${project_id}_rfam.gff > ${project_id}_rfam_rrna.gff
