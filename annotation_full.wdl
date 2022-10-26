@@ -143,7 +143,7 @@ workflow annotation {
     File? functional_gff = finish_ano.final_functional_gff
     File? ko_tsv = finish_ano.final_ko_tsv
     File? ec_tsv = finish_ano.final_ec_tsv
-    #File? stats_tsv = finish_ano.final_tsv
+    File? stats_tsv = finish_ano.final_tsv
     #File? stats_json = finish_ano.final_json
     File? cog_gff = finish_ano.final_cog_gff
     File? pfam_gff = finish_ano.final_pfam_gff
@@ -472,8 +472,9 @@ task finish_ano {
              ${prefix}_rfam_ncrna_tmrna.gff "GFF3 format file with TMRNA" "TMRNA Annotation GFF3" \
              ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" \
 	           ${prefix}_products_names.tsv "Product names file" "Product names" \
-	           ${prefix}_crt.crisprs "Crisprt Terms" "Crisprt Terms" 
-  
+	           ${prefix}_crt.crisprs "Crisprt Terms" "Crisprt Terms" \
+             ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics"
+
    }
 
    output {
@@ -506,6 +507,7 @@ task finish_ano {
         File final_proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
         File final_product_names_tsv = "${prefix}_product_names.tsv"
         File final_crt_crisprs = "${prefix}_crt.crisprs"
+        File final_tsv = "${prefix}_stats.tsv"
         
     }
     runtime {
