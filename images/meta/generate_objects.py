@@ -26,14 +26,15 @@ def gen_id(gid, git_url, start_date, end_date):
     print(md5hash)
     return 'nmdc:{}'.format(md5hash)
 
-def gen_data_objects(fpath, url, name, des, gid):
+def gen_data_objects(fpath, url, name, dotype, gid):
         md5 = get_md5(fpath)
         fmeta = os.stat(fpath)
 
         obj = {
            'id': 'nmdc:{}'.format(md5),
            'name': '{}_{}'.format(gid, name),
-           'description': '{} for {}'.format(des, gid),
+           'description': '{} for {}'.format(name, gid),
+           'data_object_type': dotype,
            'md5_checksum': md5,
            'url': url,
            'file_size_bytes': fmeta.st_size
@@ -74,10 +75,10 @@ def main():
         item_list = []
     for i in range(0, len(item_list),3):
         fn = item_list[i]
-        des = item_list[i+1]
-        name = item_list[i+2]
+        name = item_list[i+1]
+        dotype = item_list[i+2]
         url = '%s%s' % (args.url, fn.split('/')[-1])
-        obj = gen_data_objects(fn, url, name, des, args.id)
+        obj = gen_data_objects(fn, url, name, dotype, args.id)
         data_objects.append(obj)
         outs.append(obj['id'])
     if args.activityid:
