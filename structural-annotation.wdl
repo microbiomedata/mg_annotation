@@ -121,11 +121,17 @@ workflow s_annotate {
     }
   }
   output {
-    #File  gff = "${output_dir}"+"/"+"${imgap_project_id}_structural_annotation.gff"
     #File  gff = gff_merge.final_gff
     #File  gff = post_qc.out
     File?  gff = fasta_merge.final_modified_gff
+    File? crt_gff = crt.gff
     File? crisprs = crt.crisprs 
+    File? genemark_gff = genemark.gff
+    File? prodigal_gff = prodigal.gff
+    File? trna_gff = trnascan.gff
+    File? misc_bind_misc_feature_regulatory_gff = rfam.misc_bind_misc_feature_regulatory_gff
+    File? rrna_gff = rfam.rrna_gff
+    File? ncrna_tmrna_gff = rfam.ncrna_tmrna_gff
     File? proteins = fasta_merge.final_proteins 
   }
 }
