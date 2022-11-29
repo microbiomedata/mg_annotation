@@ -5,9 +5,9 @@ workflow annotation {
   String  proj
   String  resource
   String  informed_by
-  String?  git_url="https://github.com/microbiomedata/mg_annotation/releases/tag/0.1"
-  String?  url_root="https://data.microbiomedata.org/data/"
-  String    input_file
+  String? git_url="https://github.com/microbiomedata/mg_annotation/releases/tag/0.1"
+  String? url_root="https://data.microbiomedata.org/data/"
+  String  input_file
   String  imgap_project_id
   String  database_location="/cromwell_root/database"
   String  imgap_project_type="metagenome"

@@ -2,138 +2,43 @@ import "structural-annotation.wdl" as sa
 import "functional-annotation.wdl" as fa
 
 workflow annotation {
-  String  imgap_input_file
-  String  imgap_project_id
-  Int     additional_threads=72
+  File?   zscore_file
+  File    imgap_input_fasta
+  String  imgap_project_id="GaXXXXXXX_contigs.fna"
+  String database_location="/cromwell_root/database"
+  String  imgap_project_type="metagenome"
+  Int     additional_threads=16
 
-  call setup {
-    input:
-      file = imgap_input_file
-  }
+  # structural annotation
+  Boolean sa_execute=true
+  # functional annotation
+  Boolean fa_execute=true
 
-  scatter(split in setup.splits) {
+  Int?    fa_approx_num_proteins
 
-    call sa.s_annotate {
-      input:
-        imgap_project_id = imgap_project_id,
-        additional_threads = additional_threads,
-        imgap_input_fasta = split
+  if(sa_execute) {
+      call sa.s_annotate {
+        input:
+          imgap_input_fasta = imgap_input_fasta,
+          imgap_project_id = imgap_project_id,
+          additional_threads = additional_threads,
+          imgap_project_type = imgap_project_type,
+          database_location = database_location
+      }
     }
 
-    call fa.f_annotate {
-      input:
-        imgap_project_id = imgap_project_id,
-        additional_threads = additional_threads,
-        sa_gff = s_annotate.gff,
-        input_fasta = s_annotate.proteins
-    }
-  }
-  call merge_outputs {
-    input:
-       project_id = imgap_project_id,
-       structural_gffs=s_annotate.gff,
-       functional_gffs=f_annotate.gff,
-       ko_tsvs = f_annotate.ko_tsv,
-       ec_tsvs = f_annotate.ec_tsv,
-       phylo_tsvs =  f_annotate.phylo_tsv,
-       proteins = s_annotate.proteins
+    if(fa_execute) {
+      call fa.f_annotate {
+        input:
+	  zscore_file = zscore_file,
+          imgap_project_id = imgap_project_id,
+          imgap_project_type = imgap_project_type,
+          additional_threads = additional_threads,
+          input_fasta = s_annotate.proteins,
+          approx_num_proteins = fa_approx_num_proteins,
+          database_location = database_location,
+          sa_gff = s_annotate.gff
+      }
 
-  }
-  call final_stats {
-    input:
-       project_id = imgap_project_id,
-       structural_gff = merge_outputs.structural_gff,
-       input_fasta = imgap_input_file
-  }
-
-}
-
-task setup {
-  String file
-
-  command {
-    python <<CODE
-    import os
-    chunksize = 10*1024*1024
-
-    infile = "${file}"
-    chunk = 1
-
-    fin = open(infile)
-
-    done = False
-    while not done:
-       outf = '%s.%d' % (os.path.basename(infile), chunk)
-       print(outf)
-       fout = open(outf, 'w')
-       data = fin.read(chunksize)
-       fout.write(data)
-       if len(data) < chunksize:
-           done = True
-       while True:
-          line = fin.readline()
-          if line.startswith('>') or len(line)==0:
-             fin.seek(fin.tell()-len(line), 0)
-             break
-          fout.write(line)
-       chunk += 1
-
-    CODE
-    }
-
-  output {
-    Array[File] splits = read_lines(stdout())
   }
 }
-
-task merge_outputs {
-  String  project_id
-  Array[File] structural_gffs
-  Array[File] functional_gffs
-  Array[File] ko_tsvs
-  Array[File] ec_tsvs
-  Array[File] phylo_tsvs
-  Array[File?] proteins
-
-  command {
-      cat ${sep=" " structural_gffs} > "${project_id}_structural_annotation.gff"
-      cat ${sep=" " functional_gffs} > "${project_id}_functional_annotation.gff"
-      cat ${sep=" " ko_tsvs} >  "${project_id}_ko.tsv"
-      cat ${sep=" " ec_tsvs} >  "${project_id}_ec.tsv"
-      cat ${sep=" " phylo_tsvs} > "${project_id}_gene_phylogeny.tsv"
-      cat ${sep=" " proteins} > "${project_id}.faa"
-  }
-  output {
-    File functional_gff = "${project_id}_structural_annotation.gff"
-    File structural_gff = "${project_id}_functional_annotation.gff"
-    File ko_tsv = "${project_id}_ko.tsv"
-    File ec_tsv = "${project_id}_ec.tsv"
-    File phylo_tsv = "${project_id}_gene_phylogeny.tsv"
-    File protein_faa = "${project_id}.faa"
-  }
-
-}
-
-task final_stats {
-
-  String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
-  File   input_fasta
-  String project_id
-  File   structural_gff
-
-  command {
-    ${bin} ${input_fasta} ${structural_gff}
-    sleep 1
-    mv ../inputs/*/assembly_structural_annotation_stats.tsv .
-  }
-
-  output {
-    File tsv = "assembly_structural_annotation_stats.tsv"
-  }
-
-  runtime {
-    time: "0:10:00"
-    mem: "86G"
-  }
-}
-
