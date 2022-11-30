@@ -1,5 +1,5 @@
 {
   "default_runtime_attributes": {
-    "docker": "bfoster1/img-omics:0.1.6"
+    "docker": "aclum/img-omics:5.1"
   }
 }
