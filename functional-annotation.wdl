@@ -30,13 +30,13 @@ workflow f_annotate {
   String  pfam_clan_filter="/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
   Boolean cath_funfam_execute=true
   String  cath_funfam_db="${database_location}"+"Cath-FunFam/latest/funfam.hmm"
-  Boolean signalp_execute=true
-  String  signalp_gram_stain="GRAM_STAIN"
-  String  signalp_bin="/opt/omics/bin/signalp"
-  Boolean tmhmm_execute=true
-  String  tmhmm_model="/opt/omics/programs/tmhmm-2.0c/lib/TMHMM2.0.model"
-  String  tmhmm_decode="/opt/omics/bin/decodeanhmm"
-  String  tmhmm_decode_parser="/opt/omics/bin/functional_annotation/decodeanhmm_parser.py"
+#  Boolean signalp_execute=true
+#  String  signalp_gram_stain="GRAM_STAIN"
+#  String  signalp_bin="/opt/omics/bin/signalp"
+#  Boolean tmhmm_execute=true
+#  String  tmhmm_model="/opt/omics/programs/tmhmm-2.0c/lib/TMHMM2.0.model"
+#  String  tmhmm_decode="/opt/omics/bin/decodeanhmm"
+#  String  tmhmm_decode_parser="/opt/omics/bin/functional_annotation/decodeanhmm_parser.py"
   File    sa_gff
   String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
   String  product_names_mapping_dir="${database_location}"+"Product_Name_Mappings/latest"
@@ -142,27 +142,6 @@ workflow f_annotate {
         hmmsearch = hmmsearch_bin,
         frag_hits_filter = frag_hits_filter_bin,
         container=hmm_container
-    }
-  }
-  if(imgap_project_type == "isolate" && signalp_execute) {
-    call signalp {
-      input:
-        project_id = imgap_project_id,
-        input_fasta = input_fasta,
-        gram_stain = signalp_gram_stain,
-        signalp = signalp_bin,
-        container=container
-    }
-  }
-  if(imgap_project_type == "isolate" && tmhmm_execute) {
-    call tmhmm {
-      input:
-        project_id = imgap_project_id,
-        input_fasta = input_fasta,
-        model = tmhmm_model,
-        decode = tmhmm_decode,
-        decode_parser = tmhmm_decode_parser,
-        container=container
     }
   }
   if(true){

@@ -151,14 +151,12 @@ COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 
 COPY --from=last /opt/omics/programs/last /opt/omics/programs/last
 COPY --from=img /opt/omics/programs/CRT /opt/omics/programs/CRT
-COPY --from=img /opt/omics/programs/tmhmm-2.0c /opt/omics/programs/tmhmm-2.0c
 
 COPY --from=infernal /opt/omics/programs/infernal /opt/omics/programs/infernal/
 #COPY --from=infernal /opt/omics/programs/infernal/infernal-1.1.2/bin/cmsearch /opt/omics/bin/cmsearch
 COPY --from=img /opt/omics/bin/ /opt/omics/bin/
 COPY --from=img /opt/omics/programs/CRT /opt/omics/programs/CRT
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
-COPY --from=img /opt/omics/programs/signalp-4.1 /opt/omics/programs/signalp-4.1
 
 RUN \
     mkdir /opt/omics/lib && cd /opt/omics/lib && \
@@ -175,9 +173,7 @@ RUN \
     ln -s ../programs/last/bin/lastal && \
     ln -s ../programs/CRT/CRT-CLI_v1.8.2.jar CRT-CLI.jar && \
     ln -s ../programs/prodigal &&\
-    ln -s ../programs/hmmer/bin/hmmsearch &&\
-    ln -s ../programs/tmhmm-2.0c/bin/decodeanhmm.Linux_x86_64 decodeanhmm &&\
-    ln -s ../programs/signalp-4.1/signalp 
+    ln -s ../programs/hmmer/bin/hmmsearch 
 
 #COPY --from=img /opt/omics /opt/omics3/
 
