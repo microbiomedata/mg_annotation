@@ -5,7 +5,7 @@ workflow annotation {
   File?   zscore_file
   File    imgap_input_fasta
   String  imgap_project_id="GaXXXXXXX_contigs.fna"
-  String database_location="/cromwell_root/database"
+  String database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   Int     additional_threads=16
 

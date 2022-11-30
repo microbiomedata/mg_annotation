@@ -15,56 +15,41 @@ RUN cd Prodigal && git checkout v2.6.3 && make
 RUN cd Prodigal && make install
 
 #
-# Build trnascan 2.0.06
+# Build trnascan 2.0.05
 #
 FROM buildbase as trnascan
 
-RUN apt-get -y install autoconf
-
-RUN wget http://trna.ucsc.edu/software/trnascan-se-2.0.6.tar.gz
+RUN wget http://trna.ucsc.edu/software/trnascan-se-2.0.5.tar.gz
 
 RUN \
-    tar xzvf trnascan-se-2.0.6.tar.gz && \
+    tar xzvf trnascan-se-2.0.5.tar.gz && \
     cd tRNAscan-SE-2.0 && \
-    ./configure --prefix=/opt/omics/programs/tRNAscan-SE/tRNAscan-SE/ && \
+    ./configure --prefix=/opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.4/ && \
     make && make install
 
 #
-# Build HMMER 3.1b2 with HPC enhancements from Arndt
+# Build HMMER 3.1b2
 #
 FROM buildbase as hmm
-ENV V=3.1b2
 
 RUN \
-    cd /opt && \
+    V=3.1b2 && cd /opt && \
     wget http://eddylab.org/software/hmmer/hmmer-$V.tar.gz && \
     tar -zxvf hmmer-$V.tar.gz && \
     cd hmmer-$V && ./configure --prefix /opt/omics/programs/hmmer/ && \
     make && make install
 
-# get and extract master branch of modification file, copy into hmmer source code
-RUN \
-    wget -v https://github.com/Larofeticus/hpc_hmmsearch/tarball/master && \
-    tar -xvf master && \
-    cp /Larofeticus-hpc_hmmsearch-*/hpc_hmmsearch.c /opt/hmmer-3.1b2/src && \
-    cd /opt/hmmer-$V/src && \
-    gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -pthread -fPIC -msse2 -DHAVE_CONFIG_H -I../easel -I../libdivsufsort -I../easel -I. -I. -o hpc_hmmsearch.o -c hpc_hmmsearch.c && \
-    gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -pthread -fPIC -msse2 -DHAVE_CONFIG_H -L../easel -L./impl_sse -L../libdivsufsort -L. -o hpc_hmmsearch hpc_hmmsearch.o -lhmmer -leasel -ldivsufsort -lm  && \
-   cp hpc_hmmsearch /opt/omics/programs/hmmer/bin/ && \
-   /opt/omics/programs/hmmer/bin/hpc_hmmsearch -h
-
-# Build last 983
+# Build last 1256
 #
 FROM buildbase as last
 
-RUN apt-get -y install unzip g++
+RUN apt-get -y install  g++
 
 RUN \
-    wget last.cbrc.jp/last-983.zip &&  \
-    unzip last-983.zip
+    git clone --depth 1 --branch 1256  https://gitlab.com/mcfrith/last
 
 RUN \
-    cd last-983 && \
+    cd last && \
     make && \
     make prefix=/opt/omics/programs/last install
 
@@ -82,7 +67,7 @@ RUN \
     make && make install
 
 #
-# IMG scripts and tools
+# IMG scripts and tools, rm 2019 bin dir, replace with commit 40bc08c3 from (https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/commit/40bc08c3020da77dcf0ba252d18e134b75c0ef21). Add split.py from bfoster1/img-omics:0.1.12 (md5sum 21fb20bf430e61ce55430514029e7a83)
 #
 FROM buildbase as img
 
@@ -91,7 +76,22 @@ RUN \
     wget http://portal.nersc.gov/dna/metagenome/assembly/img-scripts/omics.20200317.tar.gz && \
     tar -zxvf omics.20200317.tar.gz && \
     chmod -R 755 omics && \
+    rm -rf /opt/omics/bin  \
     rm omics.20200317.tar.gz
+
+#not reproducible for others to build an image from currently
+COPY bin /opt/omics/bin
+    
+
+# MetaGeneMark version was updated for img annotation pipeline 5.1.*
+
+
+RUN \
+    cd /opt && \
+    wget http://portal.nersc.gov/dna/metagenome/assembly/gms2_linux_64.v1.14_1.25_lic.tar.gz && \
+    tar -zxvf gms2_linux_64.v1.14_1.25_lic.tar.gz && \
+    #chmod -R 755 omics && \
+    rm gms2_linux_64.v1.14_1.25_lic.tar.gz
 
 # Let's remove some cruft
 RUN rm -rf /opt/omics/bin/bu
@@ -141,29 +141,43 @@ ENV  CONDA_PYTHON_EXE '/miniconda3/bin/python'
 
 COPY --from=cromwell /opt/omics/bin/ /opt/omics/bin/
 
-COPY --from=prodigal /usr/local/bin/prodigal /opt/omics/programs/prodigal/prodigal_v2.6.3
+COPY --from=prodigal /usr/local/bin/prodigal /opt/omics/programs/prodigal
 
-COPY --from=trnascan /opt/omics/programs/tRNAscan-SE /opt/omics/programs/tRNAscan-SE/
-#COPY --from=trnascan /usr/local/lib /opt/omics/programs/tRNAscan-SE/tRNAscan-SE/lib/
+COPY --from=trnascan /opt/omics/programs/tRNAscan-SE /opt/omics/programs/tRNAscan-SE
+#COPY --from=trnascan /usr/local/lib /opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.4/lib/
 
-COPY --from=hmm /opt/omics /opt/omics/
+COPY --from=hmm /opt/omics/programs/hmmer/ /opt/omics/programs/hmmer
+COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 
-COPY --from=last /opt/omics/programs/last /opt/omics/programs/last/last-983
+COPY --from=last /opt/omics/programs/last /opt/omics/programs/last
+COPY --from=img /opt/omics/programs/CRT /opt/omics/programs/CRT
+COPY --from=img /opt/omics/programs/tmhmm-2.0c /opt/omics/programs/tmhmm-2.0c
 
 COPY --from=infernal /opt/omics/programs/infernal /opt/omics/programs/infernal/
-
+#COPY --from=infernal /opt/omics/programs/infernal/infernal-1.1.2/bin/cmsearch /opt/omics/bin/cmsearch
 COPY --from=img /opt/omics/bin/ /opt/omics/bin/
 COPY --from=img /opt/omics/programs/CRT /opt/omics/programs/CRT
-COPY --from=img /opt/omics/programs/GeneMark /opt/omics/programs/GeneMark
-COPY --from=img /opt/omics/programs/tmhmm-2.0c /opt/omics/programs/tmhmm-2.0c
+COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
+COPY --from=img /opt/omics/programs/signalp-4.1 /opt/omics/programs/signalp-4.1
 
 RUN \
     mkdir /opt/omics/lib && cd /opt/omics/lib && \
-    ln -s ../programs/tRNAscan-SE/tRNAscan-SE/lib/tRNAscan-SE/* .
+    ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.4/lib/tRNAscan-SE/* . 
+
+#link things to the bin directory
 
 RUN \
-    cd /opt/omics/programs/tRNAscan-SE/tRNAscan-SE/bin/ && \
-    sed -i  's|infernal_dir: {bin_dir}|infernal_dir: /opt/omics/programs/infernal/infernal-1.1.2/bin/|' tRNAscan-SE.conf
+    cd /opt/omics/bin &&\ 
+    ln -s ../programs/gms2_linux_64/gms2.pl &&\
+    ln -s ../programs/gms2_linux_64/gmhmmp2 &&\
+    ln -s ../programs/infernal/infernal-1.1.2/bin/cmsearch && \
+    ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.4/bin/tRNAscan-SE && \
+    ln -s ../programs/last/bin/lastal && \
+    ln -s ../programs/CRT/CRT-CLI_v1.8.2.jar CRT-CLI.jar && \
+    ln -s ../programs/prodigal &&\
+    ln -s ../programs/hmmer/bin/hmmsearch &&\
+    ln -s ../programs/tmhmm-2.0c/bin/decodeanhmm.Linux_x86_64 decodeanhmm &&\
+    ln -s ../programs/signalp-4.1/signalp 
 
 #COPY --from=img /opt/omics /opt/omics3/
 

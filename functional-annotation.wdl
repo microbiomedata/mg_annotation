@@ -6,9 +6,9 @@ workflow f_annotate {
   File    input_fasta
   String  database_location
   Boolean ko_ec_execute=true
-  String  ko_ec_img_nr_db="${database_location}"+"IMG-NR/20190607/img_nr"
-  String  ko_ec_md5_mapping="${database_location}"+"IMG-NR/20190607/md5Hash2Data.txt"
-  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"IMG-NR/20190607/taxonOid2Taxonomy.txt"
+  String  ko_ec_img_nr_db="${database_location}"+"IMG-NR/20211118/img_nr"
+  String  ko_ec_md5_mapping="${database_location}"+"IMG-NR/20211118/md5Hash2Data.txt"
+  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"IMG-NR/20211118/taxonOid2Taxonomy.txt"
   String  lastal_bin="/opt/omics/bin/lastal"
   String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
   Boolean smart_execute=true
@@ -41,8 +41,8 @@ workflow f_annotate {
   String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
   String  product_names_mapping_dir="${database_location}"+"Product_Name_Mappings/latest"
   String  container
-  String  hmm_container="scanon/im-hmmsearch:v0.0.0"
-  String  last_container="scanon/im-last:v0.0.1"
+  String  hmm_container="aclum/img-omics:5.1"
+  String  last_container="aclum/img-omics:5.1"
 
   if(ko_ec_execute) {
     call ko_ec {
