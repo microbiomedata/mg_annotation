@@ -1,5 +1,5 @@
-import "structural-annotation.wdl" as sa
-import "functional-annotation.wdl" as fa
+import "./structural-annotation.wdl" as sa
+import "./functional-annotation.wdl" as fa
 
 workflow annotation {
   File    imgap_input_fasta

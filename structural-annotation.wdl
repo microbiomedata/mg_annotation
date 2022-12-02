@@ -1,8 +1,9 @@
-import "trnascan.wdl" as trnascan
-import "rfam.wdl" as rfam
-import "crt.wdl" as crt
-import "prodigal.wdl" as prodigal
-import "genemark.wdl" as genemark
+import "./trnascan.wdl" as trnascan
+import "./rfam.wdl" as rfam
+import "./crt.wdl" as crt
+import "./cds_prediction.wdl as cds_prediction
+#import "prodigal.wdl" as prodigal
+#import "genemark.wdl" as genemark
 
 workflow s_annotate {
   String  cmzscore
@@ -10,10 +11,12 @@ workflow s_annotate {
   String  imgap_project_id
   String  imgap_project_type
   Int     additional_threads
+  Int? imgap_structural_annotation_translation_table
   Boolean pre_qc_execute=false
   Boolean trnascan_se_execute=true
   Boolean rfam_execute=true
   Boolean crt_execute=true
+  Boolean cds_prediction_execute=true
   Boolean prodigal_execute=true
   Boolean genemark_execute=true
   Boolean gff_and_fasta_stats_execute=true
@@ -59,24 +62,38 @@ workflow s_annotate {
         container=container
     }
   }
-  if(prodigal_execute) {
-    call prodigal.prodigal {
-      input:
-        imgap_input_fasta = imgap_input_fasta,
-        imgap_project_id = imgap_project_id,
-        imgap_project_type = imgap_project_type,
-        container=container
+
+   if(cds_prediction_execute) {
+     call cds_prediction.cds_prediction {
+       input:
+         imgap_input_fasta = imgap_input_fasta,
+         imgap_project_id = imgap_project_id,
+         imgap_project_type = imgap_project_type,
+         prodigal_execute = prodigal_execute,
+         genemark_execute = genemark_execute,
+         imgap_structural_annotation_translation_table =imgap_structural_annotation_translation_table,
+         container=container
     }
   }
-  if(genemark_execute) {
-    call genemark.genemark {
-      input:
-        imgap_input_fasta = imgap_input_fasta,
-        imgap_project_id = imgap_project_id,
-        imgap_project_type = imgap_project_type,
-        container=container
-    }
-  }
+
+#  if(prodigal_execute) {
+#    call prodigal.prodigal {
+#      input:
+#        imgap_input_fasta = imgap_input_fasta,
+#        imgap_project_id = imgap_project_id,
+#        imgap_project_type = imgap_project_type,
+#        container=container
+#    }
+#  }
+#  if(genemark_execute) {
+#    call genemark.genemark {
+#      input:
+#        imgap_input_fasta = imgap_input_fasta,
+#        imgap_project_id = imgap_project_id,
+#        imgap_project_type = imgap_project_type,
+#        container=container
+#    }
+#  }
   call gff_merge {
     input:
       input_fasta = imgap_input_fasta,
@@ -90,19 +107,20 @@ workflow s_annotate {
       prodigal_gff = prodigal.gff,
       container=container
   }
-  if(prodigal_execute || genemark_execute) {
-    call fasta_merge {
-      input:
-        input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id,
-        final_gff = gff_merge.final_gff,
-        genemark_genes = genemark.genes,
-        genemark_proteins = genemark.proteins,
-        prodigal_genes = prodigal.genes,
-        prodigal_proteins = prodigal.proteins,
-        container=container
-    }
-  }
+#  if(prodigal_execute || genemark_execute) {
+#    call fasta_merge {
+#      input:
+#        input_fasta = imgap_input_fasta,
+#        project_id = imgap_project_id,
+#        final_gff = gff_merge.final_gff,
+#        genemark_genes = genemark.genes,
+#        genemark_proteins = genemark.proteins,
+#        prodigal_genes = prodigal.genes,
+#        prodigal_proteins = prodigal.proteins,
+#        container=container
+#    }
+#  }
+
   if(gff_and_fasta_stats_execute) {
     call gff_and_fasta_stats {
       input:

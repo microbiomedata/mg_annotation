@@ -158,8 +158,8 @@ workflow f_annotate {
         supfam_gff = superfam.gff,
         pfam_gff = pfam.gff,
         cath_funfam_gff = cath_funfam.gff,
-        signalp_gff = signalp.gff,
-        tmhmm_gff = tmhmm.gff,
+ #       signalp_gff = signalp.gff,
+ #       tmhmm_gff = tmhmm.gff,
         container=container
     }
   }
@@ -520,15 +520,15 @@ task product_name {
   File?  supfam_gff
   File?  pfam_gff
   File?  cath_funfam_gff
-  File?  signalp_gff
-  File?  tmhmm_gff
+#  File?  signalp_gff
+#  File?  tmhmm_gff
   String container
 
   command {
     set -euo pipefail
     ${product_assign} ${"-k " + ko_ec_gff} ${"-s " + smart_gff} ${"-c " + cog_gff} \
                       ${"-t " + tigrfam_gff} ${"-u " + supfam_gff} ${"-p " + pfam_gff} \
-                      ${"-f " + cath_funfam_gff} ${"-e " + signalp_gff} ${"-r " + tmhmm_gff} \
+                      ${"-f " + cath_funfam_gff}  \
                       ${map_dir} ${sa_gff}
     mv ../inputs/*/*.gff .
     mv ../inputs/*/*.tsv .
