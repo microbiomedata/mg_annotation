@@ -1,3 +1,4 @@
+version 1.0
 import "./trnascan.wdl" as trnascan
 import "./rfam.wdl" as rfam
 import "./crt.wdl" as crt

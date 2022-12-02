@@ -1,3 +1,4 @@
+version 1.0
 workflow f_annotate {
   String  imgap_project_id
   String  imgap_project_type

@@ -1,3 +1,4 @@
+version 1.0
 workflow rfam {
   String cmzscore
   String imgap_input_fasta
