@@ -2,7 +2,7 @@ version 1.0
 import "./trnascan.wdl" as trnascan
 import "./rfam.wdl" as rfam
 import "./crt.wdl" as crt
-import "./cds_prediction.wdl as cds_prediction
+import "./cds_prediction.wdl" as cds_prediction
 #import "prodigal.wdl" as prodigal
 #import "genemark.wdl" as genemark
 
