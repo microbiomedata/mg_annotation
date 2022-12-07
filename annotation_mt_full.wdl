@@ -8,12 +8,13 @@ workflow annotation {
   String  imgap_project_type="metagenome"
   Int     additional_threads=16
   String  container="aclum/img-omics:5.1"
-
+  String bc_bin="/miniconda3/bin/bc"
   # structural annotation
   Boolean sa_execute=true
 
   # functional annotation
   Boolean fa_execute=true
+  File? gm_license
 
   call split {
     input: infile=imgap_input_fasta,
@@ -32,7 +33,8 @@ workflow annotation {
           imgap_project_type = imgap_project_type,
           database_location = database_location,
           rfam_execute = false,
-          container=container
+          container=container,
+          gm_license=gm_license
       }
     }
 
@@ -131,6 +133,7 @@ task split{
    String zfile="zscore.txt"
    String cmzfile="cmzscore.txt"
    String container
+   File? gm_license
 
    command{
      set -euo pipefail

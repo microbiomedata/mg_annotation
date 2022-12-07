@@ -13,7 +13,7 @@ workflow test_small {
   }
   call awf.annotation {
     input: imgap_project_id=proj,
-           imgap_input_fasta=prepare.fasta,
+           input_file=prepare.fasta,
            database_location=database
   }
   call validate {

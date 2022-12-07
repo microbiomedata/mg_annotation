@@ -1,4 +1,3 @@
-version 1.0
 workflow rfam {
   String cmzscore
   String imgap_input_fasta
@@ -28,6 +27,7 @@ workflow rfam {
     File misc_bind_misc_feature_regulatory_gff = run.misc_bind_misc_feature_regulatory_gff
     File rrna_gff = run.rrna_gff
     File ncrna_tmrna_gff = run.ncrna_tmrna_gff
+    File rfam_gff = run.rfam_gff
   }
 }
 

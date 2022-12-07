@@ -19,8 +19,9 @@ workflow annotation {
 
   # functional annotation
   Boolean fa_execute=true
-
-  call stage {
+  File? gm_license
+ 
+ call stage {
       input: container=container,
           input_file=input_file
     }
@@ -41,7 +42,8 @@ workflow annotation {
           additional_threads = additional_threads,
           imgap_project_type = imgap_project_type,
           database_location = database_location,
-          container=container
+          container=container,
+          gm_license=gm_license
       }
     }
 
@@ -221,6 +223,7 @@ task split {
    String zfile="zscore.txt"
    String cmzfile="cmzscore.txt"
    String container
+   File? gm_license
 
    command{
      set -euo pipefail

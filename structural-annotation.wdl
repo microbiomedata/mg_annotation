@@ -1,8 +1,7 @@
-version 1.0
-import "./trnascan.wdl" as trnascan
-import "./rfam.wdl" as rfam
-import "./crt.wdl" as crt
-import "./cds_prediction.wdl" as cds_prediction
+import "trnascan.wdl" as trnascan
+import "rfam.wdl" as rfam
+import "crt.wdl" as crt
+import "cds_prediction.wdl" as cds_prediction
 #import "prodigal.wdl" as prodigal
 #import "genemark.wdl" as genemark
 
@@ -23,6 +22,7 @@ workflow s_annotate {
   Boolean gff_and_fasta_stats_execute=true
   String  database_location
   String  container
+  File? gm_license
 
   if(pre_qc_execute) {
     call pre_qc {
@@ -72,55 +72,44 @@ workflow s_annotate {
          imgap_project_type = imgap_project_type,
          prodigal_execute = prodigal_execute,
          genemark_execute = genemark_execute,
-         imgap_structural_annotation_translation_table =imgap_structural_annotation_translation_table,
-         container=container
+         imgap_structural_annotation_translation_table = imgap_structural_annotation_translation_table,
+         container = container,
+         gm_license = gm_license
     }
   }
 
-#  if(prodigal_execute) {
-#    call prodigal.prodigal {
-#      input:
-#        imgap_input_fasta = imgap_input_fasta,
-#        imgap_project_id = imgap_project_id,
-#        imgap_project_type = imgap_project_type,
-#        container=container
-#    }
-#  }
-#  if(genemark_execute) {
-#    call genemark.genemark {
-#      input:
-#        imgap_input_fasta = imgap_input_fasta,
-#        imgap_project_id = imgap_project_id,
-#        imgap_project_type = imgap_project_type,
-#        container=container
-#    }
-#  }
-  call gff_merge {
-    input:
-      input_fasta = imgap_input_fasta,
-      project_id = imgap_project_id,
-      misc_and_regulatory_gff = rfam.misc_bind_misc_feature_regulatory_gff,
-      rrna_gff = rfam.rrna_gff,
-      trna_gff = trnascan.gff,
-      ncrna_tmrna_gff = rfam.ncrna_tmrna_gff,
-      crt_gff = crt.gff, 
-      genemark_gff = genemark.gff,
-      prodigal_gff = prodigal.gff,
-      container=container
+
+    call gff_merge {
+      input:
+        input_fasta = imgap_input_fasta,
+        project_id = imgap_project_id,
+        misc_and_regulatory_gff = rfam.misc_bind_misc_feature_regulatory_gff,
+        rrna_gff = rfam.rrna_gff,
+        rfam_gff = rfam.rfam_gff,
+        trna_gff = trnascan.gff,
+        ncrna_tmrna_gff = rfam.ncrna_tmrna_gff,
+        crt_gff = crt.gff, 
+     #   genemark_gff = cds_prediction.genemark_gff,
+     #   prodigal_gff = cds_prediction.prodigal_gff,
+        cds_gff = cds_prediction.gff,
+        container=container
+    }
+
+  if(prodigal_execute || genemark_execute)  {
+    call fasta_merge {
+      input:
+        input_fasta = imgap_input_fasta,
+        project_id = imgap_project_id,
+        final_gff = gff_merge.final_gff,
+        genemark_genes = cds_prediction.genemark_genes,
+        genemark_proteins = cds_prediction.genemark_proteins,
+        prodigal_genes = cds_prediction.prodigal_genes,
+        prodigal_proteins = cds_prediction.prodigal_proteins,
+        container=container,
+        genemark_execute=genemark_execute,
+        prodigal_execute=prodigal_execute
+    }
   }
-#  if(prodigal_execute || genemark_execute) {
-#    call fasta_merge {
-#      input:
-#        input_fasta = imgap_input_fasta,
-#        project_id = imgap_project_id,
-#        final_gff = gff_merge.final_gff,
-#        genemark_genes = genemark.genes,
-#        genemark_proteins = genemark.proteins,
-#        prodigal_genes = prodigal.genes,
-#        prodigal_proteins = prodigal.proteins,
-#        container=container
-#    }
-#  }
 
   if(gff_and_fasta_stats_execute) {
     call gff_and_fasta_stats {
@@ -140,18 +129,18 @@ workflow s_annotate {
     }
   }
   output {
-    #File  gff = gff_merge.final_gff
+    File  gff = gff_merge.final_gff 
     #File  gff = post_qc.out
-    File?  gff = fasta_merge.final_modified_gff
+    #File?  gff = fasta_merge.final_modified_gff
     File? crt_gff = crt.gff
     File? crisprs = crt.crisprs 
-    File? genemark_gff = genemark.gff
-    File? prodigal_gff = prodigal.gff
+    File? genemark_gff = cds_prediction.genemark_gff
+    File? prodigal_gff = cds_prediction.prodigal_gff
     File? trna_gff = trnascan.gff
     File? misc_bind_misc_feature_regulatory_gff = rfam.misc_bind_misc_feature_regulatory_gff
     File? rrna_gff = rfam.rrna_gff
     File? ncrna_tmrna_gff = rfam.ncrna_tmrna_gff
-    File? proteins = fasta_merge.final_proteins 
+    File? proteins = cds_prediction.proteins
   }
 }
 
@@ -224,21 +213,23 @@ task gff_merge {
 
   String bin="/opt/omics/bin/structural_annotation/gff_files_merger.py"
   File   input_fasta
+  String fasta_filename = basename(input_fasta)
   String project_id
   File?  misc_and_regulatory_gff
   File?  rrna_gff
   File?  trna_gff
+  File?  rfam_gff
   File?  ncrna_tmrna_gff
   File?  crt_gff
-  File?  genemark_gff
-  File?  prodigal_gff
+#  File?  genemark_gff
+#  File?  prodigal_gff
+  File?  cds_gff =
   String container
 
   command {
     set -euo pipefail
-    ${bin} -f ${input_fasta} ${"-a " + misc_and_regulatory_gff + " " + rrna_gff} \
-    ${trna_gff} ${ncrna_tmrna_gff} ${crt_gff} \
-    ${genemark_gff} ${prodigal_gff} 1> ${project_id}_structural_annotation.gff
+    ${bin} --contigs_fasta ${input_fasta} --cds_gff ${cds_gff} --crt_gff ${crt_gff} \
+     --log_file ${fasta_filename}_gff_merge.log ${rfam_gff} ${trna_gff} 1> ${project_id}_structural_annotation.gff
   }
 
   runtime {
@@ -264,24 +255,38 @@ task fasta_merge {
   File?  prodigal_proteins
   String final_gff_out=basename(final_gff)
   String container
+  Boolean genemark_execute
+  Boolean prodigal_execute
 
   command {
     set -euo pipefail
     cp ${final_gff} ${final_gff_out}
-    ${bin} ${final_gff_out} ${genemark_genes} ${prodigal_genes} 1> ${project_id}_genes.fna
-    ${bin} ${final_gff_out} ${genemark_proteins} ${prodigal_proteins} 1> ${project_id}_proteins.faa
+    prodigal_execute_bash=${prodigal_execute}
+    genemark_execute_bash=${genemark_execute}   
+          if [[ "$prodigal_execute_bash" = true ]] ; then
+              ${bin} ${final_gff}  ${prodigal_genes} 1> ${project_id}_prodigal_genes.fna
+              ${bin} ${final_gff}  ${prodigal_proteins} 1> ${project_id}_prodigal_proteins.faa
+          fi
+          if [[ "$genemark_execute_bash" = true ]] ; then
+              ${bin} ${final_gff}  ${genemark_genes} 1> ${project_id}_genemark_genes.fna
+              ${bin} ${final_gff}  ${genemark_proteins} 1> ${project_id}_genemark_proteins.faa
+          fi
   }
 
   runtime {
     time: "2:00:00"
     memory: "40G"
-    docker: "doejgi/img-annotation-pipeline:5.0.25"
+    docker: container
   }
     
   output {
-    File final_genes = "${project_id}_genes.fna"
-    File final_proteins = "${project_id}_proteins.faa"
-    File final_modified_gff = "${final_gff_out}"
+    File? final_genemark_genes = "${project_id}_genemark_genes.fna"
+    File? final_genemark_proteins = "${project_id}_genemark_proteins.faa"
+    File? final_prodigal_genes = "${project_id}_prodigal_genes.fna"
+    File? final_prodigal_proteins = "${project_id}_prodigal_proteins.faa"
+    #File final_genes = "${project_id}_genes.fna"
+    #File final_proteins = "${project_id}_proteins.faa"
+    #File final_modified_gff = "${final_gff_out}"
   }
 }
 

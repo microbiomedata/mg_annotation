@@ -1,4 +1,3 @@
-version 1.0
 workflow f_annotate {
   String  imgap_project_id
   String  imgap_project_type
@@ -210,7 +209,7 @@ task ko_ec {
                 ${project_type} ${md5} ${phylo} \
                 ${project_id}_ko.tsv ${project_id}_ec.tsv \
                 ${project_id}_gene_phylogeny.tsv ${project_id}_ko_ec.gff \
-                < ${project_id}_proteins.img_nr.last.blasttab
+                ${project_id}_proteins.img_nr.last.blasttab
   }
 
   runtime {

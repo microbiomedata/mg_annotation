@@ -1,4 +1,3 @@
-version 1.0
 workflow trnascan {
 
   String imgap_input_fasta
