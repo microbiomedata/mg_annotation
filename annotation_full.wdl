@@ -102,7 +102,8 @@ workflow annotation {
 
   call finish_ano {
     input:
-      container="microbiomedata/workflowmeta:1.1.0",
+      container="microbiomedata/workflowmeta:1.1.1",
+      input_file=stage.imgap_input_fasta,
       proj=proj,
       start=stage.start,
       resource=resource,
@@ -374,6 +375,7 @@ task final_stats {
 
 task finish_ano {
    String container
+   String input_file
    String proj
    String prefix=sub(proj, ":", "_")
    String start
@@ -439,41 +441,42 @@ task finish_ano {
        cat ${stats_json} | sed ${sed} > ${prefix}_stats.json
        nmdc gff2json ${prefix}_functional_annotation.gff -of features.json -oa annotations.json -ai ${informed_by}
 
-       /scripts/generate_object_json.py \
-            --type "nmdc:MetagenomeAnnotationActivity" \
-            --set metagenome_annotation_activity_set \
-            --part ${proj} \
+        /scripts/generate_object_json.py \
+             --type "nmdc:MetagenomeAnnotationActivity" \
+             --set metagenome_annotation_activity_set \
+             --part ${proj} \
              -p "name=Annotation Activity for ${proj}" \
                 was_informed_by=${informed_by} \
                 started_at_time=${start} \
                 ended_at_time=$end \
                 execution_resource=${resource} \
                 git_url=${git_url} \
+                version="v0.0.1"
              --url ${url_root}${proj}/annotation/ \
-             --inputs ${prefix}_contigs.fna \
+             --inputs ${input_file} \
              --outputs \
-             ${prefix}_proteins.faa "FASTA amino acid file for annotated proteins" "Annotation Amino Acid FASTA" \
-             ${prefix}_structural_annotation.gff "GFF3 format file with structural annotations" "Structural Annotation GFF" \
-             ${prefix}_functional_annotation.gff "GFF3 format file with functional annotations" "Functional Annotation GFF" \
-             ${prefix}_ko.tsv "Tab delimited file for KO annotation" "Annotation KEGG Orthology" \
-             ${prefix}_ec.tsv "Tab delimited file for EC annotation" "Annotation Enzyme Commission" \
-             ${prefix}_cog.gff "GFF3 format file with COGs" "Clusters of Orthologous Groups (COG) Annotation GFF" \
-             ${prefix}_pfam.gff "GFF3 format file with Pfam" "Pfam Annotation GFF" \
-             ${prefix}_tigrfam.gff "GFF3 format file with TIGRfam" "TIGRFam Annotation GFF" \
-             ${prefix}_smart.gff "GFF3 format file with SMART" "SMART Annotation GFF" \
-             ${prefix}_supfam.gff "GFF3 format file with SUPERFam" "SUPERFam Annotation GFF" \
-             ${prefix}_cath_funfam.gff "GFF3 format file with CATH FunFams" "CATH FunFams (Functional Families) Annotation GFF" \
-             ${prefix}_crt.gff "GFF3 format file with CRT" "CRT Annotation GFF" \
-             ${prefix}_genemark.gff "GFF3 format file with Genemark" "Genemark Annotation GFF" \
-             ${prefix}_prodigal.gff "GFF3 format file with Prodigal" "Prodigal Annotation GFF" \
-             ${prefix}_trna.gff "GFF3 format file with TRNA" "TRNA Annotation GFF3" \
-             ${prefix}_rfam_misc_bind_misc_feature_regulatory.gff "GFF3 format file with Misc" "Misc Annotation GFF" \
-             ${prefix}_rfam_rrna.gff "GFF3 format file with RFAM" "RFAM Annotation GFF" \
-             ${prefix}_rfam_ncrna_tmrna.gff "GFF3 format file with TMRNA" "TMRNA Annotation GFF3" \
-             ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" \
-	           ${prefix}_products_names.tsv "Product names file" "Product names" \
-	           ${prefix}_crt.crisprs "Crisprt Terms" "Crisprt Terms" \
-             ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics"
+             ${prefix}_proteins.faa "FASTA amino acid file for annotated proteins" "Annotation Amino Acid FASTA" "FASTA Amino Acid File for ${proj}" \
+             ${prefix}_structural_annotation.gff "GFF3 format file with structural annotations" "Structural Annotation GFF" "Structural Annotation for ${proj}" \
+             ${prefix}_functional_annotation.gff "GFF3 format file with functional annotations" "Functional Annotation GFF" "Functional Annotation for ${proj}" \
+             ${prefix}_ko.tsv "Tab delimited file for KO annotation" "Annotation KEGG Orthology" "KEGG Orthology for ${proj}" \
+             ${prefix}_ec.tsv "Tab delimited file for EC annotation" "Annotation Enzyme Commission" "EC Annotations for ${proj}" \
+             ${prefix}_cog.gff "GFF3 format file with COGs" "Clusters of Orthologous Groups (COG) Annotation GFF" "COGs for ${proj}" \
+             ${prefix}_pfam.gff "GFF3 format file with Pfam" "Pfam Annotation GFF" "Pfam Annotation for ${proj}" \
+             ${prefix}_tigrfam.gff "GFF3 format file with TIGRfam" "TIGRFam Annotation GFF" "TIGRFam for ${proj}" \
+             ${prefix}_smart.gff "GFF3 format file with SMART" "SMART Annotation GFF" "SMART Annotations for ${proj}" \
+             ${prefix}_supfam.gff "GFF3 format file with SUPERFam" "SUPERFam Annotation GFF" "SUPERFam Annotations for ${proj}" \
+             ${prefix}_cath_funfam.gff "GFF3 format file with CATH FunFams" "CATH FunFams (Functional Families) Annotation GFF" "CATH FunFams for ${proj}" \
+             ${prefix}_crt.gff "GFF3 format file with CRT" "CRT Annotation GFF" "CRT Annotations for ${proj}" \
+             ${prefix}_genemark.gff "GFF3 format file with Genemark" "Genemark Annotation GFF" "Genemark Annotations for ${proj}" \
+             ${prefix}_prodigal.gff "GFF3 format file with Prodigal" "Prodigal Annotation GFF" " Prodigal Annotations ${proj}" \
+             ${prefix}_trna.gff "GFF3 format file with TRNA" "TRNA Annotation GFF3" "TRNA Annotations ${proj}" \
+             ${prefix}_rfam_misc_bind_misc_feature_regulatory.gff "GFF3 format file with Misc" "Misc Annotation GFF" "Misc Annotations for ${proj}" \
+             ${prefix}_rfam_rrna.gff "GFF3 format file with RFAM" "RFAM Annotation GFF" "RFAM Annotations for ${proj}" \
+             ${prefix}_rfam_ncrna_tmrna.gff "GFF3 format file with TMRNA" "TMRNA Annotation GFF3" "TMRNA Annotations for ${proj}"\
+             ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" "KO_EC Annotations for ${proj}" \
+	           ${prefix}_products_names.tsv "Product names file" "Product names" "Product names for ${proj}"\
+	           ${prefix}_crt.crisprs "Crisprt Terms" "Crisprt Terms" "Crispr Terms for ${proj}" \
+             ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}"
 
    }
 
