@@ -9,7 +9,7 @@ workflow annotation {
   String? url_root="https://data.microbiomedata.org/data/"
   String  input_file
   String  imgap_project_id
-  String  database_location="/cromwell_root/database"
+  String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   Int     additional_threads=16
   String  container="bfoster1/img-omics:0.1.9"
