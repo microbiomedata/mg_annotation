@@ -7,7 +7,7 @@ workflow annotation {
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   Int     additional_threads=16
-  String  container="aclum/img-omics:5.1"
+  String  container="aclum/img-omics:5.1.12"
   String bc_bin="/miniconda3/bin/bc"
   # structural annotation
   Boolean sa_execute=true
@@ -148,7 +148,7 @@ task split{
      String cmzscore = read_string(cmzfile)
    }
    runtime {
-     memory: "120 GiB"
+     memory: "120G"
      cpu:  16
      maxRetries: 1
      docker: container
@@ -231,7 +231,7 @@ task merge_outputs {
     File crt_crisprs = "${project_id}_crt.crisprs"
   }
   runtime {
-    memory: "2 GiB"
+    memory: "2G"
     cpu:  4
     maxRetries: 1
     docker: container

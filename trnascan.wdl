@@ -1,5 +1,4 @@
 workflow trnascan {
-
   String imgap_input_fasta
   String imgap_project_id
   String imgap_project_type

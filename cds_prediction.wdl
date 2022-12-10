@@ -1,5 +1,4 @@
 workflow cds_prediction {
-
   File imgap_input_fasta
   String fasta_filename = basename(imgap_input_fasta)
   String imgap_project_type
@@ -11,7 +10,6 @@ workflow cds_prediction {
   String bin="/opt/omics/bin/structural_annotation"
   #if running w/JAWS $HOME is not mounted so need the license file in the execution dir
   File? gm_license
-
 
     call run_cds_prediction  {
        input: imgap_input_fasta=imgap_input_fasta,
@@ -39,7 +37,11 @@ workflow cds_prediction {
      File gff = run_cds_prediction.gff
     
   }
-
+  meta {
+     author: "Alicia Clum"
+     email: "aclum@lbl.gov"
+     version: "1.0.0"
+  }
 }
 
 task run_cds_prediction {
@@ -97,8 +99,8 @@ task run_cds_prediction {
     File? prodigal_proteins= "${project_id}_prodigal.gff"
     File? prodigal_genes = "${project_id}_prodigal_genes.fna"
     File? prodigal_gff = "${project_id}_prodigal.gff"
-    File  proteins= "${project_id}_proteins.faa"
-    File  genes= "${project_id}_genes.fna"
+    File  proteins= "${project_id}_cds_proteins.faa"
+    File  genes= "${project_id}_cds_genes.fna"
     File  gff= "${project_id}_cds.gff"
   }
 

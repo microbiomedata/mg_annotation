@@ -2,8 +2,6 @@ import "trnascan.wdl" as trnascan
 import "rfam.wdl" as rfam
 import "crt.wdl" as crt
 import "cds_prediction.wdl" as cds_prediction
-#import "prodigal.wdl" as prodigal
-#import "genemark.wdl" as genemark
 
 workflow s_annotate {
   String  cmzscore
@@ -83,31 +81,27 @@ workflow s_annotate {
       input:
         input_fasta = imgap_input_fasta,
         project_id = imgap_project_id,
-        misc_and_regulatory_gff = rfam.misc_bind_misc_feature_regulatory_gff,
-        rrna_gff = rfam.rrna_gff,
         rfam_gff = rfam.rfam_gff,
         trna_gff = trnascan.gff,
-        ncrna_tmrna_gff = rfam.ncrna_tmrna_gff,
         crt_gff = crt.gff, 
-     #   genemark_gff = cds_prediction.genemark_gff,
-     #   prodigal_gff = cds_prediction.prodigal_gff,
         cds_gff = cds_prediction.gff,
-        container=container
+        prodigal_execute = prodigal_execute,
+        genemark_execute = genemark_execute,
+        crt_execute = crt_execute,
+        rfam_execute = rfam_execute,
+        trnascan_se_execute = trnascan_se_execute,
+        container = container
     }
 
   if(prodigal_execute || genemark_execute)  {
     call fasta_merge {
       input:
-        input_fasta = imgap_input_fasta,
+       # input_fasta = imgap_input_fasta,
         project_id = imgap_project_id,
         final_gff = gff_merge.final_gff,
-        genemark_genes = cds_prediction.genemark_genes,
-        genemark_proteins = cds_prediction.genemark_proteins,
-        prodigal_genes = cds_prediction.prodigal_genes,
-        prodigal_proteins = cds_prediction.prodigal_proteins,
-        container=container,
-        genemark_execute=genemark_execute,
-        prodigal_execute=prodigal_execute
+        cds_genes = cds_prediction.genes,
+        cds_proteins = cds_prediction.proteins,
+        container = container
     }
   }
 
@@ -117,7 +111,7 @@ workflow s_annotate {
         input_fasta = imgap_input_fasta,
         project_id = imgap_project_id,
         final_gff = gff_merge.final_gff,
-        container=container
+        container = container
     }
   }
   if(imgap_project_type == "isolate") {
@@ -125,7 +119,7 @@ workflow s_annotate {
       input:
         input_fasta = imgap_input_fasta,
         project_id = imgap_project_id,
-        container=container
+        container = container
     }
   }
   output {
@@ -135,12 +129,17 @@ workflow s_annotate {
     File? crt_gff = crt.gff
     File? crisprs = crt.crisprs 
     File? genemark_gff = cds_prediction.genemark_gff
+    File? genemark_genes = cds_prediction.genemark_genes
+    File? genemark_proteins = cds_prediction.genemark_proteins 
     File? prodigal_gff = cds_prediction.prodigal_gff
+    File? prodigal_genes = cds_prediction.prodigal_genes
+    File? prodigal_proteins = cds_prediction.prodigal_proteins
     File? trna_gff = trnascan.gff
     File? misc_bind_misc_feature_regulatory_gff = rfam.misc_bind_misc_feature_regulatory_gff
     File? rrna_gff = rfam.rrna_gff
     File? ncrna_tmrna_gff = rfam.ncrna_tmrna_gff
-    File? proteins = cds_prediction.proteins
+    File? proteins = fasta_merge.final_proteins
+    File? genes = fasta_merge.final_genes
   }
 }
 
@@ -213,23 +212,53 @@ task gff_merge {
 
   String bin="/opt/omics/bin/structural_annotation/gff_files_merger.py"
   File   input_fasta
-  String fasta_filename = basename(input_fasta)
   String project_id
-  File?  misc_and_regulatory_gff
   File?  rrna_gff
   File?  trna_gff
   File?  rfam_gff
-  File?  ncrna_tmrna_gff
   File?  crt_gff
-#  File?  genemark_gff
-#  File?  prodigal_gff
-  File?  cds_gff =
+  File?  cds_gff 
+  Boolean prodigal_execute
+  Boolean genemark_execute
+  Boolean crt_execute
+  Boolean rfam_execute
+  Boolean trnascan_se_execute
   String container
 
   command {
     set -euo pipefail
-    ${bin} --contigs_fasta ${input_fasta} --cds_gff ${cds_gff} --crt_gff ${crt_gff} \
-     --log_file ${fasta_filename}_gff_merge.log ${rfam_gff} ${trna_gff} 1> ${project_id}_structural_annotation.gff
+    # set cromwell booleans as bash variables
+    prodigal_execute=${prodigal_execute}  
+    genemark_execute=${genemark_execute}
+    crt_execute=${crt_execute}
+    rfam_execute=${rfam_execute}
+    trnascan_se_execute=${trnascan_se_execute}
+
+    #construct arguments for gff_files_merger.py
+    merger_args="--contigs_fasta ${input_fasta}"
+
+    if [[ "$prodigal_execute" = true ]] || [[ "$genemark_execute" = true ]] ; then
+       merger_args="$merger_args --cds_gff ${cds_gff}"
+    fi
+
+    if [["$crt_execute" = true ]] ; then
+       merger_args="$merger_args --crt_gff ${crt_gff}"
+    fi
+
+    if [[("$prodigal_execute" = true || "$genemark_execute" = true) ]] && [["$crt_execute" = true ]] ; then
+       merger_args="$merger_args --log_file ${project_id}_gff_merge.log"
+    fi
+
+    if [[ "$rfam_execute" = true ]] ; then
+       merger_args="$merger_args ${rfam_gff}"
+    fi
+
+    if [[ "$trnascan_se_execute" = true ]] ; then
+       merger_args="$merger_args ${trna_gff}"
+    fi
+
+    #excute gff_files_merger.py
+    ${bin} $merger_args 1> ${project_id}_structural_annotation.gff
   }
 
   runtime {
@@ -245,32 +274,21 @@ task gff_merge {
 
 task fasta_merge {
 
-  String bin="/opt/omics/bin/structural_annotation/fasta_files_merger.py"
-  File   input_fasta
+  String bin="/opt/omics/bin/structural_annotation/finalize_fasta_files.py"
   String project_id
   File   final_gff
-  File?  genemark_genes
-  File?  genemark_proteins
-  File?  prodigal_genes
-  File?  prodigal_proteins
-  String final_gff_out=basename(final_gff)
+  File cds_genes
+  File cds_proteins
+  String genes_filename = basename(cds_genes)
+  String proteins_filename = basename(cds_proteins)
   String container
-  Boolean genemark_execute
-  Boolean prodigal_execute
 
   command {
-    set -euo pipefail
-    cp ${final_gff} ${final_gff_out}
-    prodigal_execute_bash=${prodigal_execute}
-    genemark_execute_bash=${genemark_execute}   
-          if [[ "$prodigal_execute_bash" = true ]] ; then
-              ${bin} ${final_gff}  ${prodigal_genes} 1> ${project_id}_prodigal_genes.fna
-              ${bin} ${final_gff}  ${prodigal_proteins} 1> ${project_id}_prodigal_proteins.faa
-          fi
-          if [[ "$genemark_execute_bash" = true ]] ; then
-              ${bin} ${final_gff}  ${genemark_genes} 1> ${project_id}_genemark_genes.fna
-              ${bin} ${final_gff}  ${genemark_proteins} 1> ${project_id}_genemark_proteins.faa
-          fi
+   set -euo pipefail
+   cp ${final_gff} .
+   cp ${cds_genes} .
+   cp ${cds_proteins} .
+   ${bin} ${final_gff} ${genes_filename} ${proteins_filename}
   }
 
   runtime {
@@ -280,13 +298,8 @@ task fasta_merge {
   }
     
   output {
-    File? final_genemark_genes = "${project_id}_genemark_genes.fna"
-    File? final_genemark_proteins = "${project_id}_genemark_proteins.faa"
-    File? final_prodigal_genes = "${project_id}_prodigal_genes.fna"
-    File? final_prodigal_proteins = "${project_id}_prodigal_proteins.faa"
-    #File final_genes = "${project_id}_genes.fna"
-    #File final_proteins = "${project_id}_proteins.faa"
-    #File final_modified_gff = "${final_gff_out}"
+    File final_genes = "${project_id}_genes.fna"
+    File final_proteins = "${project_id}_proteins.faa"
   }
 }
 

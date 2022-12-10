@@ -6,30 +6,30 @@ workflow f_annotate {
   File    input_fasta
   String  database_location
   Boolean ko_ec_execute=true
-  String  ko_ec_img_nr_db="${database_location}"+"IMG-NR/20211118/img_nr"
-  String  ko_ec_md5_mapping="${database_location}"+"IMG-NR/20211118/md5Hash2Data.txt"
-  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"IMG-NR/20211118/taxonOid2Taxonomy.txt"
+  String  ko_ec_img_nr_db="${database_location}"+"/IMG-NR/20211118/img_nr"
+  String  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20211118/md5Hash2Data.txt"
+  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20211118/taxonOid2Taxonomy.txt"
   String  lastal_bin="/opt/omics/bin/lastal"
   String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
   Boolean smart_execute=true
   Int?    par_hmm_inst
   Int?    approx_num_proteins
-  String  smart_db="${database_location}"+"SMART/01_06_2016/SMART.hmm"
+  String  smart_db="${database_location}"+"/SMART/01_06_2016/SMART.hmm"
   String  hmmsearch_bin="/opt/omics/bin/hmmsearch"
   String  frag_hits_filter_bin="/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
   Boolean cog_execute=true
-  String  cog_db="${database_location}"+"COG/HMMs/2003/COG.hmm"
+  String  cog_db="${database_location}"+"/COG/HMMs/2003/COG.hmm"
   Boolean tigrfam_execute=true
-  String  tigrfam_db="${database_location}"+"TIGRFAM/v15.0/TIGRFAM.hmm"
+  String  tigrfam_db="${database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
   String  hit_selector_bin="/opt/omics/bin/functional_annotation/hmmsearch_hit_selector.py"
   Boolean superfam_execute=true
-  String  superfam_db="${database_location}"+"SuperFamily/v1.75/supfam.hmm"
+  String  superfam_db="${database_location}"+"/SuperFamily/v1.75/supfam.hmm"
   Boolean pfam_execute=true
-  String  pfam_db="${database_location}"+"Pfam/Pfam-A-LATEST/Pfam-A.hmm"
-  String  pfam_claninfo_tsv="${database_location}"+"Pfam/Pfam-A-LATEST/Pfam-A.clans.tsv"
+  String  pfam_db="${database_location}"+"/Pfam/Pfam-A-LATEST/Pfam-A.hmm"
+  String  pfam_claninfo_tsv="${database_location}"+"/Pfam/Pfam-A-LATEST/Pfam-A.clans.tsv"
   String  pfam_clan_filter="/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
   Boolean cath_funfam_execute=true
-  String  cath_funfam_db="${database_location}"+"Cath-FunFam/latest/funfam.hmm"
+  String  cath_funfam_db="${database_location}"+"/Cath-FunFam/latest/funfam.hmm"
 #  Boolean signalp_execute=true
 #  String  signalp_gram_stain="GRAM_STAIN"
 #  String  signalp_bin="/opt/omics/bin/signalp"
@@ -39,10 +39,10 @@ workflow f_annotate {
 #  String  tmhmm_decode_parser="/opt/omics/bin/functional_annotation/decodeanhmm_parser.py"
   File    sa_gff
   String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
-  String  product_names_mapping_dir="${database_location}"+"Product_Name_Mappings/latest"
+  String  product_names_mapping_dir="${database_location}"+"/Product_Name_Mappings/latest"
   String  container
-  String  hmm_container="aclum/img-omics:5.1"
-  String  last_container="aclum/img-omics:5.1"
+  String  hmm_container="aclum/img-omics:5.1.12"
+  String  last_container="aclum/img-omics:5.1.12"
 
   if(ko_ec_execute) {
     call ko_ec {

@@ -1,7 +1,7 @@
 import "annotation_full.wdl" as awf
 
 workflow test_small {
-  String  container="aclum/img-omics:5.1"
+  String  container="aclum/img-omics:5.1.12"
   String  proj="Testsmall"
   String  database="/refdata/img/"
   String  url="https://portal.nersc.gov/project/m3408/test_data"
@@ -44,7 +44,7 @@ task prepare {
       File fasta = "${proj}_contigs.fna"
    }
    runtime {
-     memory: "1 GiB"
+     memory: "1G"
      cpu:  2
      maxRetries: 1
      docker: container
@@ -68,7 +68,7 @@ task validate {
    }
 
    runtime {
-     memory: "10 GiB"
+     memory: "10G"
      cpu:  4
      maxRetries: 1
      docker: "microbiomedata/mg-validate:v0.0.0"
