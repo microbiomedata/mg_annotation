@@ -159,12 +159,12 @@ workflow annotation {
     File? misc_bind_misc_feature_regulatory_gff = finish_ano.final_misc_bind_misc_feature_regulatory_gff
     File? rrna_gff = finish_ano.final_rrna_gff
     File? ncrna_tmrna_gff = finish_ano.final_ncrna_tmrna_gff
-    File? proteins_cog_domtblout = finish_ano.final_proteins_cog_domtblout
-    File? proteins_pfam_domtblout = finish_ano.final_proteins_pfam_domtblout
-    File? proteins_tigrfam_domtblout = finish_ano.final_proteins_tigrfam_domtblout
-    File? proteins_smart_domtblout = finish_ano.final_proteins_smart_domtblout
-    File? proteins_supfam_domtblout = finish_ano.final_proteins_supfam_domtblout
-    File? proteins_cath_funfam_domtblout = finish_ano.final_proteins_cath_funfam_domtblout
+    # File? proteins_cog_domtblout = finish_ano.final_proteins_cog_domtblout
+    # File? proteins_pfam_domtblout = finish_ano.final_proteins_pfam_domtblout
+    # File? proteins_tigrfam_domtblout = finish_ano.final_proteins_tigrfam_domtblout
+    # File? proteins_smart_domtblout = finish_ano.final_proteins_smart_domtblout
+    # File? proteins_supfam_domtblout = finish_ano.final_proteins_supfam_domtblout
+    # File? proteins_cath_funfam_domtblout = finish_ano.final_proteins_cath_funfam_domtblout
     File? product_names_tsv = finish_ano.final_product_names_tsv
     File? crt_crisprs = finish_ano.final_crt_crisprs
     File? ano_objects = finish_ano.objects
@@ -416,7 +416,7 @@ task finish_ano {
       end=`date --iso-8601=seconds`
       #Generate annotation objects
 
-       cat ${proteins_faa} | sed ${sed} > $${prefix}_proteins.faa
+       cat ${proteins_faa} | sed ${sed} > ${prefix}_proteins.faa
        cat ${structural_gff} | sed ${sed} > ${prefix}_structural_annotation.gff
        cat ${functional_gff} | sed ${sed} > ${prefix}_functional_annotation.gff
        cat ${ko_tsv} | sed ${sed} > ${prefix}_ko.tsv
@@ -435,6 +435,7 @@ task finish_ano {
        cat ${rrna_gff} | sed ${sed} > ${prefix}_rfam_rrna.gff
        cat ${ncrna_tmrna_gff} | sed ${sed} > ${prefix}_rfam_ncrna_tmrna.gff
        cat ${crt_crisprs} | sed ${sed} > ${prefix}_crt.crisprs
+       cat ${gene_phylogeny_tsv} | sed ${sed} > ${prefix}_gene_phylogeny.tsv
        cat ${product_names_tsv} | sed ${sed} > ${prefix}_product_names.tsv
        cat ${ko_ec_gff} | sed ${sed} > ${prefix}_ko_ec.gff
        cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
@@ -451,7 +452,7 @@ task finish_ano {
                 ended_at_time=$end \
                 execution_resource=${resource} \
                 git_url=${git_url} \
-                version="v0.0.1"
+                version="v1.0.0-beta" \
              --url ${url_root}${proj}/annotation/ \
              --inputs ${input_file} \
              --outputs \
@@ -474,7 +475,8 @@ task finish_ano {
              ${prefix}_rfam_rrna.gff "GFF3 format file with RFAM" "RFAM Annotation GFF" "RFAM Annotations for ${proj}" \
              ${prefix}_rfam_ncrna_tmrna.gff "GFF3 format file with TMRNA" "TMRNA Annotation GFF3" "TMRNA Annotations for ${proj}"\
              ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" "KO_EC Annotations for ${proj}" \
-	           ${prefix}_products_names.tsv "Product names file" "Product names" "Product names for ${proj}"\
+	           ${prefix}_product_names.tsv "Product names file" "Product names" "Product names for ${proj}"\
+             ${prefix}_product_names.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
 	           ${prefix}_crt.crisprs "Crisprt Terms" "Crisprt Terms" "Crispr Terms for ${proj}" \
              ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}"
 
@@ -487,7 +489,7 @@ task finish_ano {
         File final_ko_tsv = "${prefix}_ko.tsv"
         File final_ec_tsv = "${prefix}_ec.tsv"
         File final_gene_phylogeny_tsv = "${prefix}_gene_phylogeny.tsv"
-        File final_proteins_faa = "${prefix}.faa"
+        File final_proteins_faa = "${prefix}_proteins.faa"
         File final_ko_ec_gff = "${prefix}_ko_ec.gff"
         File final_cog_gff = "${prefix}_cog.gff"
         File final_pfam_gff = "${prefix}_pfam.gff"
@@ -502,12 +504,12 @@ task finish_ano {
         File final_misc_bind_misc_feature_regulatory_gff = "${prefix}_rfam_misc_bind_misc_feature_regulatory.gff"
         File final_rrna_gff = "${prefix}_rfam_rrna.gff"
         File final_ncrna_tmrna_gff = "${prefix}_rfam_ncrna_tmrna.gff"
-        File final_proteins_cog_domtblout = "${prefix}_proteins.cog.domtblout"
-        File final_proteins_pfam_domtblout = "${prefix}_proteins.pfam.domtblout"
-        File final_proteins_tigrfam_domtblout = "${prefix}_proteins.tigrfam.domtblout"
-        File final_proteins_smart_domtblout = "${prefix}_proteins.smart.domtblout"
-        File final_proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
-        File final_proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
+        # File final_proteins_cog_domtblout = "${prefix}_proteins.cog.domtblout"
+        # File final_proteins_pfam_domtblout = "${prefix}_proteins.pfam.domtblout"
+        # File final_proteins_tigrfam_domtblout = "${prefix}_proteins.tigrfam.domtblout"
+        # File final_proteins_smart_domtblout = "${prefix}_proteins.smart.domtblout"
+        # File final_proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
+        # File final_proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
         File final_product_names_tsv = "${prefix}_product_names.tsv"
         File final_crt_crisprs = "${prefix}_crt.crisprs"
         File final_tsv = "${prefix}_stats.tsv"
