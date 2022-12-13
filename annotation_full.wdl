@@ -383,6 +383,7 @@ task finish_ano {
    String resource
    String url_root
    String git_url
+   File input_file
    File proteins_faa
    File structural_gff
    File functional_gff
@@ -476,7 +477,7 @@ task finish_ano {
              ${prefix}_rfam_ncrna_tmrna.gff "GFF3 format file with TMRNA" "TMRNA Annotation GFF3" "TMRNA Annotations for ${proj}"\
              ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" "KO_EC Annotations for ${proj}" \
 	           ${prefix}_product_names.tsv "Product names file" "Product names" "Product names for ${proj}"\
-             ${prefix}_product_names.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
+             ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
 	           ${prefix}_crt.crisprs "Crisprt Terms" "Crisprt Terms" "Crispr Terms for ${proj}" \
              ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}"
 
