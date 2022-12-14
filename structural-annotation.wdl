@@ -124,8 +124,6 @@ workflow s_annotate {
   }
   output {
     File  gff = gff_merge.final_gff 
-    #File  gff = post_qc.out
-    #File?  gff = fasta_merge.final_modified_gff
     File? crt_gff = crt.gff
     File? crisprs = crt.crisprs 
     File? genemark_gff = cds_prediction.genemark_gff
@@ -135,9 +133,7 @@ workflow s_annotate {
     File? prodigal_genes = cds_prediction.prodigal_genes
     File? prodigal_proteins = cds_prediction.prodigal_proteins
     File? trna_gff = trnascan.gff
-    File? misc_bind_misc_feature_regulatory_gff = rfam.misc_bind_misc_feature_regulatory_gff
-    File? rrna_gff = rfam.rrna_gff
-    File? ncrna_tmrna_gff = rfam.ncrna_tmrna_gff
+    File? rfam_gff = rfam.rfam_gff
     File? proteins = fasta_merge.final_proteins
     File? genes = fasta_merge.final_genes
   }

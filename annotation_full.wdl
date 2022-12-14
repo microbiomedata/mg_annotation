@@ -89,9 +89,7 @@ workflow annotation {
        genemark_gffs = s_annotate.genemark_gff,
        prodigal_gffs = s_annotate.prodigal_gff,
        trna_gffs = s_annotate.trna_gff,
-       misc_bind_misc_feature_regulatory_gffs = s_annotate.misc_bind_misc_feature_regulatory_gff,
-       rrna_gffs = s_annotate.rrna_gff,
-       ncrna_tmrna_gffs = s_annotate.ncrna_tmrna_gff,
+       rfam_gffs = s_annotate.rfam_gff, 
        container=container
   }
   call final_stats {
@@ -104,7 +102,8 @@ workflow annotation {
 
   call finish_ano {
     input:
-      container="microbiomedata/workflowmeta:1.1.0",
+      container="microbiomedata/workflowmeta:1.1.1",
+      input_file=stage.imgap_input_fasta,
       proj=proj,
       start=stage.start,
       resource=resource,
@@ -130,9 +129,7 @@ workflow annotation {
       genemark_gff = merge_outputs.genemark_gff,
       prodigal_gff = merge_outputs.prodigal_gff,
       trna_gff = merge_outputs.trna_gff,
-      misc_bind_misc_feature_regulatory_gff = merge_outputs.misc_bind_misc_feature_regulatory_gff,
-      rrna_gff = merge_outputs.rrna_gff,
-      ncrna_tmrna_gff = merge_outputs.ncrna_tmrna_gff,
+      rfam_gff = merge_outputs.rfam_gff,
       product_names_tsv = merge_outputs.product_names_tsv,
       crt_crisprs = merge_outputs.crt_crisprs
   }
@@ -157,9 +154,7 @@ workflow annotation {
     File? genemark_gff = finish_ano.final_genemark_gff
     File? prodigal_gff = finish_ano.final_prodigal_gff
     File? trna_gff = finish_ano.final_trna_gff
-    File? misc_bind_misc_feature_regulatory_gff = finish_ano.final_misc_bind_misc_feature_regulatory_gff
-    File? rrna_gff = finish_ano.final_rrna_gff
-    File? ncrna_tmrna_gff = finish_ano.final_ncrna_tmrna_gff
+    File? final_rfam_gff = finish_ano.final_rfam_gff
     File? proteins_cog_domtblout = finish_ano.final_proteins_cog_domtblout
     File? proteins_pfam_domtblout = finish_ano.final_proteins_pfam_domtblout
     File? proteins_tigrfam_domtblout = finish_ano.final_proteins_tigrfam_domtblout
@@ -273,9 +268,8 @@ task merge_outputs {
   Array[File?] genemark_gffs
   Array[File?] prodigal_gffs
   Array[File?] trna_gffs
-  Array[File?] misc_bind_misc_feature_regulatory_gffs
-  Array[File?] rrna_gffs
-  Array[File?] ncrna_tmrna_gffs
+  Array[File?] rfam_gffs
+
   String container
 
   command {
@@ -296,17 +290,13 @@ task merge_outputs {
      cat ${sep=" " genemark_gffs} > "${project_id}_genemark.gff"
      cat ${sep=" " prodigal_gffs} > "${project_id}_prodigal.gff"
      cat ${sep=" " trna_gffs} > "${project_id}_trna.gff"
-     cat ${sep=" " misc_bind_misc_feature_regulatory_gffs} > "${project_id}_rfam_misc_bind_misc_feature_regulatory.gff"
-     cat ${sep=" " rrna_gffs} > "${project_id}_rfam_rrna.gff"
-     cat ${sep=" " ncrna_tmrna_gffs} > "${project_id}_rfam_ncrna_tmrna.gff"
-
+     cat ${sep=" " rfam_gffs} > "${project_id}_rfam.gff" 
      cat ${sep=" " cog_domtblouts} > "${project_id}_proteins.cog.domtblout"
      cat ${sep=" " pfam_domtblouts} > "${project_id}_proteins.pfam.domtblout"
      cat ${sep=" " tigrfam_domtblouts} > "${project_id}_proteins.tigrfam.domtblout"
      cat ${sep=" " smart_domtblouts} > "${project_id}_proteins.smart.domtblout"
      cat ${sep=" " supfam_domtblouts} > "${project_id}_proteins.supfam.domtblout"
      cat ${sep=" " cath_funfam_domtblouts} > "${project_id}_proteins.cath_funfam.domtblout"
-
      cat ${sep=" " product_name_tsvs} > "${project_id}_product_names.tsv"
      cat ${sep=" " crt_crisprs_s} > "${project_id}_crt.crisprs"
   }
@@ -328,9 +318,7 @@ task merge_outputs {
     File genemark_gff = "${project_id}_genemark.gff"
     File prodigal_gff = "${project_id}_prodigal.gff"
     File trna_gff = "${project_id}_trna.gff"
-    File misc_bind_misc_feature_regulatory_gff = "${project_id}_rfam_misc_bind_misc_feature_regulatory.gff"
-    File rrna_gff = "${project_id}_rfam_rrna.gff"
-    File ncrna_tmrna_gff = "${project_id}_rfam_ncrna_tmrna.gff"
+    File rfam_gff = "${project_id}_rfam.gff"
     File proteins_cog_domtblout = "${project_id}_proteins.cog.domtblout"
     File proteins_pfam_domtblout = "${project_id}_proteins.pfam.domtblout"
     File proteins_tigrfam_domtblout = "${project_id}_proteins.tigrfam.domtblout"
@@ -377,6 +365,7 @@ task final_stats {
 
 task finish_ano {
    String container
+   File input_file
    String proj
    String prefix=sub(proj, ":", "_")
    String start
@@ -400,9 +389,7 @@ task finish_ano {
    File genemark_gff
    File prodigal_gff
    File trna_gff
-   File misc_bind_misc_feature_regulatory_gff
-   File rrna_gff
-   File ncrna_tmrna_gff
+   File rfam_gff
    File ko_ec_gff
    File? stats_tsv
    File stats_json
@@ -417,7 +404,7 @@ task finish_ano {
       end=`date --iso-8601=seconds`
       #Generate annotation objects
 
-       cat ${proteins_faa} | sed ${sed} > $${prefix}_proteins.faa
+       cat ${proteins_faa} | sed ${sed} > ${prefix}_proteins.faa
        cat ${structural_gff} | sed ${sed} > ${prefix}_structural_annotation.gff
        cat ${functional_gff} | sed ${sed} > ${prefix}_functional_annotation.gff
        cat ${ko_tsv} | sed ${sed} > ${prefix}_ko.tsv
@@ -432,10 +419,9 @@ task finish_ano {
        cat ${genemark_gff} | sed ${sed} > ${prefix}_genemark.gff
        cat ${prodigal_gff} | sed ${sed} > ${prefix}_prodigal.gff
        cat ${trna_gff} | sed ${sed} > ${prefix}_trna.gff
-       cat ${misc_bind_misc_feature_regulatory_gff} | sed ${sed} > ${prefix}_rfam_misc_bind_misc_feature_regulatory.gff
-       cat ${rrna_gff} | sed ${sed} > ${prefix}_rfam_rrna.gff
-       cat ${ncrna_tmrna_gff} | sed ${sed} > ${prefix}_rfam_ncrna_tmrna.gff
+       cat ${rfam_gff} | sed ${sed} > ${prefix}_rfam.gff
        cat ${crt_crisprs} | sed ${sed} > ${prefix}_crt.crisprs
+       cat ${gene_phylogeny_tsv} | sed ${sed} > ${prefix}_gene_phylogeny.tsv
        cat ${product_names_tsv} | sed ${sed} > ${prefix}_product_names.tsv
        cat ${ko_ec_gff} | sed ${sed} > ${prefix}_ko_ec.gff
        cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
@@ -450,33 +436,33 @@ task finish_ano {
                 was_informed_by=${informed_by} \
                 started_at_time=${start} \
                 ended_at_time=$end \
-                execution_resource=${resource} \
+                execution_resource="${resource}" \
                 git_url=${git_url} \
+                version="v1.0.0-beta" \
              --url ${url_root}${proj}/annotation/ \
-             --inputs ${prefix}_contigs.fna \
+             --inputs ${input_file} \
              --outputs \
-             ${prefix}_proteins.faa "FASTA amino acid file for annotated proteins" "Annotation Amino Acid FASTA" \
-             ${prefix}_structural_annotation.gff "GFF3 format file with structural annotations" "Structural Annotation GFF" \
-             ${prefix}_functional_annotation.gff "GFF3 format file with functional annotations" "Functional Annotation GFF" \
-             ${prefix}_ko.tsv "Tab delimited file for KO annotation" "Annotation KEGG Orthology" \
-             ${prefix}_ec.tsv "Tab delimited file for EC annotation" "Annotation Enzyme Commission" \
-             ${prefix}_cog.gff "GFF3 format file with COGs" "Clusters of Orthologous Groups (COG) Annotation GFF" \
-             ${prefix}_pfam.gff "GFF3 format file with Pfam" "Pfam Annotation GFF" \
-             ${prefix}_tigrfam.gff "GFF3 format file with TIGRfam" "TIGRFam Annotation GFF" \
-             ${prefix}_smart.gff "GFF3 format file with SMART" "SMART Annotation GFF" \
-             ${prefix}_supfam.gff "GFF3 format file with SUPERFam" "SUPERFam Annotation GFF" \
-             ${prefix}_cath_funfam.gff "GFF3 format file with CATH FunFams" "CATH FunFams (Functional Families) Annotation GFF" \
-             ${prefix}_crt.gff "GFF3 format file with CRT" "CRT Annotation GFF" \
-             ${prefix}_genemark.gff "GFF3 format file with Genemark" "Genemark Annotation GFF" \
-             ${prefix}_prodigal.gff "GFF3 format file with Prodigal" "Prodigal Annotation GFF" \
-             ${prefix}_trna.gff "GFF3 format file with TRNA" "TRNA Annotation GFF3" \
-             ${prefix}_rfam_misc_bind_misc_feature_regulatory.gff "GFF3 format file with Misc" "Misc Annotation GFF" \
-             ${prefix}_rfam_rrna.gff "GFF3 format file with RFAM" "RFAM Annotation GFF" \
-             ${prefix}_rfam_ncrna_tmrna.gff "GFF3 format file with TMRNA" "TMRNA Annotation GFF3" \
-             ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" \
-	           ${prefix}_products_names.tsv "Product names file" "Product names" \
-	           ${prefix}_crt.crisprs "Crisprt Terms" "Crisprt Terms" \
-             ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics"
+             ${prefix}_proteins.faa "FASTA amino acid file for annotated proteins" "Annotation Amino Acid FASTA" "FASTA Amino Acid File for ${proj}" \
+             ${prefix}_structural_annotation.gff "GFF3 format file with structural annotations" "Structural Annotation GFF"  "Structural Annotation for ${proj}"\
+             ${prefix}_functional_annotation.gff "GFF3 format file with functional annotations" "Functional Annotation GFF" "Functional Annotation for ${proj}" \
+             ${prefix}_ko.tsv "Tab delimited file for KO annotation" "Annotation KEGG Orthology" "KEGG Orthology for ${proj}" \
+             ${prefix}_ec.tsv "Tab delimited file for EC annotation" "Annotation Enzyme Commission" "EC Annotations for ${proj}" \
+             ${prefix}_cog.gff "GFF3 format file with COGs" "Clusters of Orthologous Groups (COG) Annotation GFF" "COGs for ${proj}" \
+             ${prefix}_pfam.gff "GFF3 format file with Pfam" "Pfam Annotation GFF" "Pfam Annotation for ${proj}" \
+             ${prefix}_tigrfam.gff "GFF3 format file with TIGRfam" "TIGRFam Annotation GFF" "TIGRFam for ${proj}" \
+             ${prefix}_smart.gff "GFF3 format file with SMART" "SMART Annotation GFF" "SMART Annotations for ${proj}" \
+             ${prefix}_supfam.gff "GFF3 format file with SUPERFam" "SUPERFam Annotation GFF" "SUPERFam Annotations for ${proj}" \
+             ${prefix}_cath_funfam.gff "GFF3 format file with CATH FunFams" "CATH FunFams (Functional Families) Annotation GFF" "CATH FunFams for ${proj}" \
+             ${prefix}_crt.gff "GFF3 format file with CRT" "CRT Annotation GFF" "CRT Annotations for ${proj}" \
+             ${prefix}_genemark.gff "GFF3 format file with Genemark" "Genemark Annotation GFF" "Genemark Annotations for ${proj}" \
+             ${prefix}_prodigal.gff "GFF3 format file with Prodigal" "Prodigal Annotation GFF" "Prodigal Annotations ${proj}" \
+             ${prefix}_trna.gff "GFF3 format file with TRNA" "TRNA Annotation GFF3" "TRNA Annotations ${proj}" \
+             ${prefix}_rfam.gff "GFF3 format file with RFAM" "RFAM Annotation GFF" "RFAM Annotations for ${proj}" \
+             ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" "KO_EC Annotations for ${proj}" \
+	     ${prefix}_product_names.tsv "Product names file" "Product names" "Product names for ${proj}" \
+	     ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
+             ${prefix}_crt.crisprs "Crispr Terms" "Crispr Terms" "Crispr Terms for ${proj}"  \
+             ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}"
 
    }
 
@@ -499,9 +485,7 @@ task finish_ano {
         File final_genemark_gff = "${prefix}_genemark.gff"
         File final_prodigal_gff = "${prefix}_prodigal.gff"
         File final_trna_gff = "${prefix}_trna.gff"
-        File final_misc_bind_misc_feature_regulatory_gff = "${prefix}_rfam_misc_bind_misc_feature_regulatory.gff"
-        File final_rrna_gff = "${prefix}_rfam_rrna.gff"
-        File final_ncrna_tmrna_gff = "${prefix}_rfam_ncrna_tmrna.gff"
+        File final_rfam_gff = "${prefix}_rfam.gff"
         File final_proteins_cog_domtblout = "${prefix}_proteins.cog.domtblout"
         File final_proteins_pfam_domtblout = "${prefix}_proteins.pfam.domtblout"
         File final_proteins_tigrfam_domtblout = "${prefix}_proteins.tigrfam.domtblout"

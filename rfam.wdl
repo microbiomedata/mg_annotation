@@ -24,9 +24,6 @@ workflow rfam {
   }
 
   output {
-    File misc_bind_misc_feature_regulatory_gff = run.misc_bind_misc_feature_regulatory_gff
-    File rrna_gff = run.rrna_gff
-    File ncrna_tmrna_gff = run.ncrna_tmrna_gff
     File rfam_gff = run.rfam_gff
   }
 }
@@ -57,11 +54,6 @@ task run {
             ${clan_filter_bin} "$tool_and_version" \
             ${claninfo_tsv} ${feature_lookup_tsv} > ${project_id}_rfam.gff
     fi
-    awk -F'\t' '$3 == "misc_bind" || $3 == "misc_feature" || $3 == "regulatory" {print $0}' \
-        ${project_id}_rfam.gff > ${project_id}_rfam_misc_bind_misc_feature_regulatory.gff
-    awk -F'\t' '$3 == "rRNA" {print $0}' ${project_id}_rfam.gff > ${project_id}_rfam_rrna.gff
-    awk -F'\t' '$3 == "ncRNA" || $3 == "tmRNA" {print $0}' \
-        ${project_id}_rfam.gff > ${project_id}_rfam_ncrna_tmrna.gff
   >>>
 
   runtime {
@@ -73,8 +65,5 @@ task run {
   output {
     File tbl = "${project_id}_rfam.tbl"
     File rfam_gff = "${project_id}_rfam.gff"
-    File misc_bind_misc_feature_regulatory_gff = "${project_id}_rfam_misc_bind_misc_feature_regulatory.gff"
-    File rrna_gff = "${project_id}_rfam_rrna.gff"
-    File ncrna_tmrna_gff = "${project_id}_rfam_ncrna_tmrna.gff"
   }
 }
