@@ -1,6 +1,6 @@
 FROM debian as buildbase
 
-RUN apt-get -y update && apt-get -y install git gcc make wget
+RUN apt-get -y update && apt-get -y install git gcc make wget time autoconf
 
 RUN apt-get -y install libz-dev
 #
@@ -8,23 +8,23 @@ RUN apt-get -y install libz-dev
 #
 FROM buildbase as prodigal
 
-RUN git clone https://github.com/hyattpd/Prodigal
+RUN git clone --branch v2.6.3 https://github.com/hyattpd/Prodigal
 
-RUN cd Prodigal && git checkout v2.6.3 && make
+RUN cd Prodigal  && make install
 
-RUN cd Prodigal && make install
+#RUN cd Prodigal && make install
 
-#
-# Build trnascan 2.0.05
+
+# Build trnascan 2.0.08
 #
 FROM buildbase as trnascan
 
-RUN wget http://trna.ucsc.edu/software/trnascan-se-2.0.5.tar.gz
+RUN wget http://trna.ucsc.edu/software/trnascan-se-2.0.8.tar.gz
 
 RUN \
-    tar xzvf trnascan-se-2.0.5.tar.gz && \
+    tar xzvf trnascan-se-2.0.8.tar.gz && \
     cd tRNAscan-SE-2.0 && \
-    ./configure --prefix=/opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.4/ && \
+    ./configure --prefix=/opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.8/ && \
     make && make install
 
 #
@@ -67,7 +67,7 @@ RUN \
     make && make install
 
 #
-# IMG scripts and tools, rm 2019 bin dir, replace with commit 40bc08c3 from (https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/commit/40bc08c3020da77dcf0ba252d18e134b75c0ef21). Add split.py from bfoster1/img-omics:0.1.12 (md5sum 21fb20bf430e61ce55430514029e7a83)
+# IMG scripts and tools, rm 2019 bin dir, replace with commit b35b472c from (https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/commit/b35b472c94eee83ff0c0485ffb431a80c6ff7122) v 5.1.12. Add split.py from bfoster1/img-omics:0.1.12 (md5sum 21fb20bf430e61ce55430514029e7a83)
 #
 FROM buildbase as img
 
@@ -144,23 +144,23 @@ COPY --from=cromwell /opt/omics/bin/ /opt/omics/bin/
 COPY --from=prodigal /usr/local/bin/prodigal /opt/omics/programs/prodigal
 
 COPY --from=trnascan /opt/omics/programs/tRNAscan-SE /opt/omics/programs/tRNAscan-SE
-#COPY --from=trnascan /usr/local/lib /opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.4/lib/
+#COPY --from=trnascan /usr/local/lib /opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.8/lib/
 
 COPY --from=hmm /opt/omics/programs/hmmer/ /opt/omics/programs/hmmer
 COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 
 COPY --from=last /opt/omics/programs/last /opt/omics/programs/last
 COPY --from=img /opt/omics/programs/CRT /opt/omics/programs/CRT
+#COPY --from=img /opt/omics/programs/tmhmm-2.0c /opt/omics/programs/tmhmm-2.0c
 
 COPY --from=infernal /opt/omics/programs/infernal /opt/omics/programs/infernal/
-#COPY --from=infernal /opt/omics/programs/infernal/infernal-1.1.2/bin/cmsearch /opt/omics/bin/cmsearch
 COPY --from=img /opt/omics/bin/ /opt/omics/bin/
 COPY --from=img /opt/omics/programs/CRT /opt/omics/programs/CRT
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
 
 RUN \
     mkdir /opt/omics/lib && cd /opt/omics/lib && \
-    ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.4/lib/tRNAscan-SE/* . 
+    ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.8/lib/tRNAscan-SE/* . 
 
 #link things to the bin directory
 
@@ -169,11 +169,18 @@ RUN \
     ln -s ../programs/gms2_linux_64/gms2.pl &&\
     ln -s ../programs/gms2_linux_64/gmhmmp2 &&\
     ln -s ../programs/infernal/infernal-1.1.2/bin/cmsearch && \
-    ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.4/bin/tRNAscan-SE && \
+    ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.8/bin/tRNAscan-SE && \
     ln -s ../programs/last/bin/lastal && \
     ln -s ../programs/CRT/CRT-CLI_v1.8.2.jar CRT-CLI.jar && \
     ln -s ../programs/prodigal &&\
     ln -s ../programs/hmmer/bin/hmmsearch 
+
+#make sure tRNAscan can see cmsearch and cmscan
+
+RUN \ 
+    cd /opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.8/bin/ &&\
+    ln -s /opt/omics/programs/infernal/infernal-1.1.2/bin/cmsearch && \
+    ln -s /opt/omics/programs/infernal/infernal-1.1.2/bin/cmscan
 
 #COPY --from=img /opt/omics /opt/omics3/
 

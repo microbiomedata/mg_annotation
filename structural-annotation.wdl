@@ -126,14 +126,21 @@ workflow s_annotate {
     File  gff = gff_merge.final_gff 
     File? crt_gff = crt.gff
     File? crisprs = crt.crisprs 
+    File? crt_out = crt.crt_out
     File? genemark_gff = cds_prediction.genemark_gff
     File? genemark_genes = cds_prediction.genemark_genes
     File? genemark_proteins = cds_prediction.genemark_proteins 
     File? prodigal_gff = cds_prediction.prodigal_gff
     File? prodigal_genes = cds_prediction.prodigal_genes
     File? prodigal_proteins = cds_prediction.prodigal_proteins
+    File? cds_gff = cds_prediction.gff
+    File? cds_proteins = cds_prediction.proteins
+    File? cds_genes = cds_prediction.genes
     File? trna_gff = trnascan.gff
+    File? trna_bacterial_out = trnascan.bacterial_out
+    File? trna_archaeal_out = trnascan.archaeal_out
     File? rfam_gff = rfam.rfam_gff
+    File? rfam_tbl = rfam.rfam_tbl
     File? proteins = fasta_merge.final_proteins
     File? genes = fasta_merge.final_genes
   }

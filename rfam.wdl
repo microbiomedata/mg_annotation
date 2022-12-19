@@ -25,6 +25,7 @@ workflow rfam {
 
   output {
     File rfam_gff = run.rfam_gff
+    File rfam_tbl = run.tbl
   }
 }
 

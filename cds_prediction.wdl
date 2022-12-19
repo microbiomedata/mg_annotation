@@ -9,7 +9,7 @@ workflow cds_prediction {
   Int? imgap_structural_annotation_translation_table
   String bin="/opt/omics/bin/structural_annotation"
   #if running w/JAWS $HOME is not mounted so need the license file in the execution dir
-  File? gm_license
+  String gm_license = "refdata/licences/.gmhmmp2_key"
 
     call run_cds_prediction  {
        input: imgap_input_fasta=imgap_input_fasta,
@@ -52,7 +52,7 @@ task run_cds_prediction {
    String container
    Int? imgap_structural_annotation_translation_table
    String bin
-   File? gm_license
+   String gm_license
    Boolean genemark_execute
    Boolean prodigal_execute
 
@@ -60,7 +60,7 @@ task run_cds_prediction {
    command {
        set -oeu pipefail
        #set name for log, code needs fasta to be in working dir, set varaiables, run cds_prediction.sh  
-       cds_log=${fasta_filename}_cds.log
+       cds_log=${project_id}_cds.log
        #copy file to cromwell execution dir to get outputs in this folder
        cp ../inputs/*/${fasta_filename} ./${project_id}_contigs.fna
        #set env variables
@@ -76,11 +76,8 @@ task run_cds_prediction {
         else
         export imgap_structural_annotation_genemark_execute="False"
        fi 
-       #if a licence file is provided, copy it to the execution dir
-       if [ -s ../inputs/*/.gmhmmp2_key ]
-         then
-            cp ../inputs/*/.gmhmmp2_key .
-       fi
+       #copy genemark license to the execution dir
+       cp /refdata/licences/.gmhmmp2_key .
        /usr/bin/time ${bin}/cds_prediction.sh ${project_id}_contigs.fna ${imgap_project_type} ${imgap_structural_annotation_translation_table} &> $cds_log
        rm ${project_id}_contigs.fna
    }
@@ -96,7 +93,7 @@ task run_cds_prediction {
     File? genemark_proteins= "${project_id}_genemark_proteins.faa"
     File? genemark_genes= "${project_id}_genemark_genes.fna"
     File? genemark_gff= "${project_id}_genemark.gff"
-    File? prodigal_proteins= "${project_id}_prodigal.gff"
+    File? prodigal_proteins= "${project_id}_prodigal_proteins.faa"
     File? prodigal_genes = "${project_id}_prodigal_genes.fna"
     File? prodigal_gff = "${project_id}_prodigal.gff"
     File  proteins= "${project_id}_cds_proteins.faa"

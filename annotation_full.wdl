@@ -70,7 +70,9 @@ workflow annotation {
        ko_tsvs = f_annotate.ko_tsv,
        ec_tsvs = f_annotate.ec_tsv,
        phylo_tsvs =  f_annotate.phylo_tsv,
+       last_blasttabs = f_annotate.last_blasttab,
        proteins = s_annotate.proteins,
+       genes = s_annotate.genes,
        ko_ec_gffs = f_annotate.ko_ec_gff,
        cog_gffs = f_annotate.cog_gff,
        pfam_gffs = f_annotate.pfam_gff,
@@ -85,11 +87,22 @@ workflow annotation {
        supfam_domtblouts = f_annotate.supfam_domtblout,
        cath_funfam_domtblouts = f_annotate.cath_funfam_domtblout,
        crt_crisprs_s = s_annotate.crisprs,
+       crt_outs = s_annotate.crt_out,
        crt_gffs = s_annotate.crt_gff,
        genemark_gffs = s_annotate.genemark_gff,
+       genemark_genes = s_annotate.genemark_genes,
+       genemark_proteins = s_annotate.genemark_proteins,
        prodigal_gffs = s_annotate.prodigal_gff,
+       prodigal_genes = s_annotate.prodigal_genes,
+       prodigal_proteins = s_annotate.prodigal_proteins,
+       cds_gffs = s_annotate.cds_gff,
+       cds_genes = s_annotate.cds_genes,
+       cds_proteins = s_annotate.cds_proteins,
        trna_gffs = s_annotate.trna_gff,
+       trna_bacterial_outs = s_annotate.trna_bacterial_out,
+       trna_archaeal_outs = s_annotate.trna_archaeal_out,
        rfam_gffs = s_annotate.rfam_gff, 
+       rfam_tbls = s_annotate.rfam_tbl,
        container=container
   }
   call final_stats {
@@ -155,12 +168,12 @@ workflow annotation {
     File? prodigal_gff = finish_ano.final_prodigal_gff
     File? trna_gff = finish_ano.final_trna_gff
     File? final_rfam_gff = finish_ano.final_rfam_gff
-    File? proteins_cog_domtblout = finish_ano.final_proteins_cog_domtblout
-    File? proteins_pfam_domtblout = finish_ano.final_proteins_pfam_domtblout
-    File? proteins_tigrfam_domtblout = finish_ano.final_proteins_tigrfam_domtblout
-    File? proteins_smart_domtblout = finish_ano.final_proteins_smart_domtblout
-    File? proteins_supfam_domtblout = finish_ano.final_proteins_supfam_domtblout
-    File? proteins_cath_funfam_domtblout = finish_ano.final_proteins_cath_funfam_domtblout
+ #   File? proteins_cog_domtblout = finish_ano.final_proteins_cog_domtblout
+ #   File? proteins_pfam_domtblout = finish_ano.final_proteins_pfam_domtblout
+ #   File? proteins_tigrfam_domtblout = finish_ano.final_proteins_tigrfam_domtblout
+ #   File? proteins_smart_domtblout = finish_ano.final_proteins_smart_domtblout
+ #   File? proteins_supfam_domtblout = finish_ano.final_proteins_supfam_domtblout
+ #   File? proteins_cath_funfam_domtblout = finish_ano.final_proteins_cath_funfam_domtblout
     File? product_names_tsv = finish_ano.final_product_names_tsv
     File? crt_crisprs = finish_ano.final_crt_crisprs
     File? ano_objects = finish_ano.objects
@@ -218,7 +231,6 @@ task split {
    String zfile="zscore.txt"
    String cmzfile="cmzscore.txt"
    String container
-   File? gm_license
 
    command{
      set -euo pipefail
@@ -248,7 +260,9 @@ task merge_outputs {
   Array[File?] ko_tsvs
   Array[File?] ec_tsvs
   Array[File?] phylo_tsvs
+  Array[File?] last_blasttabs
   Array[File?] proteins
+  Array[File?] genes
   Array[File?] ko_ec_gffs
   Array[File?] cog_gffs
   Array[File?] pfam_gffs
@@ -265,10 +279,21 @@ task merge_outputs {
   Array[File?] product_name_tsvs
   Array[File?] crt_crisprs_s
   Array[File?] crt_gffs
+  Array[File?] crt_outs
   Array[File?] genemark_gffs
+  Array[File?] genemark_genes
+  Array[File?] genemark_proteins 
   Array[File?] prodigal_gffs
+  Array[File?] prodigal_genes
+  Array[File?] prodigal_proteins
+  Array[File?] cds_gffs
+  Array[File?] cds_genes
+  Array[File?] cds_proteins
   Array[File?] trna_gffs
+  Array[File?] trna_bacterial_outs
+  Array[File?] trna_archaeal_outs
   Array[File?] rfam_gffs
+  Array[File?] rfam_tbls
 
   String container
 
@@ -278,7 +303,9 @@ task merge_outputs {
      cat ${sep=" " ko_tsvs} >  "${project_id}_ko.tsv"
      cat ${sep=" " ec_tsvs} >  "${project_id}_ec.tsv"
      cat ${sep=" " phylo_tsvs} > "${project_id}_gene_phylogeny.tsv"
-     cat ${sep=" " proteins} > "${project_id}.faa"
+     cat ${sep=" " last_blasttabs} > "${project_id}_proteins.img_nr.last.blasttab"
+     cat ${sep=" " proteins} > "${project_id}_proteins.faa"
+     cat ${sep=" " genes} > "${project_id}_genes.fna"
      cat ${sep=" " ko_ec_gffs} > "${project_id}_ko_ec.gff"
      cat ${sep=" " cog_gffs} > "${project_id}_cog.gff"
      cat ${sep=" " pfam_gffs} > "${project_id}_pfam.gff"
@@ -286,19 +313,30 @@ task merge_outputs {
      cat ${sep=" " smart_gffs} > "${project_id}_smart.gff"
      cat ${sep=" " supfam_gffs} > "${project_id}_supfam.gff"
      cat ${sep=" " cath_funfam_gffs} > "${project_id}_cath_funfam.gff"
-     cat ${sep=" " crt_gffs} > "${project_id}_crt.gff"
+     cat ${sep=" " product_name_tsvs} > "${project_id}_product_names.tsv"
      cat ${sep=" " genemark_gffs} > "${project_id}_genemark.gff"
+     cat ${sep=" " genemark_genes} > "${project_id}_genemark_genes.fna"
+     cat ${sep=" " genemark_proteins} > "${project_id}_genemark_proteins.faa"
      cat ${sep=" " prodigal_gffs} > "${project_id}_prodigal.gff"
+     cat ${sep=" " prodigal_proteins} > "${project_id}_prodigal_proteins.faa"
+     cat ${sep=" " prodigal_genes} > "${project_id}_prodigal_genes.fna"
+     cat ${sep=" " cds_gffs} > "${project_id}_cds.gff"
+     cat ${sep=" " cds_proteins} > "${project_id}_cds_proteins.faa"
+     cat ${sep=" " cds_genes} > "${project_id}_cds_genes.fna"
      cat ${sep=" " trna_gffs} > "${project_id}_trna.gff"
-     cat ${sep=" " rfam_gffs} > "${project_id}_rfam.gff" 
+     cat ${sep=" " trna_bacterial_outs} > "${project_id}_trnascan_bacterial.out"
+     cat ${sep=" " trna_archaeal_outs} > "${project_id}_trnascan_archaeal.out"
+     cat ${sep=" " rfam_gffs} > "${project_id}_rfam.gff"
+     cat ${sep=" " rfam_tbls} > "${project_id}_rfam.tbl"  
      cat ${sep=" " cog_domtblouts} > "${project_id}_proteins.cog.domtblout"
      cat ${sep=" " pfam_domtblouts} > "${project_id}_proteins.pfam.domtblout"
      cat ${sep=" " tigrfam_domtblouts} > "${project_id}_proteins.tigrfam.domtblout"
      cat ${sep=" " smart_domtblouts} > "${project_id}_proteins.smart.domtblout"
      cat ${sep=" " supfam_domtblouts} > "${project_id}_proteins.supfam.domtblout"
      cat ${sep=" " cath_funfam_domtblouts} > "${project_id}_proteins.cath_funfam.domtblout"
-     cat ${sep=" " product_name_tsvs} > "${project_id}_product_names.tsv"
      cat ${sep=" " crt_crisprs_s} > "${project_id}_crt.crisprs"
+     cat ${sep=" " crt_gffs} > "${project_id}_crt.gff"
+     cat ${sep=" " crt_outs} > "${project_id}_crt.out"
   }
   output {
     File functional_gff = "${project_id}_functional_annotation.gff"
@@ -306,7 +344,9 @@ task merge_outputs {
     File ko_tsv = "${project_id}_ko.tsv"
     File ec_tsv = "${project_id}_ec.tsv"
     File gene_phylogeny_tsv = "${project_id}_gene_phylogeny.tsv"
-    File proteins_faa = "${project_id}.faa"
+    File last_blasttab = "${project_id}_proteins.img_nr.last.blasttab"
+    File proteins_faa = "${project_id}_proteins.faa"
+    File genes_fna = "${project_id}_genes.fna"
     File ko_ec_gff = "${project_id}_ko_ec.gff"
     File cog_gff = "${project_id}_cog.gff"
     File pfam_gff = "${project_id}_pfam.gff"
@@ -316,9 +356,19 @@ task merge_outputs {
     File cath_funfam_gff = "${project_id}_cath_funfam.gff"
     File crt_gff = "${project_id}_crt.gff"
     File genemark_gff = "${project_id}_genemark.gff"
+    File genemark_gene = "${project_id}_genemark_genes.fna"
+    File genemark_protein = "${project_id}_genemark_proteins.faa"
     File prodigal_gff = "${project_id}_prodigal.gff"
+    File prodigal_gene = "${project_id}_prodigal_genes.fna"
+    File prodigal_protein = "${project_id}_prodigal_proteins.faa"
+    File cds_gff = "${project_id}_cds.gff"
+    File cds_gene = "${project_id}_cds_genes.fna"
+    File cds_protein = "${project_id}_cds_proteins.faa"
     File trna_gff = "${project_id}_trna.gff"
+    File trna_bacterial_out = "${project_id}_trnascan_bacterial.out"
+    File trna_archaeal_out = "${project_id}_trnascan_archaeal.out"
     File rfam_gff = "${project_id}_rfam.gff"
+    File rfam_tbl = "${project_id}_rfam.tbl"
     File proteins_cog_domtblout = "${project_id}_proteins.cog.domtblout"
     File proteins_pfam_domtblout = "${project_id}_proteins.pfam.domtblout"
     File proteins_tigrfam_domtblout = "${project_id}_proteins.tigrfam.domtblout"
@@ -327,6 +377,7 @@ task merge_outputs {
     File proteins_cath_funfam_domtblout = "${project_id}_proteins.cath_funfam.domtblout"
     File product_names_tsv = "${project_id}_product_names.tsv"
     File crt_crisprs = "${project_id}_crt.crisprs"
+    File crt_out = "${project_id}_crt.out"
   }
   runtime {
     memory: "2G"
@@ -347,7 +398,7 @@ task final_stats {
 
   command {
     set -euo pipefail
-    ln ${input_fasta} ${fna}
+    cp ${input_fasta} ${fna}
     ${bin} ${fna} ${structural_gff}
   }
 
@@ -473,7 +524,7 @@ task finish_ano {
         File final_ko_tsv = "${prefix}_ko.tsv"
         File final_ec_tsv = "${prefix}_ec.tsv"
         File final_gene_phylogeny_tsv = "${prefix}_gene_phylogeny.tsv"
-        File final_proteins_faa = "${prefix}.faa"
+        File final_proteins_faa = "${prefix}_proteins.faa"
         File final_ko_ec_gff = "${prefix}_ko_ec.gff"
         File final_cog_gff = "${prefix}_cog.gff"
         File final_pfam_gff = "${prefix}_pfam.gff"
@@ -486,12 +537,12 @@ task finish_ano {
         File final_prodigal_gff = "${prefix}_prodigal.gff"
         File final_trna_gff = "${prefix}_trna.gff"
         File final_rfam_gff = "${prefix}_rfam.gff"
-        File final_proteins_cog_domtblout = "${prefix}_proteins.cog.domtblout"
-        File final_proteins_pfam_domtblout = "${prefix}_proteins.pfam.domtblout"
-        File final_proteins_tigrfam_domtblout = "${prefix}_proteins.tigrfam.domtblout"
-        File final_proteins_smart_domtblout = "${prefix}_proteins.smart.domtblout"
-        File final_proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
-        File final_proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
+#        File final_proteins_cog_domtblout = "${prefix}_proteins.cog.domtblout"
+#        File final_proteins_pfam_domtblout = "${prefix}_proteins.pfam.domtblout"
+#        File final_proteins_tigrfam_domtblout = "${prefix}_proteins.tigrfam.domtblout"
+#        File final_proteins_smart_domtblout = "${prefix}_proteins.smart.domtblout"
+#        File final_proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
+#        File final_proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
         File final_product_names_tsv = "${prefix}_product_names.tsv"
         File final_crt_crisprs = "${prefix}_crt.crisprs"
         File final_tsv = "${prefix}_stats.tsv"

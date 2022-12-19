@@ -14,6 +14,8 @@ workflow trnascan {
   }
   output {
     File gff = trnascan_ba.gff
+    File bacterial_out = trnascan_ba.bacterial_out
+    File archaeal_out = trnascan_ba.archaeal_out
   }
   meta {
      author: "Brian Foster"
@@ -33,17 +35,14 @@ task trnascan_ba {
   command <<<
      set -euo pipefail
      cp ${input_fasta} ./${project_id}_contigs.fna
-     /opt/omics/bin/structural_annotation/trnascan-se_trnas.sh ${project_id}_contigs.fna metagenome ${threads}
+     /opt/omics/bin/structural_annotation/trnascan-se_trnas.sh ${project_id}_contigs.fna ${threads}
   >>>
 
   runtime {
     time: "9:00:00"
-    docker: "scanon/im-trnascan:v0.0.1"
-    shared: "1"
+    docker: "aclum/img-omics:5.1.12"
+    cpu: threads
     memory: "115G"
-    poolname: "tuesday-one"
-    node: 5
-    nwpn: 8
   }
 
   output {

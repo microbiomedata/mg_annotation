@@ -25,11 +25,11 @@ workflow f_annotate {
   Boolean superfam_execute=true
   String  superfam_db="${database_location}"+"/SuperFamily/v1.75/supfam.hmm"
   Boolean pfam_execute=true
-  String  pfam_db="${database_location}"+"/Pfam/Pfam-A-LATEST/Pfam-A.hmm"
-  String  pfam_claninfo_tsv="${database_location}"+"/Pfam/Pfam-A-LATEST/Pfam-A.clans.tsv"
+  String  pfam_db="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.v34.0.hmm"
+  String  pfam_claninfo_tsv="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
   String  pfam_clan_filter="/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
   Boolean cath_funfam_execute=true
-  String  cath_funfam_db="${database_location}"+"/Cath-FunFam/latest/funfam.hmm"
+  String  cath_funfam_db="${database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
 #  Boolean signalp_execute=true
 #  String  signalp_gram_stain="GRAM_STAIN"
 #  String  signalp_bin="/opt/omics/bin/signalp"
@@ -170,6 +170,7 @@ workflow f_annotate {
     File? ec_tsv = ko_ec.ec_tsv
     File? phylo_tsv = ko_ec.phylo_tsv
     File? ko_ec_gff = ko_ec.gff
+    File? last_blasttab = ko_ec.last_blasttab
     File? cog_gff = cog.gff
     File? pfam_gff = pfam.gff
     File? tigrfam_gff = tigrfam.gff
