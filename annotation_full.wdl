@@ -11,15 +11,16 @@ workflow annotation {
   String  imgap_project_id
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
+  String?  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
-  String  container="aclum/img-omics:5.1.12"
+  String  container="microbiomedata/img-omics:5.1.13"
+  
 
   # structural annotation
   Boolean sa_execute=true
 
   # functional annotation
   Boolean fa_execute=true
-  File? gm_license
  
  call stage {
       input: container=container,
@@ -105,6 +106,30 @@ workflow annotation {
        rfam_tbls = s_annotate.rfam_tbl,
        container=container
   }
+  call make_info_file {
+    input: project_id = imgap_project_id, 
+       container=container,
+       sa_execute = sa_execute,
+       fa_execute = fa_execute,
+       structural_gff  = merge_outputs.structural_gff,
+       imgap_version = split.imgap_version,
+       rfam_version = s_annotate.rfam_version,
+       lastal_version = f_annotate.lastal_version,
+       img_nr_db_version = f_annotate.img_nr_db_version,
+       hmmsearch_smart_version = f_annotate.hmmsearch_smart_version,
+       smart_db_version = f_annotate.smart_db_version,
+       hmmsearch_cog_version = f_annotate.hmmsearch_cog_version,
+       cog_db_version = f_annotate.cog_db_version,
+       hmmserach_tigrfam_version = f_annotate.hmmserach_tigrfam_version,
+       tigrfam_db_version = f_annotate.tigrfam_db_version,
+       hmmserach_superfam_version = f_annotate.hmmserach_superfam_version,
+       superfam_db_version = f_annotate.superfam_db_version,
+       hmmserach_pfam_version = f_annotate.hmmserach_pfam_version,
+       pfam_db_version = f_annotate.pfam_db_version,
+       hmmserach_cath_funfam_version = f_annotate.hmmserach_cath_funfam_version,
+       cath_funfam_db_version = f_annotate.cath_funfam_db_version
+  }
+
   call final_stats {
     input:
        project_id = imgap_project_id,
@@ -177,6 +202,7 @@ workflow annotation {
     File? product_names_tsv = finish_ano.final_product_names_tsv
     File? crt_crisprs = finish_ano.final_crt_crisprs
     File? ano_objects = finish_ano.objects
+    File imgap_version = make_info_file.imgap_info
   }
 
   parameter_meta {
@@ -231,19 +257,23 @@ task split {
    String zfile="zscore.txt"
    String cmzfile="cmzscore.txt"
    String container
+   String imgap_version_file="imgap_version.txt"
 
    command{
      set -euo pipefail
      /opt/omics/bin/split.py ${infile} ${blocksize} .
      echo $(egrep -v "^>" ${infile} | tr -d '\n' | wc -m) / 500 | bc > ${zfile}
      echo "scale=6; ($(grep -v '^>' ${infile} | tr -d '\n' | wc -m) * 2) / 1000000" | bc -l > ${cmzfile}
+     cat /opt/omics/VERSION > ${imgap_version_file}
    }
 
    output{
      Array[File] files = read_lines('splits_out.fof')
      String zscore = read_string(zfile)
      String cmzscore = read_string(cmzfile)
+     String imgap_version = read_string(imgap_version_file)
    }
+
    runtime {
      memory: "120G"
      cpu:  16
@@ -294,10 +324,12 @@ task merge_outputs {
   Array[File?] trna_archaeal_outs
   Array[File?] rfam_gffs
   Array[File?] rfam_tbls
-
   String container
+  
 
-  command {
+  command <<<
+     
+     #combine files
      cat ${sep=" " structural_gffs} > "${project_id}_structural_annotation.gff"
      cat ${sep=" " functional_gffs} > "${project_id}_functional_annotation.gff"
      cat ${sep=" " ko_tsvs} >  "${project_id}_ko.tsv"
@@ -337,7 +369,8 @@ task merge_outputs {
      cat ${sep=" " crt_crisprs_s} > "${project_id}_crt.crisprs"
      cat ${sep=" " crt_gffs} > "${project_id}_crt.gff"
      cat ${sep=" " crt_outs} > "${project_id}_crt.out"
-  }
+     
+  >>>
   output {
     File functional_gff = "${project_id}_functional_annotation.gff"
     File structural_gff = "${project_id}_structural_annotation.gff"
@@ -387,6 +420,107 @@ task merge_outputs {
   }
 
 }
+
+task make_info_file {
+  String container
+  String imgap_version
+  Boolean fa_execute
+  Boolean sa_execute
+  String project_id
+  Array[String?] rfam_version
+  Boolean rfam_executed = if (defined(rfam_version)) then true else false
+  File structural_gff 
+  Array[String?] lastal_version
+  Array[String?] img_nr_db_version
+  Array[String?] hmmsearch_smart_version
+  Array[String?] smart_db_version
+  Array[String?] hmmsearch_cog_version
+  Array[String?] cog_db_version
+  Array[String?] hmmserach_tigrfam_version
+  Array[String?] tigrfam_db_version
+  Array[String?] hmmserach_superfam_version
+  Array[String?] superfam_db_version
+  Array[String?] hmmserach_pfam_version
+  Array[String?] pfam_db_version
+  Array[String?] hmmserach_cath_funfam_version
+  Array[String?] cath_funfam_db_version
+  String fa_version_file = "fa_tool_version.txt"
+  String fa_db_version_file = "fa_db_version.txt"
+  String rfam_version_file = "rfam_version.txt"
+  String sa_version_file = "sa_tool_version.txt"
+  String sa_db_version_file = "sa_db_version.txt"
+
+  command <<<
+    set -euo pipefail
+     echo "IMGAP Version: ${imgap_version}" > ${project_id}_imgap.info
+     #get structual annotation versions
+     if [[ "${sa_execute}" = true ]]
+       then 
+       sa_version=`cut -f2 ${structural_gff}  | sort | uniq | perl -pe 's/\n/; /g' | sed -E 's/(.*)\; /\1/'`
+       sa_version="Structural Annotation Programs Used: $sa_version"
+       echo $sa_version >> ${project_id}_imgap.info
+       if [[ "${rfam_executed}" = true ]]
+         then
+         echo ${sep="," rfam_version} > ${rfam_version_file}
+         cat  ${rfam_version_file} | tr ',' '\n' | sort | uniq  > rfam_version_uniq.txt
+
+         rfam_db_version="Structural Annotation DBs Used:"
+   #use while instead of for to handle the spaces in values
+         while read db_version ; do
+           rfam_db_version="$rfam_db_version $db_version; "
+         done < rfam_version_uniq.txt
+         rfam_db_version=`echo $rfam_db_version | sed -E 's/(.*)\;/\1/'`
+         echo  $rfam_db_version  >> ${project_id}_imgap.info
+       fi
+    fi
+     #get ftructural annotation tool versions
+     if [[ "${fa_execute}" = true ]]
+       then
+       echo ${sep="," lastal_version} > ${fa_version_file}
+       echo ${sep="," hmmsearch_smart_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_cog_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_cog_version} >> ${fa_version_file}
+       echo ${sep="," hmmserach_tigrfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmserach_superfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmserach_pfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmserach_cath_funfam_version} >> ${fa_version_file}
+       cat ${fa_version_file} | tr ',' '\n' | sort | uniq  > fa_version_uniq.txt
+       fa_tool_version="Functional Annotation Programs Used: "
+       while read tool ; do
+         fa_tool_version="$fa_tool_version $tool; "
+       done < fa_version_uniq.txt
+       fa_tool_version=`echo $fa_tool_version | sed -E 's/(.*)\;/\1/'`
+       echo $fa_tool_version >> ${project_id}_imgap.info
+       #get functional annotation db versions
+       echo ${sep="," img_nr_db_version} > ${fa_db_version_file}
+       echo ${sep="," smart_db_version} >> ${fa_db_version_file}  
+       echo ${sep="," cog_db_version} >> ${fa_db_version_file}
+       echo ${sep="," tigrfam_db_version} >> ${fa_db_version_file}
+       echo ${sep="," superfam_db_version} >> ${fa_db_version_file}
+       echo ${sep="," pfam_db_version} >> ${fa_db_version_file}
+       echo ${sep=","cath_funfam_db_version} >> ${fa_db_version_file}
+       cat ${fa_db_version_file} | tr ',' '\n' | sort | uniq  > fa_db_version_uniq.txt
+       fa_db_version="Functional Annotation DBs Used: "
+       while read db ; do
+         fa_db_version="$fa_db_version $db; "
+       done < fa_db_version_uniq.txt
+       fa_db_version=`echo $fa_db_version | sed -E 's/(.*)\;/\1/'`
+       echo $fa_db_version >> ${project_id}_imgap.info
+    fi
+  >>>
+
+  output {
+    File imgap_info = "${project_id}_imgap.info"
+  }
+  runtime {
+    memory: "2G"
+    cpu:  4
+    maxRetries: 1
+    docker: container
+  }
+
+}
+
 
 task final_stats {
   String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"

@@ -3,7 +3,7 @@ workflow trnascan {
   String imgap_project_id
   String imgap_project_type
   Int    additional_threads
-  String container
+  String container = "microbiomedata/img-omics:5.1.13"
 
   call trnascan_ba {
     input:
@@ -40,7 +40,7 @@ task trnascan_ba {
 
   runtime {
     time: "9:00:00"
-    docker: "aclum/img-omics:5.1.12"
+    docker: container
     cpu: threads
     memory: "115G"
   }

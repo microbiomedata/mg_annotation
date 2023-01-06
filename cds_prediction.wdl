@@ -9,7 +9,7 @@ workflow cds_prediction {
   Int? imgap_structural_annotation_translation_table
   String bin="/opt/omics/bin/structural_annotation"
   #if running w/JAWS $HOME is not mounted so need the license file in the execution dir
-  String gm_license = "refdata/licences/.gmhmmp2_key"
+  String? gm_license 
 
     call run_cds_prediction  {
        input: imgap_input_fasta=imgap_input_fasta,
@@ -77,7 +77,7 @@ task run_cds_prediction {
         export imgap_structural_annotation_genemark_execute="False"
        fi 
        #copy genemark license to the execution dir
-       cp /refdata/licences/.gmhmmp2_key .
+       cp ${gm_license} .
        /usr/bin/time ${bin}/cds_prediction.sh ${project_id}_contigs.fna ${imgap_project_type} ${imgap_structural_annotation_translation_table} &> $cds_log
        rm ${project_id}_contigs.fna
    }

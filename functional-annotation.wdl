@@ -41,8 +41,8 @@ workflow f_annotate {
   String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
   String  product_names_mapping_dir="${database_location}"+"/Product_Name_Mappings/latest"
   String  container
-  String  hmm_container="aclum/img-omics:5.1.12"
-  String  last_container="aclum/img-omics:5.1.12"
+  String  hmm_container="microbiomedata/img-omics:5.1.13"
+  String  last_container="microbiomedata/img-omics:5.1.13"
 
   if(ko_ec_execute) {
     call ko_ec {
@@ -183,6 +183,20 @@ workflow f_annotate {
     File? supfam_domtblout = superfam.domtblout
     File? smart_domtblout = smart.domtblout
     File? cath_funfam_domtblout = cath_funfam.domtblout
+    String? lastal_version = ko_ec.lastal_ver
+    String? img_nr_db_version = ko_ec.img_nr_db_ver
+    String? hmmsearch_smart_version = smart.hmmsearch_smart_ver
+    String? smart_db_version = smart.smart_db_ver
+    String? hmmsearch_cog_version = cog.hmmsearch_cog_ver
+    String? cog_db_version = cog.cog_db_ver
+    String? hmmserach_tigrfam_version = tigrfam.hmmserach_tigrfam_ver
+    String? tigrfam_db_version = tigrfam.tigrfam_db_ver
+    String? hmmserach_superfam_version = superfam.hmmserach_superfam_ver
+    String? superfam_db_version = superfam.superfam_db_ver
+    String? hmmserach_pfam_version = pfam.hmmserach_pfam_ver
+    String? pfam_db_version = pfam.pfam_db_ver
+    String? hmmserach_cath_funfam_version = cath_funfam.hmmserach_cath_funfam_ver
+    String? cath_funfam_db_version = cath_funfam.cath_funfam_db_ver
   }
 
 }
@@ -202,6 +216,8 @@ task ko_ec {
   String lastal
   String selector
   String container
+  String lastal_version_file = "lastal_version.txt"
+  String img_nr_db_version_file = "img_db_version.txt"
 
   command {
     set -euo pipefail
@@ -211,6 +227,12 @@ task ko_ec {
                 ${project_id}_ko.tsv ${project_id}_ec.tsv \
                 ${project_id}_gene_phylogeny.tsv ${project_id}_ko_ec.gff \
                 ${project_id}_proteins.img_nr.last.blasttab
+
+   #get version information
+   lastal_version="`${lastal} -V`"
+   echo $lastal_version > ${lastal_version_file}
+   img_nr_db_version="IMG-NR $(basename $(realpath $(dirname ${nr_db})))"
+   echo $img_nr_db_version  > ${img_nr_db_version_file}
   }
 
   runtime {
@@ -225,6 +247,8 @@ task ko_ec {
     File ec_tsv = "${project_id}_ec.tsv"
     File phylo_tsv = "${project_id}_gene_phylogeny.tsv"
     File gff = "${project_id}_ko_ec.gff"
+    String lastal_ver = read_string(lastal_version_file)
+    String img_nr_db_ver = read_string(img_nr_db_version_file)
   }
 }
 
@@ -243,6 +267,8 @@ task smart {
   String frag_hits_filter
   String base=basename(input_fasta)
   String container
+  String hmmsearch_version_file = "hmmsearch_version.txt"
+  String smart_db_version_file = "smart_db_version.txt"
 
   command <<<
      set -euo pipefail
@@ -251,6 +277,12 @@ task smart {
      ${smart_db} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
+
+   #get version
+   hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
+   echo $hmmsearch_version > ${hmmsearch_version_file}
+   smart_db_version="SMART $(basename $(realpath $(dirname ${smart_db})))"
+   echo $smart_db_version > ${smart_db_version_file}
   >>>
 
   runtime {
@@ -262,6 +294,8 @@ task smart {
   output {
     File gff = "${project_id}_smart.gff"
     File domtblout = "${project_id}_proteins.smart.domtblout"
+    String hmmsearch_smart_ver = read_string(hmmsearch_version_file)
+    String smart_db_ver = read_string(smart_db_version_file)
   }
 }
 
@@ -280,6 +314,8 @@ task cog {
   String frag_hits_filter
   String base=basename(input_fasta)
   String container
+  String hmmsearch_version_file = "hmmsearch_version.txt"
+  String cog_db_version_file = "cog_db_version.txt"
 
   command <<<
      set -euo pipefail
@@ -288,6 +324,12 @@ task cog {
      ${cog_db} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
+     
+    #get versions
+   hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3`"
+   echo $hmmsearch_version > ${hmmsearch_version_file}
+   cog_db_version="COG $(basename $(realpath $(dirname ${cog_db})))"
+   echo $cog_db_version > ${cog_db_version_file}
   >>>
 
   runtime {
@@ -299,6 +341,8 @@ task cog {
   output {
     File gff = "${project_id}_cog.gff"
     File domtblout = "${project_id}_proteins.cog.domtblout"
+    String hmmsearch_cog_ver = read_string(hmmsearch_version_file)
+    String cog_db_ver = read_string(cog_db_version_file)
   }
 }
 
@@ -316,6 +360,8 @@ task tigrfam {
   String hit_selector
   String base=basename(input_fasta)
   String container
+  String hmmsearch_version_file = "hmmsearch_version.txt"
+  String tigrfam_db_version_file = "tigrfam_db_version.txt"
 
   command <<<
      set -euo pipefail
@@ -324,6 +370,12 @@ task tigrfam {
      ${tigrfam_db} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${aln_length_ratio} ${max_overlap_ratio} 
+
+   #    #get versions
+   hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
+   echo $hmmsearch_version > ${hmmsearch_version_file}
+   tigrfam_db_version="TIGRFAM $(basename $(realpath $(dirname ${tigrfam_db})))"
+   echo $tigrfam_db_version > ${tigrfam_db_version_file}
   >>>
 
   runtime {
@@ -335,6 +387,9 @@ task tigrfam {
   output {
     File gff = "${project_id}_tigrfam.gff"
     File domtblout = "${project_id}_proteins.tigrfam.domtblout"
+    String hmmserach_tigrfam_ver = read_string(hmmsearch_version_file)
+    String tigrfam_db_ver = read_string(tigrfam_db_version_file)
+
   }
 }
 
@@ -353,6 +408,8 @@ task superfam {
   String frag_hits_filter
   String base=basename(input_fasta)
   String container
+  String hmmsearch_version_file =  "hmmsearch_version.txt"
+  String superfam_db_version_file = "superfam_db_version.txt"
 
   command <<<
      set -euo pipefail
@@ -363,6 +420,11 @@ task superfam {
      ${superfam_db} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
+ 
+     hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
+     echo $hmmsearch_version > ${hmmsearch_version_file}
+     superfam_db_version="SuperFamily $(basename $(realpath $(dirname ${superfam_db})))"
+     echo $superfam_db_version > ${superfam_db_version_file}
   >>>
 
   runtime {
@@ -374,6 +436,8 @@ task superfam {
   output {
     File gff = "${project_id}_supfam.gff"
     File domtblout = "${project_id}_proteins.supfam.domtblout"
+    String hmmserach_superfam_ver = read_string(hmmsearch_version_file)
+    String superfam_db_ver = read_string(superfam_db_version_file)
   }
 }
 
@@ -390,6 +454,8 @@ task pfam {
   String pfam_clan_filter
   String base=basename(input_fasta)
   String container
+  String hmmsearch_version_file = "hmmsearch_version.txt" 
+  String pfam_db_version_file = "pfam_db_version.txt"
 
   command <<<
      set -euo pipefail
@@ -399,6 +465,11 @@ task pfam {
      /opt/omics/bin/functional_annotation/hmmsearch_pfams.sh ${base} \
      ${pfam_db} ${pfam_claninfo_tsv} \
      ${threads} ${par_hmm_inst} ${approx_num_proteins}
+
+     hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
+     echo $hmmsearch_version > ${hmmsearch_version_file}
+     pfam_db_version="Pfam $(basename $(realpath $(dirname ${pfam_db})))"
+     echo $pfam_db_version > ${pfam_db_version_file}
   >>>
 
   runtime {
@@ -410,6 +481,8 @@ task pfam {
   output {
     File gff = "${project_id}_pfam.gff"
     File domtblout = "${project_id}_proteins.pfam.domtblout"
+    String hmmserach_pfam_ver = read_string(hmmsearch_version_file)
+    String pfam_db_ver = read_string(pfam_db_version_file)
   }
 }
 
@@ -428,6 +501,8 @@ task cath_funfam {
   String frag_hits_filter
   String base=basename(input_fasta)
   String container
+  String hmmsearch_version_file = "hmmsearch_version.txt"
+  String cath_funfam_db_version_file = "cath_funfam_db_version.txt"
 
   command <<<
      set -euo pipefail
@@ -435,6 +510,11 @@ task cath_funfam {
      /opt/omics/bin/functional_annotation/hmmsearch_cath_funfams.sh  ${base} \
      ${cath_funfam_db} ${threads} ${par_hmm_inst} ${approx_num_proteins} \
      ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
+
+     hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
+     echo $hmmsearch_version > ${hmmsearch_version_file}
+     cath_funfam_db_version="Cath-Funfam $(basename $(realpath $(dirname ${cath_funfam_db})))"
+     echo $cath_funfam_db_version > ${cath_funfam_db_version_file}
   >>>
 
   runtime {
@@ -446,6 +526,8 @@ task cath_funfam {
   output {
       File gff = "${project_id}_cath_funfam.gff"
       File domtblout = "${project_id}_proteins.cath_funfam.domtblout"
+      String hmmserach_cath_funfam_ver = read_string(hmmsearch_version_file)
+      String cath_funfam_db_ver = read_string(cath_funfam_db_version_file)
   }
 }
 

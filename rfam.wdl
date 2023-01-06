@@ -26,6 +26,7 @@ workflow rfam {
   output {
     File rfam_gff = run.rfam_gff
     File rfam_tbl = run.tbl
+    String rfam_version = run.rfam_ver
   }
 }
 
@@ -41,6 +42,7 @@ task run {
   String feature_lookup_tsv
   Int    threads
   String container
+  String rfam_version_file = "rfam_version.txt"
 
   command <<<
     set -euo pipefail
@@ -55,6 +57,10 @@ task run {
             ${clan_filter_bin} "$tool_and_version" \
             ${claninfo_tsv} ${feature_lookup_tsv} > ${project_id}_rfam.gff
     fi
+ 
+  #get database version
+  rfam_version=$(basename $(dirname ${cm}))
+  echo "Rfam $rfam_version" > ${rfam_version_file}
   >>>
 
   runtime {
@@ -66,5 +72,6 @@ task run {
   output {
     File tbl = "${project_id}_rfam.tbl"
     File rfam_gff = "${project_id}_rfam.gff"
+    String rfam_ver = read_string(rfam_version_file)
   }
 }

@@ -7,7 +7,7 @@ workflow annotation {
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   Int     additional_threads=16
-  String  container="aclum/img-omics:5.1.12"
+  String  container="microbiomedata/img-omics:5.1.13"
   String bc_bin="/miniconda3/bin/bc"
   # structural annotation
   Boolean sa_execute=true

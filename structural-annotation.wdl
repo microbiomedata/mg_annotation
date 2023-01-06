@@ -20,7 +20,7 @@ workflow s_annotate {
   Boolean gff_and_fasta_stats_execute=true
   String  database_location
   String  container
-  File? gm_license
+  String? gm_license
 
   if(pre_qc_execute) {
     call pre_qc {
@@ -141,6 +141,7 @@ workflow s_annotate {
     File? trna_archaeal_out = trnascan.archaeal_out
     File? rfam_gff = rfam.rfam_gff
     File? rfam_tbl = rfam.rfam_tbl
+    String? rfam_version = rfam.rfam_version
     File? proteins = fasta_merge.final_proteins
     File? genes = fasta_merge.final_genes
   }
@@ -227,7 +228,6 @@ task gff_merge {
   Boolean rfam_execute
   Boolean trnascan_se_execute
   String container
-
   command {
     set -euo pipefail
     # set cromwell booleans as bash variables
@@ -244,11 +244,11 @@ task gff_merge {
        merger_args="$merger_args --cds_gff ${cds_gff}"
     fi
 
-    if [["$crt_execute" = true ]] ; then
+    if [[ "$crt_execute" = true ]] ; then
        merger_args="$merger_args --crt_gff ${crt_gff}"
     fi
 
-    if [[("$prodigal_execute" = true || "$genemark_execute" = true) ]] && [["$crt_execute" = true ]] ; then
+    if [[ ("$prodigal_execute" = true || "$genemark_execute" = true) ]] && [[ "$crt_execute" = true ]] ; then
        merger_args="$merger_args --log_file ${project_id}_gff_merge.log"
     fi
 
@@ -262,6 +262,8 @@ task gff_merge {
 
     #excute gff_files_merger.py
     ${bin} $merger_args 1> ${project_id}_structural_annotation.gff
+
+
   }
 
   runtime {
