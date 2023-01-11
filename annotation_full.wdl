@@ -120,13 +120,13 @@ workflow annotation {
        smart_db_version = f_annotate.smart_db_version,
        hmmsearch_cog_version = f_annotate.hmmsearch_cog_version,
        cog_db_version = f_annotate.cog_db_version,
-       hmmserach_tigrfam_version = f_annotate.hmmserach_tigrfam_version,
+       hmmsearch_tigrfam_version = f_annotate.hmmsearch_tigrfam_version,
        tigrfam_db_version = f_annotate.tigrfam_db_version,
-       hmmserach_superfam_version = f_annotate.hmmserach_superfam_version,
+       hmmsearch_superfam_version = f_annotate.hmmsearch_superfam_version,
        superfam_db_version = f_annotate.superfam_db_version,
-       hmmserach_pfam_version = f_annotate.hmmserach_pfam_version,
+       hmmsearch_pfam_version = f_annotate.hmmsearch_pfam_version,
        pfam_db_version = f_annotate.pfam_db_version,
-       hmmserach_cath_funfam_version = f_annotate.hmmserach_cath_funfam_version,
+       hmmsearch_cath_funfam_version = f_annotate.hmmsearch_cath_funfam_version,
        cath_funfam_db_version = f_annotate.cath_funfam_db_version
   }
 
@@ -436,13 +436,13 @@ task make_info_file {
   Array[String?] smart_db_version
   Array[String?] hmmsearch_cog_version
   Array[String?] cog_db_version
-  Array[String?] hmmserach_tigrfam_version
+  Array[String?] hmmsearch_tigrfam_version
   Array[String?] tigrfam_db_version
-  Array[String?] hmmserach_superfam_version
+  Array[String?] hmmsearch_superfam_version
   Array[String?] superfam_db_version
-  Array[String?] hmmserach_pfam_version
+  Array[String?] hmmsearch_pfam_version
   Array[String?] pfam_db_version
-  Array[String?] hmmserach_cath_funfam_version
+  Array[String?] hmmsearch_cath_funfam_version
   Array[String?] cath_funfam_db_version
   String fa_version_file = "fa_tool_version.txt"
   String fa_db_version_file = "fa_db_version.txt"
@@ -473,17 +473,17 @@ task make_info_file {
          echo  $rfam_db_version  >> ${project_id}_imgap.info
        fi
     fi
-     #get ftructural annotation tool versions
+     #get functional annotation tool versions
      if [[ "${fa_execute}" = true ]]
        then
        echo ${sep="," lastal_version} > ${fa_version_file}
        echo ${sep="," hmmsearch_smart_version} >> ${fa_version_file}
        echo ${sep="," hmmsearch_cog_version} >> ${fa_version_file}
        echo ${sep="," hmmsearch_cog_version} >> ${fa_version_file}
-       echo ${sep="," hmmserach_tigrfam_version} >> ${fa_version_file}
-       echo ${sep="," hmmserach_superfam_version} >> ${fa_version_file}
-       echo ${sep="," hmmserach_pfam_version} >> ${fa_version_file}
-       echo ${sep="," hmmserach_cath_funfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_tigrfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_superfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_pfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_cath_funfam_version} >> ${fa_version_file}
        cat ${fa_version_file} | tr ',' '\n' | sort | uniq  > fa_version_uniq.txt
        fa_tool_version="Functional Annotation Programs Used: "
        while read tool ; do

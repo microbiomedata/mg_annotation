@@ -189,13 +189,13 @@ workflow f_annotate {
     String? smart_db_version = smart.smart_db_ver
     String? hmmsearch_cog_version = cog.hmmsearch_cog_ver
     String? cog_db_version = cog.cog_db_ver
-    String? hmmserach_tigrfam_version = tigrfam.hmmserach_tigrfam_ver
+    String? hmmsearch_tigrfam_version = tigrfam.hmmsearch_tigrfam_ver
     String? tigrfam_db_version = tigrfam.tigrfam_db_ver
-    String? hmmserach_superfam_version = superfam.hmmserach_superfam_ver
+    String? hmmsearch_superfam_version = superfam.hmmsearch_superfam_ver
     String? superfam_db_version = superfam.superfam_db_ver
-    String? hmmserach_pfam_version = pfam.hmmserach_pfam_ver
+    String? hmmsearch_pfam_version = pfam.hmmsearch_pfam_ver
     String? pfam_db_version = pfam.pfam_db_ver
-    String? hmmserach_cath_funfam_version = cath_funfam.hmmserach_cath_funfam_ver
+    String? hmmsearch_cath_funfam_version = cath_funfam.hmmsearch_cath_funfam_ver
     String? cath_funfam_db_version = cath_funfam.cath_funfam_db_ver
   }
 
@@ -387,7 +387,7 @@ task tigrfam {
   output {
     File gff = "${project_id}_tigrfam.gff"
     File domtblout = "${project_id}_proteins.tigrfam.domtblout"
-    String hmmserach_tigrfam_ver = read_string(hmmsearch_version_file)
+    String hmmsearch_tigrfam_ver = read_string(hmmsearch_version_file)
     String tigrfam_db_ver = read_string(tigrfam_db_version_file)
 
   }
@@ -436,7 +436,7 @@ task superfam {
   output {
     File gff = "${project_id}_supfam.gff"
     File domtblout = "${project_id}_proteins.supfam.domtblout"
-    String hmmserach_superfam_ver = read_string(hmmsearch_version_file)
+    String hmmsearch_superfam_ver = read_string(hmmsearch_version_file)
     String superfam_db_ver = read_string(superfam_db_version_file)
   }
 }
@@ -481,7 +481,7 @@ task pfam {
   output {
     File gff = "${project_id}_pfam.gff"
     File domtblout = "${project_id}_proteins.pfam.domtblout"
-    String hmmserach_pfam_ver = read_string(hmmsearch_version_file)
+    String hmmsearch_pfam_ver = read_string(hmmsearch_version_file)
     String pfam_db_ver = read_string(pfam_db_version_file)
   }
 }
@@ -526,7 +526,7 @@ task cath_funfam {
   output {
       File gff = "${project_id}_cath_funfam.gff"
       File domtblout = "${project_id}_proteins.cath_funfam.domtblout"
-      String hmmserach_cath_funfam_ver = read_string(hmmsearch_version_file)
+      String hmmsearch_cath_funfam_ver = read_string(hmmsearch_version_file)
       String cath_funfam_db_ver = read_string(cath_funfam_db_version_file)
   }
 }
