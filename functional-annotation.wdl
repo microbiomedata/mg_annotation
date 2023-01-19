@@ -41,8 +41,8 @@ workflow f_annotate {
   String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
   String  product_names_mapping_dir="${database_location}"+"/Product_Name_Mappings/latest"
   String  container
-  String  hmm_container="microbiomedata/img-omics:5.1.13"
-  String  last_container="microbiomedata/img-omics:5.1.13"
+  String  hmm_container="microbiomedata/img-omics@sha256:15201879b4ab462a557945f5392b3d96f37dcc9b933e0a34043cd0832f27e84e"
+  String  last_container="microbiomedata/img-omics@sha256:15201879b4ab462a557945f5392b3d96f37dcc9b933e0a34043cd0832f27e84e"
 
   if(ko_ec_execute) {
     call ko_ec {

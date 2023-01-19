@@ -3,7 +3,7 @@ workflow trnascan {
   String imgap_project_id
   String imgap_project_type
   Int    additional_threads
-  String container = "microbiomedata/img-omics:5.1.13"
+  String container = "microbiomedata/img-omics@sha256:15201879b4ab462a557945f5392b3d96f37dcc9b933e0a34043cd0832f27e84e"
 
   call trnascan_ba {
     input:
