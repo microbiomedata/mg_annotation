@@ -1,7 +1,7 @@
 import "annotation_full.wdl" as awf
 
 workflow test_small {
-  String  container="microbiomedata/img-omics@sha256:15201879b4ab462a557945f5392b3d96f37dcc9b933e0a34043cd0832f27e84e"
+  String  container="microbiomedata/img-omics@sha256:9f092d7616e0d996123e039d6c40e95663cb144a877b88ee7186df6559b02bc8"
   String  proj="Testsmall"
   String  database="/refdata/img/"
   String  url="https://portal.nersc.gov/project/m3408/test_data"
