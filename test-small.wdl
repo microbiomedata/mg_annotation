@@ -1,7 +1,7 @@
 import "annotation_full.wdl" as awf
 
 workflow test_small {
-  String  container="bfoster1/img-omics:0.1.7"
+  String  container="microbiomedata/img-omics@sha256:9f092d7616e0d996123e039d6c40e95663cb144a877b88ee7186df6559b02bc8"
   String  proj="Testsmall"
   String  database="/refdata/img/"
   String  url="https://portal.nersc.gov/project/m3408/test_data"
@@ -13,7 +13,7 @@ workflow test_small {
   }
   call awf.annotation {
     input: imgap_project_id=proj,
-           imgap_input_fasta=prepare.fasta,
+           input_file=prepare.fasta,
            database_location=database
   }
   call validate {
@@ -44,7 +44,7 @@ task prepare {
       File fasta = "${proj}_contigs.fna"
    }
    runtime {
-     memory: "1 GiB"
+     memory: "1G"
      cpu:  2
      maxRetries: 1
      docker: container
@@ -68,7 +68,7 @@ task validate {
    }
 
    runtime {
-     memory: "10 GiB"
+     memory: "10G"
      cpu:  4
      maxRetries: 1
      docker: "microbiomedata/mg-validate:v0.0.0"

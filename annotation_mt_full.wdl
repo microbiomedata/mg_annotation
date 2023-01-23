@@ -1,19 +1,20 @@
-import "structural-annotation.wdl" as sa
-import "functional-annotation.wdl" as fa
+import "./structural-annotation.wdl" as sa
+import "./functional-annotation.wdl" as fa
 
 workflow annotation {
   File    imgap_input_fasta
   String  imgap_project_id="GaXXXXXXX_contigs.fna"
-  String  database_location="/cromwell_root/database"
+  String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   Int     additional_threads=16
-  String  container="bfoster1/img-omics:0.1.9"
-
+  String  container="microbiomedata/img-omics@sha256:9f092d7616e0d996123e039d6c40e95663cb144a877b88ee7186df6559b02bc8"
+  String bc_bin="/miniconda3/bin/bc"
   # structural annotation
   Boolean sa_execute=true
 
   # functional annotation
   Boolean fa_execute=true
+  File? gm_license
 
   call split {
     input: infile=imgap_input_fasta,
@@ -32,7 +33,8 @@ workflow annotation {
           imgap_project_type = imgap_project_type,
           database_location = database_location,
           rfam_execute = false,
-          container=container
+          container=container,
+          gm_license=gm_license
       }
     }
 
@@ -131,6 +133,7 @@ task split{
    String zfile="zscore.txt"
    String cmzfile="cmzscore.txt"
    String container
+   File? gm_license
 
    command{
      set -euo pipefail
@@ -145,7 +148,7 @@ task split{
      String cmzscore = read_string(cmzfile)
    }
    runtime {
-     memory: "120 GiB"
+     memory: "120G"
      cpu:  16
      maxRetries: 1
      docker: container
@@ -228,7 +231,7 @@ task merge_outputs {
     File crt_crisprs = "${project_id}_crt.crisprs"
   }
   runtime {
-    memory: "2 GiB"
+    memory: "2G"
     cpu:  4
     maxRetries: 1
     docker: container

@@ -1,10 +1,9 @@
 workflow trnascan {
-
   String imgap_input_fasta
   String imgap_project_id
   String imgap_project_type
   Int    additional_threads
-  String container
+  String container = "microbiomedata/img-omics@sha256:9f092d7616e0d996123e039d6c40e95663cb144a877b88ee7186df6559b02bc8"
 
   call trnascan_ba {
     input:
@@ -15,6 +14,8 @@ workflow trnascan {
   }
   output {
     File gff = trnascan_ba.gff
+    File bacterial_out = trnascan_ba.bacterial_out
+    File archaeal_out = trnascan_ba.archaeal_out
   }
   meta {
      author: "Brian Foster"
@@ -34,17 +35,14 @@ task trnascan_ba {
   command <<<
      set -euo pipefail
      cp ${input_fasta} ./${project_id}_contigs.fna
-     /opt/omics/bin/structural_annotation/trnascan-se_trnas.sh ${project_id}_contigs.fna metagenome ${threads}
+     /opt/omics/bin/structural_annotation/trnascan-se_trnas.sh ${project_id}_contigs.fna ${threads}
   >>>
 
   runtime {
     time: "9:00:00"
-    docker: "scanon/im-trnascan:v0.0.1"
-    shared: "1"
+    docker: container
+    cpu: threads
     memory: "115G"
-    poolname: "tuesday-one"
-    node: 5
-    nwpn: 8
   }
 
   output {
