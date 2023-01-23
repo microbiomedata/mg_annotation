@@ -559,6 +559,7 @@ task finish_ano {
    String resource
    String url_root
    String git_url
+   File input_file
    File proteins_faa
    File structural_gff
    File functional_gff
@@ -614,10 +615,10 @@ task finish_ano {
        cat ${stats_json} | sed ${sed} > ${prefix}_stats.json
        nmdc gff2json ${prefix}_functional_annotation.gff -of features.json -oa annotations.json -ai ${informed_by}
 
-       /scripts/generate_object_json.py \
-            --type "nmdc:MetagenomeAnnotationActivity" \
-            --set metagenome_annotation_activity_set \
-            --part ${proj} \
+        /scripts/generate_object_json.py \
+             --type "nmdc:MetagenomeAnnotationActivity" \
+             --set metagenome_annotation_activity_set \
+             --part ${proj} \
              -p "name=Annotation Activity for ${proj}" \
                 was_informed_by=${informed_by} \
                 started_at_time=${start} \
@@ -628,7 +629,7 @@ task finish_ano {
              --url ${url_root}${proj}/annotation/ \
              --inputs ${input_file} \
              --outputs \
-             ${prefix}_proteins.faa "FASTA amino acid file for annotated proteins" "Annotation Amino Acid FASTA" "FASTA Amino Acid File for ${proj}" \
+             ${prefix}_proteins.faa "FASTA amino acid file for annotated proteins" "Annotation Amino Acid FASTA" "FASTA Amino Acid File for ${proj}" \<<<<<<< 5.1_sync
              ${prefix}_structural_annotation.gff "GFF3 format file with structural annotations" "Structural Annotation GFF"  "Structural Annotation for ${proj}"\
              ${prefix}_functional_annotation.gff "GFF3 format file with functional annotations" "Functional Annotation GFF" "Functional Annotation for ${proj}" \
              ${prefix}_ko.tsv "Tab delimited file for KO annotation" "Annotation KEGG Orthology" "KEGG Orthology for ${proj}" \
@@ -645,8 +646,8 @@ task finish_ano {
              ${prefix}_trna.gff "GFF3 format file with TRNA" "TRNA Annotation GFF3" "TRNA Annotations ${proj}" \
              ${prefix}_rfam.gff "GFF3 format file with RFAM" "RFAM Annotation GFF" "RFAM Annotations for ${proj}" \
              ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" "KO_EC Annotations for ${proj}" \
-	     ${prefix}_product_names.tsv "Product names file" "Product names" "Product names for ${proj}" \
-	     ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
+             ${prefix}_product_names.tsv "Product names file" "Product names" "Product names for ${proj}" \
+	           ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
              ${prefix}_crt.crisprs "Crispr Terms" "Crispr Terms" "Crispr Terms for ${proj}"  \
              ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}"
 
