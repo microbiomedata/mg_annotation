@@ -551,7 +551,6 @@ task final_stats {
 
 task finish_ano {
    String container
-   File input_file
    String proj
    String prefix=sub(proj, ":", "_")
    String start
