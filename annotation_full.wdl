@@ -642,11 +642,11 @@ task finish_ano {
              ${prefix}_crt.gff "GFF3 format file with CRT" "CRT Annotation GFF" "CRT Annotations for ${proj}" \
              ${prefix}_genemark.gff "GFF3 format file with Genemark" "Genemark Annotation GFF" "Genemark Annotations for ${proj}" \
              ${prefix}_prodigal.gff "GFF3 format file with Prodigal" "Prodigal Annotation GFF" "Prodigal Annotations ${proj}" \
-             ${prefix}_trna.gff "GFF3 format file with TRNA" "TRNA Annotation GFF3" "TRNA Annotations ${proj}" \
+             ${prefix}_trna.gff "GFF3 format file with TRNA" "TRNA Annotation GFF" "TRNA Annotations ${proj}" \
              ${prefix}_rfam.gff "GFF3 format file with RFAM" "RFAM Annotation GFF" "RFAM Annotations for ${proj}" \
              ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" "KO_EC Annotations for ${proj}" \
-             ${prefix}_product_names.tsv "Product names file" "Product names" "Product names for ${proj}" \
-	           ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
+             ${prefix}_product_names.tsv "Product names file" "Product Names" "Product names for ${proj}" \
+             ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny tsv" "Gene Phylogeny for ${proj}"\
              ${prefix}_crt.crisprs "Crispr Terms" "Crispr Terms" "Crispr Terms for ${proj}"  \
              ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}"
 
