@@ -13,16 +13,16 @@ workflow annotation {
   String  imgap_project_type="metagenome"
   String?  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
-  # 5.1.13 -> sha256:9f092d7616e0d996123e039d6c40e95663cb144a877b88ee7186df6559b02bc8    
+  # 5.1.13 -> sha256:9f092d7616e0d996123e039d6c40e95663cb144a877b88ee7186df6559b02bc8
   String  container="microbiomedata/img-omics@sha256:9f092d7616e0d996123e039d6c40e95663cb144a877b88ee7186df6559b02bc8"
-  
+
 
   # structural annotation
   Boolean sa_execute=true
 
   # functional annotation
   Boolean fa_execute=true
- 
+
  call stage {
       input: container=container,
           input_file=input_file
@@ -103,12 +103,12 @@ workflow annotation {
        trna_gffs = s_annotate.trna_gff,
        trna_bacterial_outs = s_annotate.trna_bacterial_out,
        trna_archaeal_outs = s_annotate.trna_archaeal_out,
-       rfam_gffs = s_annotate.rfam_gff, 
+       rfam_gffs = s_annotate.rfam_gff,
        rfam_tbls = s_annotate.rfam_tbl,
        container=container
   }
   call make_info_file {
-    input: project_id = imgap_project_id, 
+    input: project_id = imgap_project_id,
        container=container,
        sa_execute = sa_execute,
        fa_execute = fa_execute,
@@ -313,7 +313,7 @@ task merge_outputs {
   Array[File?] crt_outs
   Array[File?] genemark_gffs
   Array[File?] genemark_genes
-  Array[File?] genemark_proteins 
+  Array[File?] genemark_proteins
   Array[File?] prodigal_gffs
   Array[File?] prodigal_genes
   Array[File?] prodigal_proteins
@@ -326,10 +326,10 @@ task merge_outputs {
   Array[File?] rfam_gffs
   Array[File?] rfam_tbls
   String container
-  
+ 
 
   command <<<
-     
+
      #combine files
      cat ${sep=" " structural_gffs} > "${project_id}_structural_annotation.gff"
      cat ${sep=" " functional_gffs} > "${project_id}_functional_annotation.gff"
@@ -360,7 +360,7 @@ task merge_outputs {
      cat ${sep=" " trna_bacterial_outs} > "${project_id}_trnascan_bacterial.out"
      cat ${sep=" " trna_archaeal_outs} > "${project_id}_trnascan_archaeal.out"
      cat ${sep=" " rfam_gffs} > "${project_id}_rfam.gff"
-     cat ${sep=" " rfam_tbls} > "${project_id}_rfam.tbl"  
+     cat ${sep=" " rfam_tbls} > "${project_id}_rfam.tbl"
      cat ${sep=" " cog_domtblouts} > "${project_id}_proteins.cog.domtblout"
      cat ${sep=" " pfam_domtblouts} > "${project_id}_proteins.pfam.domtblout"
      cat ${sep=" " tigrfam_domtblouts} > "${project_id}_proteins.tigrfam.domtblout"
@@ -370,7 +370,7 @@ task merge_outputs {
      cat ${sep=" " crt_crisprs_s} > "${project_id}_crt.crisprs"
      cat ${sep=" " crt_gffs} > "${project_id}_crt.gff"
      cat ${sep=" " crt_outs} > "${project_id}_crt.out"
-     
+
   >>>
   output {
     File functional_gff = "${project_id}_functional_annotation.gff"
@@ -430,7 +430,7 @@ task make_info_file {
   String project_id
   Array[String?] rfam_version
   Boolean rfam_executed = if (defined(rfam_version)) then true else false
-  File structural_gff 
+  File structural_gff
   Array[String?] lastal_version
   Array[String?] img_nr_db_version
   Array[String?] hmmsearch_smart_version
@@ -456,7 +456,7 @@ task make_info_file {
      echo "IMGAP Version: ${imgap_version}" > ${project_id}_imgap.info
      #get structual annotation versions
      if [[ "${sa_execute}" = true ]]
-       then 
+       then
        sa_version=`cut -f2 ${structural_gff}  | sort | uniq | perl -pe 's/\n/; /g' | sed -E 's/(.*)\; /\1/'`
        sa_version="Structural Annotation Programs Used: $sa_version"
        echo $sa_version >> ${project_id}_imgap.info
@@ -494,7 +494,7 @@ task make_info_file {
        echo $fa_tool_version >> ${project_id}_imgap.info
        #get functional annotation db versions
        echo ${sep="," img_nr_db_version} > ${fa_db_version_file}
-       echo ${sep="," smart_db_version} >> ${fa_db_version_file}  
+       echo ${sep="," smart_db_version} >> ${fa_db_version_file}
        echo ${sep="," cog_db_version} >> ${fa_db_version_file}
        echo ${sep="," tigrfam_db_version} >> ${fa_db_version_file}
        echo ${sep="," superfam_db_version} >> ${fa_db_version_file}
@@ -628,8 +628,8 @@ task finish_ano {
              --url ${url_root}${proj}/annotation/ \
              --inputs ${input_file} \
              --outputs \
-             ${prefix}_proteins.faa "FASTA amino acid file for annotated proteins" "Annotation Amino Acid FASTA" "FASTA Amino Acid File for ${proj}" \<<<<<<< 5.1_sync
-             ${prefix}_structural_annotation.gff "GFF3 format file with structural annotations" "Structural Annotation GFF"  "Structural Annotation for ${proj}"\
+             ${prefix}_proteins.faa "FASTA amino acid file for annotated proteins" "Annotation Amino Acid FASTA" "FASTA Amino Acid File for ${proj}" \
+             ${prefix}_structural_annotation.gff "GFF3 format file with structural annotations" "Structural Annotation GFF"  "Structural Annotation for ${proj}" \
              ${prefix}_functional_annotation.gff "GFF3 format file with functional annotations" "Functional Annotation GFF" "Functional Annotation for ${proj}" \
              ${prefix}_ko.tsv "Tab delimited file for KO annotation" "Annotation KEGG Orthology" "KEGG Orthology for ${proj}" \
              ${prefix}_ec.tsv "Tab delimited file for EC annotation" "Annotation Enzyme Commission" "EC Annotations for ${proj}" \
@@ -681,7 +681,7 @@ task finish_ano {
         File final_product_names_tsv = "${prefix}_product_names.tsv"
         File final_crt_crisprs = "${prefix}_crt.crisprs"
         File final_tsv = "${prefix}_stats.tsv"
-        
+ 
     }
     runtime {
         memory: "10G"
@@ -689,5 +689,5 @@ task finish_ano {
         maxRetries: 1
         docker: container
       }
-  
+
 }
