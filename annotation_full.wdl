@@ -624,7 +624,7 @@ task finish_ano {
                 ended_at_time=$end \
                 execution_resource="${resource}" \
                 git_url=${git_url} \
-                version="v1.0.0-beta" \
+                version="v1.0.1-beta" \
              --url ${url_root}${proj}/annotation/ \
              --inputs ${input_file} \
              --outputs \
@@ -646,7 +646,7 @@ task finish_ano {
              ${prefix}_rfam.gff "GFF3 format file with RFAM" "RFAM Annotation GFF" "RFAM Annotations for ${proj}" \
              ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" "KO_EC Annotations for ${proj}" \
              ${prefix}_product_names.tsv "Product names file" "Product Names" "Product names for ${proj}" \
-             ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny tsv" "Gene Phylogeny for ${proj}"\
+             ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
              ${prefix}_crt.crisprs "Crispr Terms" "Crispr Terms" "Crispr Terms for ${proj}"  \
              ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}"
 
