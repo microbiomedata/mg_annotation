@@ -15,29 +15,43 @@ RUN cd Prodigal && git checkout v2.6.3 && make
 RUN cd Prodigal && make install
 
 #
-# Build trnascan 2.0.05
+# Build trnascan 2.0.06
 #
 FROM buildbase as trnascan
 
-RUN wget http://trna.ucsc.edu/software/trnascan-se-2.0.5.tar.gz
+RUN apt-get -y install autoconf
+
+RUN wget http://trna.ucsc.edu/software/trnascan-se-2.0.6.tar.gz
 
 RUN \
-    tar xzvf trnascan-se-2.0.5.tar.gz && \
+    tar xzvf trnascan-se-2.0.6.tar.gz && \
     cd tRNAscan-SE-2.0 && \
-    ./configure --prefix=/opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.4/ && \
+    ./configure --prefix=/opt/omics/programs/tRNAscan-SE/tRNAscan-SE/ && \
     make && make install
 
 #
-# Build HMMER 3.1b2
+# Build HMMER 3.1b2 with HPC enhancements from Arndt
 #
 FROM buildbase as hmm
+ENV V=3.1b2
 
 RUN \
-    V=3.1b2 && cd /opt && \
+    cd /opt && \
     wget http://eddylab.org/software/hmmer/hmmer-$V.tar.gz && \
     tar -zxvf hmmer-$V.tar.gz && \
     cd hmmer-$V && ./configure --prefix /opt/omics/programs/hmmer/ && \
     make && make install
+
+# get and extract master branch of modification file, copy into hmmer source code
+RUN \
+    wget -v https://github.com/Larofeticus/hpc_hmmsearch/tarball/master && \
+    tar -xvf master && \
+    cp /Larofeticus-hpc_hmmsearch-*/hpc_hmmsearch.c /opt/hmmer-3.1b2/src && \
+    cd /opt/hmmer-$V/src && \
+    gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -pthread -fPIC -msse2 -DHAVE_CONFIG_H -I../easel -I../libdivsufsort -I../easel -I. -I. -o hpc_hmmsearch.o -c hpc_hmmsearch.c && \
+    gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -pthread -fPIC -msse2 -DHAVE_CONFIG_H -L../easel -L./impl_sse -L../libdivsufsort -L. -o hpc_hmmsearch hpc_hmmsearch.o -lhmmer -leasel -ldivsufsort -lm  && \
+   cp hpc_hmmsearch /opt/omics/programs/hmmer/bin/ && \
+   /opt/omics/programs/hmmer/bin/hpc_hmmsearch -h
 
 # Build last 983
 #
@@ -130,7 +144,7 @@ COPY --from=cromwell /opt/omics/bin/ /opt/omics/bin/
 COPY --from=prodigal /usr/local/bin/prodigal /opt/omics/programs/prodigal/prodigal_v2.6.3
 
 COPY --from=trnascan /opt/omics/programs/tRNAscan-SE /opt/omics/programs/tRNAscan-SE/
-#COPY --from=trnascan /usr/local/lib /opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.4/lib/
+#COPY --from=trnascan /usr/local/lib /opt/omics/programs/tRNAscan-SE/tRNAscan-SE/lib/
 
 COPY --from=hmm /opt/omics /opt/omics/
 
@@ -145,7 +159,11 @@ COPY --from=img /opt/omics/programs/tmhmm-2.0c /opt/omics/programs/tmhmm-2.0c
 
 RUN \
     mkdir /opt/omics/lib && cd /opt/omics/lib && \
-    ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.4/lib/tRNAscan-SE/* .
+    ln -s ../programs/tRNAscan-SE/tRNAscan-SE/lib/tRNAscan-SE/* .
+
+RUN \
+    cd /opt/omics/programs/tRNAscan-SE/tRNAscan-SE/bin/ && \
+    sed -i  's|infernal_dir: {bin_dir}|infernal_dir: /opt/omics/programs/infernal/infernal-1.1.2/bin/|' tRNAscan-SE.conf
 
 #COPY --from=img /opt/omics /opt/omics3/
 

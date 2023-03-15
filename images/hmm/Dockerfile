@@ -1,13 +1,12 @@
-FROM debian as buildbase
-
-RUN apt-get -y update && apt-get -y install git gcc make wget
-
-RUN apt-get -y install libz-dev
-
 #
 # Build HMMER 3.1b2 with HPC enhancements from Arndt
 #
-FROM buildbase as hmm
+FROM debian:10.4 as hmm
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get -y update && apt-get -y install git gcc make wget
+
 ENV V=3.1b2
 
 RUN \
@@ -30,7 +29,9 @@ RUN \
 
 FROM scanon/imtools:20210401
 
-RUN apt-get -y install bc parallel
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get --allow-releaseinfo-change update && apt-get -y install bc parallel
 
 COPY --from=hmm /opt/omics /opt/omics/
 
