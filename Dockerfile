@@ -108,10 +108,16 @@ RUN \
     #chmod -R 755 omics && \
     rm gms2_linux_64.v1.14_1.25_lic.tar.gz
 
+RUN apt-get install -y openjdk-11-jdk
 # get CRT version 1.8.4
 RUN \
-    cd /opt && \
-    wget http://portal.nersc.gov/dna/metagenome/assembly/CRT-CLI_v1.8.4.jar
+    wget https://code.jgi.doe.gov/img/img-pipelines/crt-cli-imgap-version/-/archive/main/crt-cli-imgap-version-main.zip && \
+    unzip crt-cli-imgap-version-main.zip && \
+    cd crt-cli-imgap-version-main && \
+    javac *.java && \
+    jar cfe CRT-CLI.jar crt *.class && \
+    cp CRT-CLI.jar /opt/.
+
 
 
 #
@@ -168,7 +174,7 @@ COPY --from=hmm /opt/omics/programs/hmmer/ /opt/omics/programs/hmmer
 COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 
 COPY --from=last /opt/omics/programs/last /opt/omics/programs/last
-COPY --from=img /opt/CRT-CLI_v1.8.4.jar /opt/omics/programs/CRT/CRT-CLI_v1.8.4.jar
+COPY --from=img /opt/CRT-CLI.jar /opt/omics/programs/CRT/CRT-CLI.jar
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
 #COPY --from=img /opt/omics/programs/tmhmm-2.0c /opt/omics/programs/tmhmm-2.0c
 
@@ -189,7 +195,7 @@ RUN \
     ln -s ../programs/infernal/infernal-1.1.3/bin/cmsearch && \
     ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.12/bin/tRNAscan-SE && \
     ln -s ../programs/last/bin/lastal && \
-    ln -s ../programs/CRT/CRT-CLI_v1.8.4.jar CRT-CLI.jar && \
+    ln -s ../programs/CRT/CRT-CLI.jar CRT-CLI.jar && \
     ln -s ../programs/prodigal &&\
     ln -s ../programs/hmmer/bin/hpc_hmmsearch /opt/omics/bin/hmmsearch 
 
