@@ -72,6 +72,7 @@ workflow annotation {
        ec_tsvs = f_annotate.ec_tsv,
        phylo_tsvs =  f_annotate.phylo_tsv,
        last_blasttabs = f_annotate.last_blasttab,
+       lineage_sdb = f_annotate.lineage_sdb,
        proteins = s_annotate.proteins,
        genes = s_annotate.genes,
        ko_ec_gffs = f_annotate.ko_ec_gff,
@@ -291,6 +292,7 @@ task merge_outputs {
   Array[File?] ec_tsvs
   Array[File?] phylo_tsvs
   Array[File?] last_blasttabs
+  Array[File?] lineage_sdb
   Array[File?] proteins
   Array[File?] genes
   Array[File?] ko_ec_gffs
@@ -336,6 +338,7 @@ task merge_outputs {
      cat ${sep=" " ec_tsvs} >  "${project_id}_ec.tsv"
      cat ${sep=" " phylo_tsvs} > "${project_id}_gene_phylogeny.tsv"
      cat ${sep=" " last_blasttabs} > "${project_id}_proteins.img_nr.last.blasttab"
+     cat ${sep=" " lineage_sdb} > "${project_id}.contigLin.assembled.sdb"
      cat ${sep=" " proteins} > "${project_id}_proteins.faa"
      cat ${sep=" " genes} > "${project_id}_genes.fna"
      cat ${sep=" " ko_ec_gffs} > "${project_id}_ko_ec.gff"
@@ -378,6 +381,7 @@ task merge_outputs {
     File ec_tsv = "${project_id}_ec.tsv"
     File gene_phylogeny_tsv = "${project_id}_gene_phylogeny.tsv"
     File last_blasttab = "${project_id}_proteins.img_nr.last.blasttab"
+    File lineage_sdb = "${project_id}.contigLin.assembled.sdb"
     File proteins_faa = "${project_id}_proteins.faa"
     File genes_fna = "${project_id}_genes.fna"
     File ko_ec_gff = "${project_id}_ko_ec.gff"
@@ -569,6 +573,7 @@ task finish_ano {
    File smart_gff
    File supfam_gff
    File gene_phylogeny_tsv
+   File lineage_sdb
    File cath_funfam_gff
    File crt_gff
    File genemark_gff
@@ -607,6 +612,7 @@ task finish_ano {
        cat ${rfam_gff} | sed ${sed} > ${prefix}_rfam.gff
        cat ${crt_crisprs} | sed ${sed} > ${prefix}_crt.crisprs
        cat ${gene_phylogeny_tsv} | sed ${sed} > ${prefix}_gene_phylogeny.tsv
+       cat ${lineage_sdb} | sed ${sed} > ${prefix}.contigLin.assembled.sdb
        cat ${product_names_tsv} | sed ${sed} > ${prefix}_product_names.tsv
        cat ${ko_ec_gff} | sed ${sed} > ${prefix}_ko_ec.gff
        cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
@@ -647,7 +653,8 @@ task finish_ano {
              ${prefix}_product_names.tsv "Product names file" "Product Names" "Product names for ${proj}" \
              ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
              ${prefix}_crt.crisprs "Crispr Terms" "Crispr Terms" "Crispr Terms for ${proj}"  \
-             ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}"
+             ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}" \
+             ${prefix}.contigLin.assembled.sdb "Phylogeny at the contig level" "Lineage sdb" "Lineage sdb for ${proj}"
 
    }
 
@@ -678,6 +685,7 @@ task finish_ano {
 #        File final_proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
 #        File final_proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
         File final_product_names_tsv = "${prefix}_product_names.tsv"
+        File final_lineage_sdb = "${prefix}.contigLin.assembled.sdb"
         File final_crt_crisprs = "${prefix}_crt.crisprs"
         File final_tsv = "${prefix}_stats.tsv"
  
