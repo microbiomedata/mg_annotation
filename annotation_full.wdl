@@ -13,8 +13,7 @@ workflow annotation {
   String  imgap_project_type="metagenome"
   String?  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
-  # 5.1.14.1` -> sha256:e3e3fff75aeb3a6e321054d4bc9d8c8c925dcfb9245d60247ab29c3b24c4bc75
-  String  container="microbiomedata/img-omics@sha256:5c7f95bbffb53e6b7ba6899705fd83ad3c8bb88046c476952a7b9ca53a93888f"
+  String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
 
   # structural annotation
   Boolean sa_execute=true
