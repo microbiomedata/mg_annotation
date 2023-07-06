@@ -3,7 +3,7 @@ workflow f_annotate {
   String  imgap_project_type
   Int     additional_threads
   File?    input_contigs_fasta
-  File    input_fasta 20230629
+  File    input_fasta
   String  database_location
   Boolean ko_ec_execute=true
   String  ko_ec_img_nr_db="${database_location}"+"/IMG-NR/20230629/img_nr"
