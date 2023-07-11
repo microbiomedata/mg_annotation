@@ -228,7 +228,7 @@ task ko_ec {
                 ${project_id}_ko.tsv ${project_id}_ec.tsv \
                 ${project_id}_gene_phylogeny.tsv ${project_id}_ko_ec.gff \
                 ${project_id}_proteins.img_nr.last.blasttab && \
-    python /opt/omics/bin/functional_annotation/create_scaffold_lineage.py ${project_id}_gene_phylogeny.tsv ${project_id}_lineage_sdb.tsv
+    python /opt/omics/bin/functional_annotation/create_scaffold_lineage.py ${project_id}_gene_phylogeny.tsv ${project_id}_scaffold_lineage.tsv
 
    #get version information
    lastal_version="`${lastal} -V`"
@@ -249,7 +249,7 @@ task ko_ec {
     File ec_tsv = "${project_id}_ec.tsv"
     File phylo_tsv = "${project_id}_gene_phylogeny.tsv"
     File gff = "${project_id}_ko_ec.gff"
-    File lineage_tsv = "${project_id}_lineage_sdb.tsv"
+    File lineage_tsv = "${project_id}_scaffold_lineage.tsv"
     String lastal_ver = read_string(lastal_version_file)
     String img_nr_db_ver = read_string(img_nr_db_version_file)
   }
