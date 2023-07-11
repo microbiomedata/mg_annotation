@@ -171,7 +171,7 @@ workflow f_annotate {
     File? phylo_tsv = ko_ec.phylo_tsv
     File? ko_ec_gff = ko_ec.gff
     File? last_blasttab = ko_ec.last_blasttab
-    File? lineage_sdb = ko_ec.lineage_sdb
+    File? lineage_tsv = ko_ec.lineage_tsv
     File? cog_gff = cog.gff
     File? pfam_gff = pfam.gff
     File? tigrfam_gff = tigrfam.gff
@@ -249,7 +249,7 @@ task ko_ec {
     File ec_tsv = "${project_id}_ec.tsv"
     File phylo_tsv = "${project_id}_gene_phylogeny.tsv"
     File gff = "${project_id}_ko_ec.gff"
-    File lineage_sdb = "${project_id}_lineage_sdb.tsv"
+    File lineage_tsv = "${project_id}_lineage_sdb.tsv"
     String lastal_ver = read_string(lastal_version_file)
     String img_nr_db_ver = read_string(img_nr_db_version_file)
   }
