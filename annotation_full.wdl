@@ -600,7 +600,7 @@ task finish_ano {
        cat ${rfam_gff} | sed ${sed} > ${prefix}_rfam.gff
        cat ${crt_crisprs} | sed ${sed} > ${prefix}_crt.crisprs
        cat ${gene_phylogeny_tsv} | sed ${sed} > ${prefix}_gene_phylogeny.tsv
-       cat ${lineage_tsv} | sed ${sed} > ${prefix}.contigLin.assembled.tsv
+       cat ${lineage_tsv} | sed ${sed} > ${prefix}_scaffold_lineage.tsv
        cat ${product_names_tsv} | sed ${sed} > ${prefix}_product_names.tsv
        cat ${ko_ec_gff} | sed ${sed} > ${prefix}_ko_ec.gff
        cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
@@ -634,7 +634,7 @@ task finish_ano {
 #        File final_proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
 #        File final_proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
         File final_product_names_tsv = "${prefix}_product_names.tsv"
-        File final_lineage_tsv = "${prefix}.contigLin.assembled.tsv"
+        File final_lineage_tsv = "${prefix}_scaffold_lineage.tsv"
         File final_crt_crisprs = "${prefix}_crt.crisprs"
         File final_tsv = "${prefix}_stats.tsv"
  
