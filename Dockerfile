@@ -1,4 +1,4 @@
-FROM debian as buildbase
+FROM debian:bullseye as buildbase
 
 RUN apt-get -y update && apt-get -y install git gcc make wget time autoconf unzip curl
 
@@ -55,16 +55,14 @@ RUN \
     gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -fopenmp -fPIC -msse2 -DHAVE_CONFIG_H -L../easel -L./impl_sse -L../libdivsufsort -L. -o hpc_hmmsearch hpc_hmmsearch.o -lhmmer -leasel -ldivsufsort -lm  && \
    cp hpc_hmmsearch /opt/omics/programs/hmmer/bin/ && \
    /opt/omics/programs/hmmer/bin/hpc_hmmsearch -h
-# Build last 1256
+# Build last 1456
 #
 FROM buildbase as last
 
 RUN apt-get -y install  g++
 
 RUN \
-    git clone --depth 1 --branch 1256  https://gitlab.com/mcfrith/last
-
-RUN \
+    git clone --depth 1 --branch 1456 https://gitlab.com/mcfrith/last && \
     cd last && \
     make && \
     make prefix=/opt/omics/programs/last install
@@ -89,9 +87,7 @@ FROM buildbase as img
 
 RUN \
     cd /opt && \
-    git clone https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline && \
-    cd img-annotation-pipeline && \
-    git reset --hard e6fe2f19f691180be0165cfef453d76e17d1f57c
+    git clone -b scaffold-lineage https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline
 
 RUN \
    cd /opt && \
@@ -108,7 +104,7 @@ RUN \
     #chmod -R 755 omics && \
     rm gms2_linux_64.v1.14_1.25_lic.tar.gz
 
-RUN apt-get install -y openjdk-11-jdk
+RUN apt-get update && apt-get install -y openjdk-11-jdk
 # get CRT version 1.8.4
 RUN \
     wget https://code.jgi.doe.gov/img/img-pipelines/crt-cli-imgap-version/-/archive/main/crt-cli-imgap-version-main.zip && \

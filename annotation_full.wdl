@@ -3,18 +3,13 @@ import "./functional-annotation.wdl" as fa
 
 workflow annotation {
   String  proj
-  String  resource
-  String  informed_by
-  String? git_url="https://github.com/microbiomedata/mg_annotation/releases/tag/0.1"
-  String? url_root="https://data.microbiomedata.org/data/"
   String  input_file
   String  imgap_project_id
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   String?  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
-  # 5.1.14.1` -> sha256:e3e3fff75aeb3a6e321054d4bc9d8c8c925dcfb9245d60247ab29c3b24c4bc75
-  String  container="microbiomedata/img-omics@sha256:5c7f95bbffb53e6b7ba6899705fd83ad3c8bb88046c476952a7b9ca53a93888f"
+  String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
 
   # structural annotation
   Boolean sa_execute=true
@@ -72,6 +67,7 @@ workflow annotation {
        ec_tsvs = f_annotate.ec_tsv,
        phylo_tsvs =  f_annotate.phylo_tsv,
        last_blasttabs = f_annotate.last_blasttab,
+       lineage_tsvs = f_annotate.lineage_tsv,
        proteins = s_annotate.proteins,
        genes = s_annotate.genes,
        ko_ec_gffs = f_annotate.ko_ec_gff,
@@ -144,15 +140,12 @@ workflow annotation {
       input_file=stage.imgap_input_fasta,
       proj=proj,
       start=stage.start,
-      resource=resource,
-      url_root=url_root,
-      git_url=git_url,
-      informed_by=informed_by,
       proteins_faa = merge_outputs.proteins_faa,
       structural_gff = merge_outputs.structural_gff,
       ko_ec_gff = merge_outputs.ko_ec_gff,
       gene_phylogeny_tsv = merge_outputs.gene_phylogeny_tsv,
       functional_gff = merge_outputs.functional_gff,
+      lineage_tsv = merge_outputs.lineage_tsv,
       ko_tsv = merge_outputs.ko_tsv,
       ec_tsv = merge_outputs.ec_tsv,
       stats_tsv = final_stats.tsv,
@@ -201,7 +194,6 @@ workflow annotation {
  #   File? proteins_cath_funfam_domtblout = finish_ano.final_proteins_cath_funfam_domtblout
     File? product_names_tsv = finish_ano.final_product_names_tsv
     File? crt_crisprs = finish_ano.final_crt_crisprs
-    File? ano_objects = finish_ano.objects
     File imgap_version = make_info_file.imgap_info
   }
 
@@ -291,6 +283,7 @@ task merge_outputs {
   Array[File?] ec_tsvs
   Array[File?] phylo_tsvs
   Array[File?] last_blasttabs
+  Array[File?] lineage_tsvs
   Array[File?] proteins
   Array[File?] genes
   Array[File?] ko_ec_gffs
@@ -336,6 +329,7 @@ task merge_outputs {
      cat ${sep=" " ec_tsvs} >  "${project_id}_ec.tsv"
      cat ${sep=" " phylo_tsvs} > "${project_id}_gene_phylogeny.tsv"
      cat ${sep=" " last_blasttabs} > "${project_id}_proteins.img_nr.last.blasttab"
+     cat ${sep=" " lineage_tsvs} > "${project_id}.contigLin.assembled.tsv"
      cat ${sep=" " proteins} > "${project_id}_proteins.faa"
      cat ${sep=" " genes} > "${project_id}_genes.fna"
      cat ${sep=" " ko_ec_gffs} > "${project_id}_ko_ec.gff"
@@ -378,6 +372,7 @@ task merge_outputs {
     File ec_tsv = "${project_id}_ec.tsv"
     File gene_phylogeny_tsv = "${project_id}_gene_phylogeny.tsv"
     File last_blasttab = "${project_id}_proteins.img_nr.last.blasttab"
+    File lineage_tsv = "${project_id}.contigLin.assembled.tsv"
     File proteins_faa = "${project_id}_proteins.faa"
     File genes_fna = "${project_id}_genes.fna"
     File ko_ec_gff = "${project_id}_ko_ec.gff"
@@ -553,10 +548,6 @@ task finish_ano {
    String proj
    String prefix=sub(proj, ":", "_")
    String start
-   String informed_by
-   String resource
-   String url_root
-   String git_url
    File input_file
    File proteins_faa
    File structural_gff
@@ -569,6 +560,7 @@ task finish_ano {
    File smart_gff
    File supfam_gff
    File gene_phylogeny_tsv
+   File lineage_tsv
    File cath_funfam_gff
    File crt_gff
    File genemark_gff
@@ -607,52 +599,15 @@ task finish_ano {
        cat ${rfam_gff} | sed ${sed} > ${prefix}_rfam.gff
        cat ${crt_crisprs} | sed ${sed} > ${prefix}_crt.crisprs
        cat ${gene_phylogeny_tsv} | sed ${sed} > ${prefix}_gene_phylogeny.tsv
+       cat ${lineage_tsv} | sed ${sed} > ${prefix}.contigLin.assembled.tsv
        cat ${product_names_tsv} | sed ${sed} > ${prefix}_product_names.tsv
        cat ${ko_ec_gff} | sed ${sed} > ${prefix}_ko_ec.gff
        cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
        cat ${stats_json} | sed ${sed} > ${prefix}_stats.json
-       nmdc gff2json ${prefix}_functional_annotation.gff -of features.json -oa annotations.json -ai ${informed_by}
-
-        /scripts/generate_object_json.py \
-             --type "nmdc:MetagenomeAnnotationActivity" \
-             --set metagenome_annotation_activity_set \
-             --part ${proj} \
-             -p "name=Annotation Activity for ${proj}" \
-                was_informed_by=${informed_by} \
-                started_at_time=${start} \
-                ended_at_time=$end \
-                execution_resource="${resource}" \
-                git_url=${git_url} \
-                version="v1.0.1-beta" \
-             --url ${url_root}${proj}/annotation/ \
-             --inputs ${input_file} \
-             --outputs \
-             ${prefix}_proteins.faa "FASTA amino acid file for annotated proteins" "Annotation Amino Acid FASTA" "FASTA Amino Acid File for ${proj}" \
-             ${prefix}_structural_annotation.gff "GFF3 format file with structural annotations" "Structural Annotation GFF"  "Structural Annotation for ${proj}" \
-             ${prefix}_functional_annotation.gff "GFF3 format file with functional annotations" "Functional Annotation GFF" "Functional Annotation for ${proj}" \
-             ${prefix}_ko.tsv "Tab delimited file for KO annotation" "Annotation KEGG Orthology" "KEGG Orthology for ${proj}" \
-             ${prefix}_ec.tsv "Tab delimited file for EC annotation" "Annotation Enzyme Commission" "EC Annotations for ${proj}" \
-             ${prefix}_cog.gff "GFF3 format file with COGs" "Clusters of Orthologous Groups (COG) Annotation GFF" "COGs for ${proj}" \
-             ${prefix}_pfam.gff "GFF3 format file with Pfam" "Pfam Annotation GFF" "Pfam Annotation for ${proj}" \
-             ${prefix}_tigrfam.gff "GFF3 format file with TIGRfam" "TIGRFam Annotation GFF" "TIGRFam for ${proj}" \
-             ${prefix}_smart.gff "GFF3 format file with SMART" "SMART Annotation GFF" "SMART Annotations for ${proj}" \
-             ${prefix}_supfam.gff "GFF3 format file with SUPERFam" "SUPERFam Annotation GFF" "SUPERFam Annotations for ${proj}" \
-             ${prefix}_cath_funfam.gff "GFF3 format file with CATH FunFams" "CATH FunFams (Functional Families) Annotation GFF" "CATH FunFams for ${proj}" \
-             ${prefix}_crt.gff "GFF3 format file with CRT" "CRT Annotation GFF" "CRT Annotations for ${proj}" \
-             ${prefix}_genemark.gff "GFF3 format file with Genemark" "Genemark Annotation GFF" "Genemark Annotations for ${proj}" \
-             ${prefix}_prodigal.gff "GFF3 format file with Prodigal" "Prodigal Annotation GFF" "Prodigal Annotations ${proj}" \
-             ${prefix}_trna.gff "GFF3 format file with TRNA" "TRNA Annotation GFF" "TRNA Annotations ${proj}" \
-             ${prefix}_rfam.gff "GFF3 format file with RFAM" "RFAM Annotation GFF" "RFAM Annotations for ${proj}" \
-             ${prefix}_ko_ec.gff "GFF3 format file with KO_EC" "KO_EC Annotation GFF" "KO_EC Annotations for ${proj}" \
-             ${prefix}_product_names.tsv "Product names file" "Product Names" "Product names for ${proj}" \
-             ${prefix}_gene_phylogeny.tsv "Gene Phylogeny file" "Gene Phylogeny" "Gene Phylogeny for ${proj}"\
-             ${prefix}_crt.crisprs "Crispr Terms" "Crispr Terms" "Crispr Terms for ${proj}"  \
-             ${prefix}_stats.tsv "Annotation statistics report" "Annotation Statistics" "Annotation Stats for ${proj}"
 
    }
 
    output {
-        File objects = "objects.json"
         File final_functional_gff = "${prefix}_functional_annotation.gff"
         File final_structural_gff = "${prefix}_structural_annotation.gff"
         File final_ko_tsv = "${prefix}_ko.tsv"
@@ -678,6 +633,7 @@ task finish_ano {
 #        File final_proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
 #        File final_proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
         File final_product_names_tsv = "${prefix}_product_names.tsv"
+        File final_lineage_tsv = "${prefix}.contigLin.assembled.tsv"
         File final_crt_crisprs = "${prefix}_crt.crisprs"
         File final_tsv = "${prefix}_stats.tsv"
  

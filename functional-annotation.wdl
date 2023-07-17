@@ -6,9 +6,9 @@ workflow f_annotate {
   File    input_fasta
   String  database_location
   Boolean ko_ec_execute=true
-  String  ko_ec_img_nr_db="${database_location}"+"/IMG-NR/20211118/img_nr"
-  String  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20211118/md5Hash2Data.txt"
-  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20211118/taxonOid2Taxonomy.txt"
+  String  ko_ec_img_nr_db="${database_location}"+"/IMG-NR/20230629/img_nr"
+  String  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20230629/md5Hash2Data.txt"
+  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20230629/taxonOid2Taxonomy.txt"
   String  lastal_bin="/opt/omics/bin/lastal"
   String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
   Boolean smart_execute=true
@@ -41,8 +41,8 @@ workflow f_annotate {
   String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
   String  product_names_mapping_dir="${database_location}"+"/Product_Name_Mappings/latest"
   String  container
-  String  hmm_container="microbiomedata/img-omics@sha256:e3e3fff75aeb3a6e321054d4bc9d8c8c925dcfb9245d60247ab29c3b24c4bc75"
-  String  last_container="microbiomedata/img-omics@sha256:e3e3fff75aeb3a6e321054d4bc9d8c8c925dcfb9245d60247ab29c3b24c4bc75"
+  String  hmm_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
+  String  last_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
 
   if(ko_ec_execute) {
     call ko_ec {
@@ -171,6 +171,7 @@ workflow f_annotate {
     File? phylo_tsv = ko_ec.phylo_tsv
     File? ko_ec_gff = ko_ec.gff
     File? last_blasttab = ko_ec.last_blasttab
+    File? lineage_tsv = ko_ec.lineage_tsv
     File? cog_gff = cog.gff
     File? pfam_gff = pfam.gff
     File? tigrfam_gff = tigrfam.gff
@@ -226,7 +227,8 @@ task ko_ec {
                 ${project_type} ${md5} ${phylo} \
                 ${project_id}_ko.tsv ${project_id}_ec.tsv \
                 ${project_id}_gene_phylogeny.tsv ${project_id}_ko_ec.gff \
-                ${project_id}_proteins.img_nr.last.blasttab
+                ${project_id}_proteins.img_nr.last.blasttab && \
+    python /opt/omics/bin/functional_annotation/create_scaffold_lineage.py ${project_id}_gene_phylogeny.tsv ${project_id}_scaffold_lineage.tsv
 
    #get version information
    lastal_version="`${lastal} -V`"
@@ -247,6 +249,7 @@ task ko_ec {
     File ec_tsv = "${project_id}_ec.tsv"
     File phylo_tsv = "${project_id}_gene_phylogeny.tsv"
     File gff = "${project_id}_ko_ec.gff"
+    File lineage_tsv = "${project_id}_scaffold_lineage.tsv"
     String lastal_ver = read_string(lastal_version_file)
     String img_nr_db_ver = read_string(img_nr_db_version_file)
   }
@@ -300,7 +303,6 @@ task smart {
 }
 
 task cog {
-  
   String project_id
   File   input_fasta
   String   cog_db
@@ -628,3 +630,4 @@ task product_name {
     File tsv = "${project_id}_product_names.tsv"
   }
 }
+
