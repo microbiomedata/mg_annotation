@@ -173,6 +173,7 @@ workflow annotation {
     File? functional_gff = finish_ano.final_functional_gff
     File? ko_tsv = finish_ano.final_ko_tsv
     File? ec_tsv = finish_ano.final_ec_tsv
+    File? lineage_tsv = finish_ano.final_lineage_tsv
     File? stats_tsv = finish_ano.final_tsv
     #File? stats_json = finish_ano.final_json
     File? cog_gff = finish_ano.final_cog_gff
