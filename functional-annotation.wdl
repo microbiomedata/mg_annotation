@@ -7,8 +7,8 @@ workflow f_annotate {
   String  database_location
   Boolean ko_ec_execute=true
   String  ko_ec_img_nr_db="${database_location}"+"/IMG-NR/20230629/img_nr"
-  String  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20230629/md5Hash2Data.txt"
-  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20230629/taxonOid2Taxonomy.txt"
+  String  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20230629/md5Hash2Data.tsv"
+  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20230629/taxonOid2Taxonomy.tsv"
   String  lastal_bin="/opt/omics/bin/lastal"
   String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
   Boolean smart_execute=true
