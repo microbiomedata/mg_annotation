@@ -140,6 +140,7 @@ workflow annotation {
       input_file=stage.imgap_input_fasta,
       proj=proj,
       start=stage.start,
+      ano_info_file=make_info_file.imgap_info,
       proteins_faa = merge_outputs.proteins_faa,
       structural_gff = merge_outputs.structural_gff,
       ko_ec_gff = merge_outputs.ko_ec_gff,
@@ -195,7 +196,7 @@ workflow annotation {
  #   File? proteins_cath_funfam_domtblout = finish_ano.final_proteins_cath_funfam_domtblout
     File? product_names_tsv = finish_ano.final_product_names_tsv
     File? crt_crisprs = finish_ano.final_crt_crisprs
-    File imgap_version = make_info_file.imgap_info
+    File imgap_version = finish_ano.final_version
   }
 
   parameter_meta {
@@ -549,6 +550,7 @@ task finish_ano {
    String proj
    String prefix=sub(proj, ":", "_")
    String start
+   File ano_info_file
    File input_file
    File proteins_faa
    File structural_gff
@@ -606,6 +608,8 @@ task finish_ano {
        cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
        cat ${stats_json} | sed ${sed} > ${prefix}_stats.json
 
+       ln ${ano_info_file} ${prefix}_imgap.info
+
    }
 
    output {
@@ -637,6 +641,7 @@ task finish_ano {
         File final_lineage_tsv = "${prefix}_scaffold_lineage.tsv"
         File final_crt_crisprs = "${prefix}_crt.crisprs"
         File final_tsv = "${prefix}_stats.tsv"
+        File final_version = "${prefix}_imgap.info"
  
     }
     runtime {
