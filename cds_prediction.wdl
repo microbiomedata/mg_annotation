@@ -47,7 +47,7 @@ workflow cds_prediction {
 }
 
 task run_cds_prediction {
-    input{
+     input{
         File imgap_input_fasta
         String fasta_filename
         String imgap_project_type
