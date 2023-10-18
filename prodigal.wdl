@@ -1,10 +1,11 @@
+version 1.0
 workflow prodigal {
-
-  String imgap_input_fasta
-  String imgap_project_id
-  String imgap_project_type
-  String container
-
+    input {
+        String imgap_input_fasta
+        String imgap_project_id
+        String imgap_project_type
+        String container
+    }
   if(imgap_project_type == "isolate") {
     call fasta_len {
       input:
@@ -59,9 +60,9 @@ workflow prodigal {
 }
 
 task fasta_len {
-
-  File input_fasta
-
+    input {
+        File input_fasta
+    }
   command {
     grep -v '^>' ${input_fasta} | wc -m
   }
@@ -77,14 +78,14 @@ task fasta_len {
 }
 
 task iso_big {
-
-  String bin="/opt/omics/bin/prodigal"
-  File   input_fasta
-  Int?   translation_table = 11
-  String project_id
-  File   train = "${project_id}_prodigal.trn"
-  String container
-
+    input {
+        String bin="/opt/omics/bin/prodigal"
+        File   input_fasta
+        Int?   translation_table = 11
+        String project_id
+        File   train = "${project_id}_prodigal.trn"
+        String container
+    }
   command {
     set -euo pipefail
     ${bin} -i ${input_fasta} -t ${train} -g ${translation_table} -q
@@ -107,12 +108,12 @@ task iso_big {
 }
 
 task iso_small {
-
-  String bin="/opt/omics/bin/prodigal"
-  File   input_fasta
-  String project_id
-  String container
-
+    input {
+        String bin="/opt/omics/bin/prodigal"
+        File   input_fasta
+        String project_id
+        String container
+    }
   command {
     ${bin} -f gff -p meta -m -i ${input_fasta} \
     -o ${project_id}_prodigal.gff -d ${project_id}_prodigal_genes.fna \
@@ -133,11 +134,12 @@ task iso_small {
 }
 
 task metag {
-
-  String bin="/opt/omics/bin/prodigal"
-  File   input_fasta
-  String project_id
-  String container
+    input {
+        String bin="/opt/omics/bin/prodigal"
+        File   input_fasta
+        String project_id
+        String container
+    }
 
   command {
     ${bin} -f gff -p meta -m -i ${input_fasta} \
@@ -159,20 +161,20 @@ task metag {
 }
 
 task clean_and_unify {
-  
-  File?  iso_big_proteins_fasta
-  File?  iso_small_proteins_fasta
-  File?  meta_proteins_fasta
-  File?  iso_big_genes_fasta
-  File?  iso_small_genes_fasta
-  File?  meta_genes_fasta
-  File?  iso_big_gff
-  File?  iso_small_gff
-  File?  meta_gff
-  String unify_bin="/opt/omics/bin/structural_annotation/unify_gene_ids.py"
-  String project_id
-  String container
-
+    input {
+        File?  iso_big_proteins_fasta
+        File?  iso_small_proteins_fasta
+        File?  meta_proteins_fasta
+        File?  iso_big_genes_fasta
+        File?  iso_small_genes_fasta
+        File?  meta_genes_fasta
+        File?  iso_big_gff
+        File?  iso_small_gff
+        File?  meta_gff
+        String unify_bin="/opt/omics/bin/structural_annotation/unify_gene_ids.py"
+        String project_id
+        String container
+    }
   command {
     sed -i 's/\*$//g' ${iso_big_proteins_fasta} ${iso_small_proteins_fasta} ${meta_proteins_fasta}
     sed -i 's/\*/X/g' ${iso_big_proteins_fasta} ${iso_small_proteins_fasta} ${meta_proteins_fasta}

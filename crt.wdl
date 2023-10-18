@@ -1,3 +1,4 @@
+version 1.0
 workflow crt {
     input {
         String imgap_input_fasta

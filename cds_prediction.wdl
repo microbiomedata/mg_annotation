@@ -1,3 +1,4 @@
+version 1.0
 workflow cds_prediction {
     input {
         File imgap_input_fasta
