@@ -48,17 +48,17 @@ workflow cds_prediction {
 
 task run_cds_prediction {
      input{
-        File imgap_input_fasta
-        String fasta_filename
-        String imgap_project_type
-        String project_id
-        String container
-        Int? imgap_structural_annotation_translation_table
-        String bin
-        String gm_license
-        Boolean genemark_execute
-        Boolean prodigal_execute
-    }
+         File imgap_input_fasta
+         String fasta_filename
+         String imgap_project_type
+         String project_id
+         String container
+         Int? imgap_structural_annotation_translation_table
+         String bin
+         String gm_license
+         Boolean genemark_execute
+         Boolean prodigal_execute
+     }
 
    command {
        set -oeu pipefail
