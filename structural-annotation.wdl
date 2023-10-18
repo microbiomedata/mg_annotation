@@ -218,21 +218,22 @@ task pre_qc {
 }
 
 task gff_merge {
-
-  String bin="/opt/omics/bin/structural_annotation/gff_files_merger.py"
-  File   input_fasta
-  String project_id
-  File?  rrna_gff
-  File?  trna_gff
-  File?  rfam_gff
-  File?  crt_gff
-  File?  cds_gff 
-  Boolean prodigal_execute
-  Boolean genemark_execute
-  Boolean crt_execute
-  Boolean rfam_execute
-  Boolean trnascan_se_execute
-  String container
+    input {
+        String bin="/opt/omics/bin/structural_annotation/gff_files_merger.py"
+        File   input_fasta
+        String project_id
+        File?  rrna_gff
+        File?  trna_gff
+        File?  rfam_gff
+        File?  crt_gff
+        File?  cds_gff
+        Boolean prodigal_execute
+        Boolean genemark_execute
+        Boolean crt_execute
+        Boolean rfam_execute
+        Boolean trnascan_se_execute
+        String container
+  }
   command {
     set -euo pipefail
     # set cromwell booleans as bash variables
@@ -283,16 +284,16 @@ task gff_merge {
 }
 
 task fasta_merge {
-
-  String bin="/opt/omics/bin/structural_annotation/finalize_fasta_files.py"
-  String project_id
-  File   final_gff
-  File cds_genes
-  File cds_proteins
-  String genes_filename = basename(cds_genes)
-  String proteins_filename = basename(cds_proteins)
-  String container
-
+    input {
+        String bin="/opt/omics/bin/structural_annotation/finalize_fasta_files.py"
+        String project_id
+        File   final_gff
+        File cds_genes
+        File cds_proteins
+        String genes_filename = basename(cds_genes)
+        String proteins_filename = basename(cds_proteins)
+        String container
+    }
   command {
    set -euo pipefail
    cp ~{final_gff} .
@@ -314,13 +315,13 @@ task fasta_merge {
 }
 
 task gff_and_fasta_stats {
-
-  String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
-  File   input_fasta
-  String project_id
-  File   final_gff
-  String container
-
+    input {
+        String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
+        File   input_fasta
+        String project_id
+        File   final_gff
+        String container
+    }
   command {
     ~{bin} ~{input_fasta} ~{final_gff}
   }
@@ -334,12 +335,12 @@ task gff_and_fasta_stats {
 }
 
 task post_qc {
-
-  String qc_bin="/opt/omics/bin/qc/post-annotation/genome_structural_annotation_sanity.py"
-  File   input_fasta
-  String project_id
-  String container
-
+    input {
+        String qc_bin="/opt/omics/bin/qc/post-annotation/genome_structural_annotation_sanity.py"
+        File   input_fasta
+        String project_id
+        String container
+    }
   command {
     ~{qc_bin} ~{input_fasta} "~{project_id}_structural_annotation.gff"
   }
