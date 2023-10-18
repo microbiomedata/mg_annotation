@@ -258,23 +258,23 @@ task ko_ec {
 }
 
 task smart {
-  
-  String project_id
-  File   input_fasta
-  String   smart_db
-  Int    threads = 62
-  Int    par_hmm_inst = 15
-  Int    approx_num_proteins = 0
-  Float  min_domain_eval_cutoff = 0.01
-  Float  aln_length_ratio = 0.7
-  Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String frag_hits_filter
-  String base=basename(input_fasta)
-  String container
-  String hmmsearch_version_file = "hmmsearch_version.txt"
-  String smart_db_version_file = "smart_db_version.txt"
-
+    input {
+        String project_id
+        File   input_fasta
+        String   smart_db
+        Int    threads = 62
+        Int    par_hmm_inst = 15
+        Int    approx_num_proteins = 0
+        Float  min_domain_eval_cutoff = 0.01
+        Float  aln_length_ratio = 0.7
+        Float  max_overlap_ratio = 0.1
+        String hmmsearch
+        String frag_hits_filter
+        String base=basename(input_fasta)
+        String container
+        String hmmsearch_version_file = "hmmsearch_version.txt"
+        String smart_db_version_file = "smart_db_version.txt"
+    }
   command <<<
      set -euo pipefail
      cp ~{input_fasta} ~{base}
@@ -305,22 +305,23 @@ task smart {
 }
 
 task cog {
-  String project_id
-  File   input_fasta
-  String   cog_db
-  Int    threads = 62
-  Int    par_hmm_inst = 15
-  Int    approx_num_proteins = 0
-  Float  min_domain_eval_cutoff = 0.01
-  Float  aln_length_ratio = 0.7
-  Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String frag_hits_filter
-  String base=basename(input_fasta)
-  String container
-  String hmmsearch_version_file = "hmmsearch_version.txt"
-  String cog_db_version_file = "cog_db_version.txt"
-
+    input {
+        String project_id
+        File   input_fasta
+        String   cog_db
+        Int    threads = 62
+        Int    par_hmm_inst = 15
+        Int    approx_num_proteins = 0
+        Float  min_domain_eval_cutoff = 0.01
+        Float  aln_length_ratio = 0.7
+        Float  max_overlap_ratio = 0.1
+        String hmmsearch
+        String frag_hits_filter
+        String base=basename(input_fasta)
+        String container
+        String hmmsearch_version_file = "hmmsearch_version.txt"
+        String cog_db_version_file = "cog_db_version.txt"
+    }
   command <<<
      set -euo pipefail
      cp ~{input_fasta} ~{base}
@@ -351,22 +352,22 @@ task cog {
 }
 
 task tigrfam {
-  
-  String project_id
-  File   input_fasta
-  String   tigrfam_db
-  Int    threads = 62
-  Int    par_hmm_inst = 15
-  Int    approx_num_proteins = 0
-  Float  aln_length_ratio = 0.7
-  Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String hit_selector
-  String base=basename(input_fasta)
-  String container
-  String hmmsearch_version_file = "hmmsearch_version.txt"
-  String tigrfam_db_version_file = "tigrfam_db_version.txt"
-
+    input {
+      String project_id
+      File   input_fasta
+      String   tigrfam_db
+      Int    threads = 62
+      Int    par_hmm_inst = 15
+      Int    approx_num_proteins = 0
+      Float  aln_length_ratio = 0.7
+      Float  max_overlap_ratio = 0.1
+      String hmmsearch
+      String hit_selector
+      String base=basename(input_fasta)
+      String container
+      String hmmsearch_version_file = "hmmsearch_version.txt"
+      String tigrfam_db_version_file = "tigrfam_db_version.txt"
+    }
   command <<<
      set -euo pipefail
      cp ~{input_fasta} ~{base}
@@ -398,23 +399,23 @@ task tigrfam {
 }
 
 task superfam {
-
-  String project_id
-  File   input_fasta
-  String   superfam_db
-  Int    threads = 62
-  Int    par_hmm_inst = 15
-  Int    approx_num_proteins = 0
-  Float  min_domain_eval_cutoff = 0.01
-  Float  aln_length_ratio = 0.7
-  Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String frag_hits_filter
-  String base=basename(input_fasta)
-  String container
-  String hmmsearch_version_file =  "hmmsearch_version.txt"
-  String superfam_db_version_file = "superfam_db_version.txt"
-
+    input {
+        String project_id
+        File   input_fasta
+        String   superfam_db
+        Int    threads = 62
+        Int    par_hmm_inst = 15
+        Int    approx_num_proteins = 0
+        Float  min_domain_eval_cutoff = 0.01
+        Float  aln_length_ratio = 0.7
+        Float  max_overlap_ratio = 0.1
+        String hmmsearch
+        String frag_hits_filter
+        String base=basename(input_fasta)
+        String container
+        String hmmsearch_version_file =  "hmmsearch_version.txt"
+        String superfam_db_version_file = "superfam_db_version.txt"
+    }
   command <<<
      set -euo pipefail
      cp ~{input_fasta} ~{base}
@@ -446,21 +447,21 @@ task superfam {
 }
 
 task pfam {
-
-  String project_id
-  File   input_fasta
-  String   pfam_db
-  String   pfam_claninfo_tsv
-  Int    threads = 62
-  Int    par_hmm_inst = 15
-  Int    approx_num_proteins = 0
-  String hmmsearch
-  String pfam_clan_filter
-  String base=basename(input_fasta)
-  String container
-  String hmmsearch_version_file = "hmmsearch_version.txt" 
-  String pfam_db_version_file = "pfam_db_version.txt"
-
+    input {
+        String project_id
+        File   input_fasta
+        String   pfam_db
+        String   pfam_claninfo_tsv
+        Int    threads = 62
+        Int    par_hmm_inst = 15
+        Int    approx_num_proteins = 0
+        String hmmsearch
+        String pfam_clan_filter
+        String base=basename(input_fasta)
+        String container
+        String hmmsearch_version_file = "hmmsearch_version.txt"
+        String pfam_db_version_file = "pfam_db_version.txt"
+    }
   command <<<
      set -euo pipefail
      cp ~{input_fasta} ~{base}
@@ -491,23 +492,23 @@ task pfam {
 }
 
 task cath_funfam {
- 
-  String project_id
-  File   input_fasta
-  String   cath_funfam_db
-  Int    threads=62
-  Int    par_hmm_inst=15
-  Int    approx_num_proteins=0
-  Float  min_domain_eval_cutoff = 0.01
-  Float  aln_length_ratio = 0.7
-  Float  max_overlap_ratio = 0.1
-  String hmmsearch
-  String frag_hits_filter
-  String base=basename(input_fasta)
-  String container
-  String hmmsearch_version_file = "hmmsearch_version.txt"
-  String cath_funfam_db_version_file = "cath_funfam_db_version.txt"
-
+    input {
+        String project_id
+        File   input_fasta
+        String   cath_funfam_db
+        Int    threads=62
+        Int    par_hmm_inst=15
+        Int    approx_num_proteins=0
+        Float  min_domain_eval_cutoff = 0.01
+        Float  aln_length_ratio = 0.7
+        Float  max_overlap_ratio = 0.1
+        String hmmsearch
+        String frag_hits_filter
+        String base=basename(input_fasta)
+        String container
+        String hmmsearch_version_file = "hmmsearch_version.txt"
+        String cath_funfam_db_version_file = "cath_funfam_db_version.txt"
+    }
   command <<<
      set -euo pipefail
      cp ~{input_fasta} ~{base}
@@ -536,13 +537,13 @@ task cath_funfam {
 }
 
 task signalp {
-  
-  String project_id
-  File   input_fasta
-  String gram_stain
-  String signalp
-  String container
-
+    input {
+        String project_id
+        File   input_fasta
+        String gram_stain
+        String signalp
+        String container
+    }
   command <<<
     set -euo pipefail
     signalp_version=$(~{signalp} -V)
