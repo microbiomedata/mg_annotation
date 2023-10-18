@@ -1,16 +1,17 @@
 workflow cds_prediction {
-  File imgap_input_fasta
-  String fasta_filename = basename(imgap_input_fasta)
-  String imgap_project_type
-  String imgap_project_id
-  String container
-  Boolean prodigal_execute=true
-  Boolean genemark_execute=true
-  Int? imgap_structural_annotation_translation_table
-  String bin="/opt/omics/bin/structural_annotation"
-  #if running w/JAWS $HOME is not mounted so need the license file in the execution dir
-  String? gm_license 
-
+    input {
+        File imgap_input_fasta
+        String fasta_filename = basename(imgap_input_fasta)
+        String imgap_project_type
+        String imgap_project_id
+        String container
+        Boolean prodigal_execute=true
+        Boolean genemark_execute=true
+        Int? imgap_structural_annotation_translation_table
+        String bin="/opt/omics/bin/structural_annotation"
+        #if running w/JAWS $HOME is not mounted so need the license file in the execution dir
+        String? gm_license
+    }
     call run_cds_prediction  {
        input: imgap_input_fasta=imgap_input_fasta,
            imgap_project_type=imgap_project_type,
@@ -45,27 +46,28 @@ workflow cds_prediction {
 }
 
 task run_cds_prediction {
-   File imgap_input_fasta
-   String fasta_filename
-   String imgap_project_type
-   String project_id
-   String container
-   Int? imgap_structural_annotation_translation_table
-   String bin
-   String gm_license
-   Boolean genemark_execute
-   Boolean prodigal_execute
-
+    input {
+        File imgap_input_fasta
+        String fasta_filename
+        String imgap_project_type
+        String project_id
+        String container
+        Int? imgap_structural_annotation_translation_table
+        String bin
+        String gm_license
+        Boolean genemark_execute
+        Boolean prodigal_execute
+    }
 
    command {
        set -oeu pipefail
        #set name for log, code needs fasta to be in working dir, set varaiables, run cds_prediction.sh  
-       cds_log=${project_id}_cds.log
+       cds_log=~{project_id}_cds.log
        #copy file to cromwell execution dir to get outputs in this folder
-       cp ../inputs/*/${fasta_filename} ./${project_id}_contigs.fna
+       cp ../inputs/*/~{fasta_filename} ./~{project_id}_contigs.fna
        #set env variables
-       genemark_execute_bash=${genemark_execute}
-       prodigal_execute_bash=${prodigal_execute}
+       genemark_execute_bash=~{genemark_execute}
+       prodigal_execute_bash=~{prodigal_execute}
        if [[ "$prodigal_execute_bash" = true ]] ; then
 	export imgap_structural_annotation_prodigal_execute="True"
         else
@@ -77,9 +79,9 @@ task run_cds_prediction {
         export imgap_structural_annotation_genemark_execute="False"
        fi 
        #copy genemark license to the execution dir
-       cp ${gm_license} .
-       /usr/bin/time ${bin}/cds_prediction.sh ${project_id}_contigs.fna ${imgap_project_type} ${imgap_structural_annotation_translation_table} &> $cds_log
-       rm ${project_id}_contigs.fna
+       cp ~{gm_license} .
+       /usr/bin/time ~{bin}/cds_prediction.sh ~{project_id}_contigs.fna ~{imgap_project_type} ~{imgap_structural_annotation_translation_table} &> $cds_log
+       rm ~{project_id}_contigs.fna
    }
    
 

@@ -1,49 +1,50 @@
 workflow f_annotate {
-  String  imgap_project_id
-  String  imgap_project_type
-  Int     additional_threads
-  File?    input_contigs_fasta
-  File    input_fasta
-  String  database_location
-  Boolean ko_ec_execute=true
-  String  ko_ec_img_nr_db="${database_location}"+"/IMG-NR/20230629/img_nr"
-  String  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20230629/md5Hash2Data.tsv"
-  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20230629/taxonOId2Taxonomy.tsv"
-  String  lastal_bin="/opt/omics/bin/lastal"
-  String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
-  Boolean smart_execute=true
-  Int?    par_hmm_inst
-  Int?    approx_num_proteins
-  String  smart_db="${database_location}"+"/SMART/01_06_2016/SMART.hmm"
-  String  hmmsearch_bin="/opt/omics/bin/hmmsearch"
-  String  frag_hits_filter_bin="/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
-  Boolean cog_execute=true
-  String  cog_db="${database_location}"+"/COG/HMMs/2003/COG.hmm"
-  Boolean tigrfam_execute=true
-  String  tigrfam_db="${database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
-  String  hit_selector_bin="/opt/omics/bin/functional_annotation/hmmsearch_hit_selector.py"
-  Boolean superfam_execute=true
-  String  superfam_db="${database_location}"+"/SuperFamily/v1.75/supfam.hmm"
-  Boolean pfam_execute=true
-  String  pfam_db="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.v34.0.hmm"
-  String  pfam_claninfo_tsv="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
-  String  pfam_clan_filter="/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
-  Boolean cath_funfam_execute=true
-  String  cath_funfam_db="${database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
-#  Boolean signalp_execute=true
-#  String  signalp_gram_stain="GRAM_STAIN"
-#  String  signalp_bin="/opt/omics/bin/signalp"
-#  Boolean tmhmm_execute=true
-#  String  tmhmm_model="/opt/omics/programs/tmhmm-2.0c/lib/TMHMM2.0.model"
-#  String  tmhmm_decode="/opt/omics/bin/decodeanhmm"
-#  String  tmhmm_decode_parser="/opt/omics/bin/functional_annotation/decodeanhmm_parser.py"
-  File    sa_gff
-  String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
-  String  product_names_mapping_dir="${database_location}"+"/Product_Name_Mappings/latest"
-  String  container
-  String  hmm_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
-  String  last_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
-
+    input {
+        String  imgap_project_id
+        String  imgap_project_type
+        Int     additional_threads
+        File?    input_contigs_fasta
+        File    input_fasta
+        String  database_location
+        Boolean ko_ec_execute=true
+        String  ko_ec_img_nr_db="${database_location}"+"/IMG-NR/20230629/img_nr"
+        String  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20230629/md5Hash2Data.tsv"
+        String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20230629/taxonOId2Taxonomy.tsv"
+        String  lastal_bin="/opt/omics/bin/lastal"
+        String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
+        Boolean smart_execute=true
+        Int?    par_hmm_inst
+        Int?    approx_num_proteins
+        String  smart_db="${database_location}"+"/SMART/01_06_2016/SMART.hmm"
+        String  hmmsearch_bin="/opt/omics/bin/hmmsearch"
+        String  frag_hits_filter_bin="/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
+        Boolean cog_execute=true
+        String  cog_db="${database_location}"+"/COG/HMMs/2003/COG.hmm"
+        Boolean tigrfam_execute=true
+        String  tigrfam_db="${database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
+        String  hit_selector_bin="/opt/omics/bin/functional_annotation/hmmsearch_hit_selector.py"
+        Boolean superfam_execute=true
+        String  superfam_db="${database_location}"+"/SuperFamily/v1.75/supfam.hmm"
+        Boolean pfam_execute=true
+        String  pfam_db="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.v34.0.hmm"
+        String  pfam_claninfo_tsv="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
+        String  pfam_clan_filter="/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
+        Boolean cath_funfam_execute=true
+        String  cath_funfam_db="${database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
+        #  Boolean signalp_execute=true
+        #  String  signalp_gram_stain="GRAM_STAIN"
+        #  String  signalp_bin="/opt/omics/bin/signalp"
+        #  Boolean tmhmm_execute=true
+        #  String  tmhmm_model="/opt/omics/programs/tmhmm-2.0c/lib/TMHMM2.0.model"
+        #  String  tmhmm_decode="/opt/omics/bin/decodeanhmm"
+        #  String  tmhmm_decode_parser="/opt/omics/bin/functional_annotation/decodeanhmm_parser.py"
+        File    sa_gff
+        String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
+        String  product_names_mapping_dir="${database_location}"+"/Product_Name_Mappings/latest"
+        String  container
+        String  hmm_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
+        String  last_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
+    }
   if(ko_ec_execute) {
     call ko_ec {
       input:
@@ -203,38 +204,38 @@ workflow f_annotate {
 }
 
 task ko_ec {
-
-  String project_id
-  String project_type
-  Int    threads = 2
-  File   input_fasta
-  String nr_db
-  String   md5
-  String   phylo
-  Int    top_hits = 5
-  Int    min_ko_hits = 2
-  Float  aln_length_ratio = 0.7
-  String lastal
-  String selector
-  String container
-  String lastal_version_file = "lastal_version.txt"
-  String img_nr_db_version_file = "img_db_version.txt"
-
+    input {
+        String project_id
+        String project_type
+        Int    threads = 2
+        File   input_fasta
+        String nr_db
+        String   md5
+        String   phylo
+        Int    top_hits = 5
+        Int    min_ko_hits = 2
+        Float  aln_length_ratio = 0.7
+        String lastal
+        String selector
+        String container
+        String lastal_version_file = "lastal_version.txt"
+        String img_nr_db_version_file = "img_db_version.txt"
+    }
   command {
     set -euo pipefail
-    ${lastal} -f blasttab+ -P ${threads} ${nr_db} ${input_fasta} 1> ${project_id}_proteins.img_nr.last.blasttab
-    ${selector} -l ${aln_length_ratio} -m ${min_ko_hits} -n ${top_hits} \
-                ${project_type} ${md5} ${phylo} \
-                ${project_id}_ko.tsv ${project_id}_ec.tsv \
-                ${project_id}_gene_phylogeny.tsv ${project_id}_ko_ec.gff \
-                ${project_id}_proteins.img_nr.last.blasttab && \
-    python /opt/omics/bin/functional_annotation/create_scaffold_lineage.py ${project_id}_gene_phylogeny.tsv ${project_id}_scaffold_lineage.tsv
+    ~{lastal} -f blasttab+ -P ~{threads} ~{nr_db} ~{input_fasta} 1> ~{project_id}_proteins.img_nr.last.blasttab
+    ~{selector} -l ~{aln_length_ratio} -m ~{min_ko_hits} -n ~{top_hits} \
+                ~{project_type} ~{md5} ~{phylo} \
+                ~{project_id}_ko.tsv ~{project_id}_ec.tsv \
+                ~{project_id}_gene_phylogeny.tsv ~{project_id}_ko_ec.gff \
+                ~{project_id}_proteins.img_nr.last.blasttab && \
+    python /opt/omics/bin/functional_annotation/create_scaffold_lineage.py ~{project_id}_gene_phylogeny.tsv ~{project_id}_scaffold_lineage.tsv
 
    #get version information
-   lastal_version="`${lastal} -V`"
-   echo $lastal_version > ${lastal_version_file}
-   img_nr_db_version="IMG-NR $(basename $(realpath $(dirname ${nr_db})))"
-   echo $img_nr_db_version  > ${img_nr_db_version_file}
+   lastal_version="`~{lastal} -V`"
+   echo $lastal_version > ~{lastal_version_file}
+   img_nr_db_version="IMG-NR $(basename $(realpath $(dirname ~{nr_db})))"
+   echo $img_nr_db_version  > ~{img_nr_db_version_file}
   }
 
   runtime {
@@ -275,17 +276,17 @@ task smart {
 
   command <<<
      set -euo pipefail
-     cp ${input_fasta} ${base}
-     /opt/omics/bin/functional_annotation/hmmsearch_smart.sh ${base} \
-     ${smart_db} \
-     ${threads} ${par_hmm_inst} ${approx_num_proteins} \
-     ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
+     cp ~{input_fasta} ~{base}
+     /opt/omics/bin/functional_annotation/hmmsearch_smart.sh ~{base} \
+     ~{smart_db} \
+     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
+     ~{min_domain_eval_cutoff} ~{aln_length_ratio} ~{max_overlap_ratio}
 
    #get version
    hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-   echo $hmmsearch_version > ${hmmsearch_version_file}
-   smart_db_version="SMART $(basename $(realpath $(dirname ${smart_db})))"
-   echo $smart_db_version > ${smart_db_version_file}
+   echo $hmmsearch_version > ~{hmmsearch_version_file}
+   smart_db_version="SMART $(basename $(realpath $(dirname ~{smart_db})))"
+   echo $smart_db_version > ~{smart_db_version_file}
   >>>
 
   runtime {
@@ -321,17 +322,17 @@ task cog {
 
   command <<<
      set -euo pipefail
-     cp ${input_fasta} ${base}
-     /opt/omics/bin/functional_annotation/hmmsearch_cogs.sh ${base} \
-     ${cog_db} \
-     ${threads} ${par_hmm_inst} ${approx_num_proteins} \
-     ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
+     cp ~{input_fasta} ~{base}
+     /opt/omics/bin/functional_annotation/hmmsearch_cogs.sh ~{base} \
+     ~{cog_db} \
+     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
+     ~{min_domain_eval_cutoff} ~{aln_length_ratio} ~{max_overlap_ratio}
      
     #get versions
    hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3`"
-   echo $hmmsearch_version > ${hmmsearch_version_file}
-   cog_db_version="COG $(basename $(realpath $(dirname ${cog_db})))"
-   echo $cog_db_version > ${cog_db_version_file}
+   echo $hmmsearch_version > ~{hmmsearch_version_file}
+   cog_db_version="COG $(basename $(realpath $(dirname ~{cog_db})))"
+   echo $cog_db_version > ~{cog_db_version_file}
   >>>
 
   runtime {
@@ -367,17 +368,17 @@ task tigrfam {
 
   command <<<
      set -euo pipefail
-     cp ${input_fasta} ${base}
-     /opt/omics/bin/functional_annotation/hmmsearch_tigrfams.sh ${base} \
-     ${tigrfam_db} \
-     ${threads} ${par_hmm_inst} ${approx_num_proteins} \
-     ${aln_length_ratio} ${max_overlap_ratio} 
+     cp ~{input_fasta} ~{base}
+     /opt/omics/bin/functional_annotation/hmmsearch_tigrfams.sh ~{base} \
+     ~{tigrfam_db} \
+     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
+     ~{aln_length_ratio} ~{max_overlap_ratio}
 
    #    #get versions
    hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-   echo $hmmsearch_version > ${hmmsearch_version_file}
-   tigrfam_db_version="TIGRFAM $(basename $(realpath $(dirname ${tigrfam_db})))"
-   echo $tigrfam_db_version > ${tigrfam_db_version_file}
+   echo $hmmsearch_version > ~{hmmsearch_version_file}
+   tigrfam_db_version="TIGRFAM $(basename $(realpath $(dirname ~{tigrfam_db})))"
+   echo $tigrfam_db_version > ~{tigrfam_db_version_file}
   >>>
 
   runtime {
@@ -415,18 +416,18 @@ task superfam {
 
   command <<<
      set -euo pipefail
-     cp ${input_fasta} ${base}
+     cp ~{input_fasta} ~{base}
     #Usage: hmmsearch_supfams.sh <proteins_fasta> <supfam_hmm_db> <number_of_additional_threads (default: 0)> <number_of_parallel_hmmsearch_instances (default: 0)> <approximate_number_of_total_proteins (default: 0)> <min_domain_evalue_cutoff (default 0.01)> <min_aln_length_ratio (default 0.7)> <max_overlap_ratio (default 0.1)> 
 
-     /opt/omics/bin/functional_annotation/hmmsearch_supfams.sh ${base} \
-     ${superfam_db} \
-     ${threads} ${par_hmm_inst} ${approx_num_proteins} \
-     ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
+     /opt/omics/bin/functional_annotation/hmmsearch_supfams.sh ~{base} \
+     ~{superfam_db} \
+     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
+     ~{min_domain_eval_cutoff} ~{aln_length_ratio} ~{max_overlap_ratio}
  
      hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-     echo $hmmsearch_version > ${hmmsearch_version_file}
-     superfam_db_version="SuperFamily $(basename $(realpath $(dirname ${superfam_db})))"
-     echo $superfam_db_version > ${superfam_db_version_file}
+     echo $hmmsearch_version > ~{hmmsearch_version_file}
+     superfam_db_version="SuperFamily $(basename $(realpath $(dirname ~{superfam_db})))"
+     echo $superfam_db_version > ~{superfam_db_version_file}
   >>>
 
   runtime {
@@ -461,17 +462,17 @@ task pfam {
 
   command <<<
      set -euo pipefail
-     cp ${input_fasta} ${base}
+     cp ~{input_fasta} ~{base}
      
     #Usage: hmmsearch_pfams.sh <proteins_fasta> <pfam_hmm_db> <pfam_claninfo_tsv> <number_of_additional_threads (default: 0)>
-     /opt/omics/bin/functional_annotation/hmmsearch_pfams.sh ${base} \
-     ${pfam_db} ${pfam_claninfo_tsv} \
-     ${threads} ${par_hmm_inst} ${approx_num_proteins}
+     /opt/omics/bin/functional_annotation/hmmsearch_pfams.sh ~{base} \
+     ~{pfam_db} ~{pfam_claninfo_tsv} \
+     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins}
 
      hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-     echo $hmmsearch_version > ${hmmsearch_version_file}
-     pfam_db_version="Pfam $(basename $(realpath $(dirname ${pfam_db})))"
-     echo $pfam_db_version > ${pfam_db_version_file}
+     echo $hmmsearch_version > ~{hmmsearch_version_file}
+     pfam_db_version="Pfam $(basename $(realpath $(dirname ~{pfam_db})))"
+     echo $pfam_db_version > ~{pfam_db_version_file}
   >>>
 
   runtime {
@@ -508,15 +509,15 @@ task cath_funfam {
 
   command <<<
      set -euo pipefail
-     cp ${input_fasta} ${base}
-     /opt/omics/bin/functional_annotation/hmmsearch_cath_funfams.sh  ${base} \
-     ${cath_funfam_db} ${threads} ${par_hmm_inst} ${approx_num_proteins} \
-     ${min_domain_eval_cutoff} ${aln_length_ratio} ${max_overlap_ratio} 
+     cp ~{input_fasta} ~{base}
+     /opt/omics/bin/functional_annotation/hmmsearch_cath_funfams.sh  ~{base} \
+     ~{cath_funfam_db} ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
+     ~{min_domain_eval_cutoff} ~{aln_length_ratio} ~{max_overlap_ratio}
 
      hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-     echo $hmmsearch_version > ${hmmsearch_version_file}
-     cath_funfam_db_version="Cath-Funfam $(basename $(realpath $(dirname ${cath_funfam_db})))"
-     echo $cath_funfam_db_version > ${cath_funfam_db_version_file}
+     echo $hmmsearch_version > ~{hmmsearch_version_file}
+     cath_funfam_db_version="Cath-Funfam $(basename $(realpath $(dirname ~{cath_funfam_db})))"
+     echo $cath_funfam_db_version > ~{cath_funfam_db_version_file}
   >>>
 
   runtime {
@@ -543,12 +544,12 @@ task signalp {
 
   command <<<
     set -euo pipefail
-    signalp_version=$(${signalp} -V)
-    ${signalp} -t ${gram_stain} -f short ${input_fasta} | \
+    signalp_version=$(~{signalp} -V)
+    ~{signalp} -t ~{gram_stain} -f short ~{input_fasta} | \
     grep -v '^#' | \
-    awk -v sv="$signalp_version" -v ot="${gram_stain}" \
+    awk -v sv="$signalp_version" -v ot="~{gram_stain}" \
         '$10 == "Y" {print $1"\t"sv"\tcleavage_site\t"$3-1"\t"$3"\t"$2\
-        "\t.\t.\tD-score="$9";network="$12";organism_type="ot}' > ${project_id}_cleavage_sites.gff
+        "\t.\t.\tD-score="$9";network="$12";organism_type="ot}' > ~{project_id}_cleavage_sites.gff
   >>>
 
   runtime {
@@ -563,22 +564,23 @@ task signalp {
 }
 
 task tmhmm {
-  
-  String project_id
-  File   input_fasta
-  String model
-  String decode
-  String decode_parser
-  String container
+    input {
+        String project_id
+        File   input_fasta
+        String model
+        String decode
+        String decode_parser
+        String container
+    }
 
   command <<<
     set -euo pipefail
-    tool_and_version=$(${decode} -v 2>&1 | head -1)
+    tool_and_version=$(~{decode} -v 2>&1 | head -1)
     background="0.081 0.015 0.054 0.061 0.040 0.068 0.022 0.057 0.056 0.093 0.025"
     background="$background 0.045 0.049 0.039 0.057 0.068 0.058 0.067 0.013 0.032"
-    sed 's/\*/X/g' ${input_fasta} | \
-    ${decode} -N 1 -background $background -PrintNumbers \
-    ${model} 2> /dev/null | ${decode_parser} "$tool_and_version" > ${project_id}_tmh.gff
+    sed 's/\*/X/g' ~{input_fasta} | \
+    ~{decode} -N 1 -background $background -PrintNumbers \
+    ~{model} 2> /dev/null | ~{decode_parser} "$tool_and_version" > ~{project_id}_tmh.gff
   >>>
 
   runtime {
@@ -593,28 +595,28 @@ task tmhmm {
 }
 
 task product_name {
-  
-  String project_id
-  File   sa_gff
-  String product_assign
-  String map_dir
-  File?  ko_ec_gff
-  File?  smart_gff
-  File?  cog_gff
-  File?  tigrfam_gff
-  File?  supfam_gff
-  File?  pfam_gff
-  File?  cath_funfam_gff
-#  File?  signalp_gff
-#  File?  tmhmm_gff
-  String container
-
+    input {
+        String project_id
+        File   sa_gff
+        String product_assign
+        String map_dir
+        File?  ko_ec_gff
+        File?  smart_gff
+        File?  cog_gff
+        File?  tigrfam_gff
+        File?  supfam_gff
+        File?  pfam_gff
+        File?  cath_funfam_gff
+        #  File?  signalp_gff
+        #  File?  tmhmm_gff
+        String container
+    }
   command {
     set -euo pipefail
-    ${product_assign} ${"-k " + ko_ec_gff} ${"-s " + smart_gff} ${"-c " + cog_gff} \
-                      ${"-t " + tigrfam_gff} ${"-u " + supfam_gff} ${"-p " + pfam_gff} \
-                      ${"-f " + cath_funfam_gff}  \
-                      ${map_dir} ${sa_gff}
+    ~{product_assign} ~{"-k " + ko_ec_gff} ~{"-s " + smart_gff} ~{"-c " + cog_gff} \
+                      ~{"-t " + tigrfam_gff} ~{"-u " + supfam_gff} ~{"-p " + pfam_gff} \
+                      ~{"-f " + cath_funfam_gff}  \
+                      ~{map_dir} ~{sa_gff}
     mv ../inputs/*/*.gff .
     mv ../inputs/*/*.tsv .
   }

@@ -1,10 +1,10 @@
 workflow genemark {
-  
-  String imgap_input_fasta
-  String imgap_project_id
-  String imgap_project_type
-  String container
-
+    input {
+        String imgap_input_fasta
+        String imgap_project_id
+        String imgap_project_type
+        String container
+    }
   if(imgap_project_type == "isolate") {
     call gm_isolate {
       input:
@@ -41,12 +41,12 @@ workflow genemark {
 }
 
 task gm_isolate {
-  
-  String bin="/opt/omics/bin/gms2.pl"
-  File   input_fasta
-  String project_id
-  String container
-
+    input {
+        String bin="/opt/omics/bin/gms2.pl"
+        File   input_fasta
+        String project_id
+        String container
+    }
   command {
     set -euo pipefail
     ${bin} --seq ${input_fasta} --genome-type auto \
@@ -69,14 +69,13 @@ task gm_isolate {
 }
 
 task gm_meta {
-  
-  String bin="/opt/omics/bin/gmhmmp2"
-
-  String model="/opt/omics/programs/gms2_linux_64/mgm_11.mod"
-  File   input_fasta
-  String project_id
-  String container
-
+    input {
+        String bin="/opt/omics/bin/gmhmmp2"
+        String model="/opt/omics/programs/gms2_linux_64/mgm_11.mod"
+        File   input_fasta
+        String project_id
+        String container
+    }
   command {
     set -euo pipefail
     ${bin} --Meta ${model} --incomplete_at_gaps 30 \
@@ -99,16 +98,17 @@ task gm_meta {
 }
 
 task clean_and_unify {
-  File?  iso_genes_fasta
-  File?  meta_genes_fasta
-  File?  iso_proteins_fasta
-  File?  meta_proteins_fasta
-  File?  iso_gff
-  File?  meta_gff
-  String unify_bin="/opt/omics/bin/structural_annotation/unify_gene_ids.py"
-  String project_id
-  String container
-  
+    input {
+        File?  iso_genes_fasta
+        File?  meta_genes_fasta
+        File?  iso_proteins_fasta
+        File?  meta_proteins_fasta
+        File?  iso_gff
+        File?  meta_gff
+        String unify_bin="/opt/omics/bin/structural_annotation/unify_gene_ids.py"
+        String project_id
+        String container
+    }
   command {
     set -uo pipefail
     sed -i 's/\*/X/g' ${iso_proteins_fasta} ${meta_proteins_fasta}
