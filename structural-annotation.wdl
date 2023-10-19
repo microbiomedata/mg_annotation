@@ -23,7 +23,7 @@ workflow s_annotate {
       Boolean gff_and_fasta_stats_execute=true
       String  database_location
       String  container
-      String? gm_license
+      String gm_license
     }
   if(pre_qc_execute) {
     call pre_qc {
@@ -96,7 +96,6 @@ workflow s_annotate {
         container = container
     }
 
-  if(prodigal_execute || genemark_execute)  {
     call fasta_merge {
       input:
        # input_fasta = imgap_input_fasta,
@@ -106,7 +105,7 @@ workflow s_annotate {
         cds_proteins = cds_prediction.proteins,
         container = container
     }
-  }
+
 
   if(gff_and_fasta_stats_execute) {
     call gff_and_fasta_stats {
@@ -137,16 +136,16 @@ workflow s_annotate {
     File? prodigal_genes = cds_prediction.prodigal_genes
     File? prodigal_proteins = cds_prediction.prodigal_proteins
     File? cds_gff = cds_prediction.gff
-    File? cds_proteins = cds_prediction.proteins
-    File? cds_genes = cds_prediction.genes
+    File cds_proteins = cds_prediction.proteins
+    File cds_genes = cds_prediction.genes
     File? trna_gff = trnascan.gff
     File? trna_bacterial_out = trnascan.bacterial_out
     File? trna_archaeal_out = trnascan.archaeal_out
     File? rfam_gff = rfam.rfam_gff
     File? rfam_tbl = rfam.rfam_tbl
     String? rfam_version = rfam.rfam_version
-    File? proteins = fasta_merge.final_proteins
-    File? genes = fasta_merge.final_genes
+    File proteins = fasta_merge.final_proteins
+    File genes = fasta_merge.final_genes
   }
 }
 
@@ -296,10 +295,10 @@ task fasta_merge {
     }
   command {
    set -euo pipefail
-   cp ~{final_gff} .
-   cp ~{cds_genes} .
-   cp ~{cds_proteins} .
-   ~{bin} ~{final_gff} ~{genes_filename} ~{proteins_filename}
+   cp ${final_gff} .
+   cp ${cds_genes} .
+   cp ${cds_proteins} .
+   ${bin} ${final_gff} ${genes_filename} ${proteins_filename}
   }
 
   runtime {
