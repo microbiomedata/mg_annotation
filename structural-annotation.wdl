@@ -65,7 +65,7 @@ workflow s_annotate {
     }
   }
 
-   if(cds_prediction_execute) {
+
      call cds_prediction.cds_prediction {
        input:
          imgap_input_fasta = imgap_input_fasta,
@@ -77,7 +77,7 @@ workflow s_annotate {
          container = container,
          gm_license = gm_license
     }
-  }
+
 
 
     call gff_merge {
