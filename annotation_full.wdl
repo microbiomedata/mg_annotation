@@ -263,7 +263,7 @@ task split {
 
    command{
      set -euo pipefail
-     /opt/omics/bin/split.py R${infile} ~{blocksize} .
+     /opt/omics/bin/split.py ${infile} ~{blocksize} .
      echo $(egrep -v "^>" ~{infile} | tr -d '\n' | wc -m) / 500 | bc > ~{zfile}
      echo "scale=6; ($(grep -v '^>' ~{infile} | tr -d '\n' | wc -m) * 2) / 1000000" | bc -l > ~{cmzfile}
      cat /opt/omics/VERSION > ~{imgap_version_file}
