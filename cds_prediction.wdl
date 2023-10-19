@@ -11,7 +11,7 @@ workflow cds_prediction {
         Int? imgap_structural_annotation_translation_table
         String bin="/opt/omics/bin/structural_annotation"
         #if running w/JAWS $HOME is not mounted so need the license file in the execution dir
-        String? gm_license
+        String gm_license
     }
     call run_cds_prediction  {
        input: imgap_input_fasta=imgap_input_fasta,
@@ -70,9 +70,9 @@ task run_cds_prediction {
        genemark_execute_bash=~{genemark_execute}
        prodigal_execute_bash=~{prodigal_execute}
        if [[ "$prodigal_execute_bash" = true ]] ; then
-	export imgap_structural_annotation_prodigal_execute="True"
-        else
-	export imgap_structural_annotation_prodigal_execute="False"
+           export imgap_structural_annotation_prodigal_execute="True"
+       else
+           export imgap_structural_annotation_prodigal_execute="False"
        fi
        if [[ "$genemark_execute_bash" = true ]] ; then
         export imgap_structural_annotation_genemark_execute="True"
