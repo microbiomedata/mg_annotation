@@ -4,7 +4,7 @@ workflow f_annotate {
         String  imgap_project_id
         String  imgap_project_type
         Int     additional_threads
-        File    input_contigs_fasta
+       # File    input_contigs_fasta
         File    input_fasta
         String  database_location
         Boolean ko_ec_execute=true
