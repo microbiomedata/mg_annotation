@@ -25,7 +25,7 @@ workflow s_annotate {
       String  container
       String gm_license
     }
-  if(pre_qc_execute) {
+
     call pre_qc {
       input:
         project_type = imgap_project_type,
@@ -33,8 +33,8 @@ workflow s_annotate {
         project_id = imgap_project_id,
         container=container
     }
-  }
-  if(trnascan_se_execute) {
+
+
     call trnascan.trnascan {
       input:
         imgap_input_fasta = imgap_input_fasta,
@@ -43,8 +43,8 @@ workflow s_annotate {
         additional_threads = additional_threads,
         container=container
     }
-  }
-  if(rfam_execute) {
+
+
     call rfam.rfam {
       input:
         cmzscore = cmzscore,
@@ -55,15 +55,15 @@ workflow s_annotate {
         additional_threads = additional_threads,
         container=container
     }
-  }
-  if(crt_execute) {
+
+
     call crt.crt {
       input:
         imgap_input_fasta = imgap_input_fasta,
         imgap_project_id = imgap_project_id,
         container=container
     }
-  }
+
 
 
      call cds_prediction.cds_prediction {
@@ -107,7 +107,7 @@ workflow s_annotate {
     }
 
 
-  if(gff_and_fasta_stats_execute) {
+
     call gff_and_fasta_stats {
       input:
         input_fasta = imgap_input_fasta,
@@ -115,35 +115,35 @@ workflow s_annotate {
         final_gff = gff_merge.final_gff,
         container = container
     }
-  }
-  if(imgap_project_type == "isolate") {
+
+
     call post_qc {
       input:
         input_fasta = imgap_input_fasta,
         project_id = imgap_project_id,
         container = container
     }
-  }
+
   output {
     File  gff = gff_merge.final_gff 
-    File? crt_gff = crt.gff
-    File? crisprs = crt.crisprs 
-    File? crt_out = crt.crt_out
-    File? genemark_gff = cds_prediction.genemark_gff
-    File? genemark_genes = cds_prediction.genemark_genes
-    File? genemark_proteins = cds_prediction.genemark_proteins 
-    File? prodigal_gff = cds_prediction.prodigal_gff
-    File? prodigal_genes = cds_prediction.prodigal_genes
-    File? prodigal_proteins = cds_prediction.prodigal_proteins
-    File? cds_gff = cds_prediction.gff
+    File crt_gff = crt.gff
+    File crisprs = crt.crisprs
+    File crt_out = crt.crt_out
+    File genemark_gff = cds_prediction.genemark_gff
+    File genemark_genes = cds_prediction.genemark_genes
+    File genemark_proteins = cds_prediction.genemark_proteins
+    File prodigal_gff = cds_prediction.prodigal_gff
+    File prodigal_genes = cds_prediction.prodigal_genes
+    File prodigal_proteins = cds_prediction.prodigal_proteins
+    File cds_gff = cds_prediction.gff
     File cds_proteins = cds_prediction.proteins
     File cds_genes = cds_prediction.genes
-    File? trna_gff = trnascan.gff
-    File? trna_bacterial_out = trnascan.bacterial_out
-    File? trna_archaeal_out = trnascan.archaeal_out
-    File? rfam_gff = rfam.rfam_gff
-    File? rfam_tbl = rfam.rfam_tbl
-    String? rfam_version = rfam.rfam_version
+    File trna_gff = trnascan.gff
+    File trna_bacterial_out = trnascan.bacterial_out
+    File trna_archaeal_out = trnascan.archaeal_out
+    File rfam_gff = rfam.rfam_gff
+    File rfam_tbl = rfam.rfam_tbl
+    String rfam_version = rfam.rfam_version
     File proteins = fasta_merge.final_proteins
     File genes = fasta_merge.final_genes
   }
@@ -221,11 +221,11 @@ task gff_merge {
         String bin="/opt/omics/bin/structural_annotation/gff_files_merger.py"
         File   input_fasta
         String project_id
-        File?  rrna_gff
-        File?  trna_gff
-        File?  rfam_gff
-        File?  crt_gff
-        File?  cds_gff
+        # File  rrna_gff
+        File  trna_gff
+        File  rfam_gff
+        File  crt_gff
+        File  cds_gff
         Boolean prodigal_execute
         Boolean genemark_execute
         Boolean crt_execute

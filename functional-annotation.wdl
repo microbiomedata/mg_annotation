@@ -4,7 +4,7 @@ workflow f_annotate {
         String  imgap_project_id
         String  imgap_project_type
         Int     additional_threads
-        File?    input_contigs_fasta
+        File    input_contigs_fasta
         File    input_fasta
         String  database_location
         Boolean ko_ec_execute=true
@@ -46,7 +46,6 @@ workflow f_annotate {
         String  hmm_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
         String  last_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
     }
-  if(ko_ec_execute) {
     call ko_ec {
       input:
         project_id = imgap_project_id,
@@ -60,8 +59,7 @@ workflow f_annotate {
         selector = selector_bin,
         container=last_container
     }
-  }
-  if(smart_execute) {
+
     call smart {
       input:
         project_id = imgap_project_id,
@@ -74,8 +72,7 @@ workflow f_annotate {
         frag_hits_filter = frag_hits_filter_bin,
         container=hmm_container
     }
-  }
-  if(cog_execute) {
+
     call cog {
       input:
         project_id = imgap_project_id,
@@ -88,8 +85,7 @@ workflow f_annotate {
         frag_hits_filter = frag_hits_filter_bin,
         container=hmm_container
     }
-  }
-  if(tigrfam_execute) {
+
     call tigrfam {
       input:
         project_id = imgap_project_id,
@@ -102,8 +98,7 @@ workflow f_annotate {
         hit_selector = hit_selector_bin,
         container=hmm_container
     }
-  }
-  if(superfam_execute) {
+
     call superfam {
       input:
         project_id = imgap_project_id,
@@ -116,8 +111,7 @@ workflow f_annotate {
         frag_hits_filter = frag_hits_filter_bin,
         container=hmm_container
     }
-  }
-  if(pfam_execute) {
+
     call pfam {
       input:
         project_id = imgap_project_id,
@@ -131,8 +125,7 @@ workflow f_annotate {
         hmmsearch = hmmsearch_bin,
         container=hmm_container
     }
-  }
-  if(cath_funfam_execute) {
+
     call cath_funfam {
       input:
         project_id = imgap_project_id,
@@ -145,8 +138,8 @@ workflow f_annotate {
         frag_hits_filter = frag_hits_filter_bin,
         container=hmm_container
     }
-  }
-  if(true){
+
+
     call product_name {
       input:
         project_id = imgap_project_id,
@@ -164,28 +157,28 @@ workflow f_annotate {
  #       tmhmm_gff = tmhmm.gff,
         container=container
     }
-  }
+
   output {
-    File? gff = product_name.gff
-    File? product_name_tsv = product_name.tsv
-    File? ko_tsv = ko_ec.ko_tsv
-    File? ec_tsv = ko_ec.ec_tsv
-    File? phylo_tsv = ko_ec.phylo_tsv
-    File? ko_ec_gff = ko_ec.gff
-    File? last_blasttab = ko_ec.last_blasttab
-    File? lineage_tsv = ko_ec.lineage_tsv
-    File? cog_gff = cog.gff
-    File? pfam_gff = pfam.gff
-    File? tigrfam_gff = tigrfam.gff
-    File? supfam_gff = superfam.gff
-    File? smart_gff = smart.gff
-    File? cath_funfam_gff = cath_funfam.gff
-    File? cog_domtblout = cog.domtblout
-    File? pfam_domtblout = pfam.domtblout
-    File? tigrfam_domtblout = tigrfam.domtblout
-    File? supfam_domtblout = superfam.domtblout
-    File? smart_domtblout = smart.domtblout
-    File? cath_funfam_domtblout = cath_funfam.domtblout
+    File gff = product_name.gff
+    File product_name_tsv = product_name.tsv
+    File ko_tsv = ko_ec.ko_tsv
+    File ec_tsv = ko_ec.ec_tsv
+    File phylo_tsv = ko_ec.phylo_tsv
+    File ko_ec_gff = ko_ec.gff
+    File last_blasttab = ko_ec.last_blasttab
+    File lineage_tsv = ko_ec.lineage_tsv
+    File cog_gff = cog.gff
+    File pfam_gff = pfam.gff
+    File tigrfam_gff = tigrfam.gff
+    File supfam_gff = superfam.gff
+    File smart_gff = smart.gff
+    File cath_funfam_gff = cath_funfam.gff
+    File cog_domtblout = cog.domtblout
+    File pfam_domtblout = pfam.domtblout
+    File tigrfam_domtblout = tigrfam.domtblout
+    File supfam_domtblout = superfam.domtblout
+    File smart_domtblout = smart.domtblout
+    File cath_funfam_domtblout = cath_funfam.domtblout
     String? lastal_version = ko_ec.lastal_ver
     String? img_nr_db_version = ko_ec.img_nr_db_ver
     String? hmmsearch_smart_version = smart.hmmsearch_smart_ver
@@ -602,15 +595,15 @@ task product_name {
         File   sa_gff
         String product_assign
         String map_dir
-        File?  ko_ec_gff
-        File?  smart_gff
-        File?  cog_gff
-        File?  tigrfam_gff
-        File?  supfam_gff
-        File?  pfam_gff
-        File?  cath_funfam_gff
-        #  File?  signalp_gff
-        #  File?  tmhmm_gff
+        File  ko_ec_gff
+        File  smart_gff
+        File  cog_gff
+        File  tigrfam_gff
+        File  supfam_gff
+        File  pfam_gff
+        File  cath_funfam_gff
+        #  File  signalp_gff
+        #  File  tmhmm_gff
         String container
     }
   command {

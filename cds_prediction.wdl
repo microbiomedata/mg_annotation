@@ -28,12 +28,12 @@ workflow cds_prediction {
 
 
   output {
-     File? genemark_proteins = run_cds_prediction.genemark_proteins
-     File? genemark_genes = run_cds_prediction.genemark_genes
-     File? genemark_gff = run_cds_prediction.genemark_gff
-     File? prodigal_proteins = run_cds_prediction.prodigal_proteins
-     File? prodigal_genes = run_cds_prediction.prodigal_genes
-     File? prodigal_gff = run_cds_prediction.prodigal_gff
+     File genemark_proteins = run_cds_prediction.genemark_proteins
+     File genemark_genes = run_cds_prediction.genemark_genes
+     File genemark_gff = run_cds_prediction.genemark_gff
+     File prodigal_proteins = run_cds_prediction.prodigal_proteins
+     File prodigal_genes = run_cds_prediction.prodigal_genes
+     File prodigal_gff = run_cds_prediction.prodigal_gff
      File proteins = run_cds_prediction.proteins
      File genes = run_cds_prediction.genes
      File gff = run_cds_prediction.gff
@@ -93,12 +93,12 @@ task run_cds_prediction {
    }
   
   output { 
-    File? genemark_proteins= "${project_id}_genemark_proteins.faa"
-    File? genemark_genes= "${project_id}_genemark_genes.fna"
-    File? genemark_gff= "${project_id}_genemark.gff"
-    File? prodigal_proteins= "${project_id}_prodigal_proteins.faa"
-    File? prodigal_genes = "${project_id}_prodigal_genes.fna"
-    File? prodigal_gff = "${project_id}_prodigal.gff"
+    File genemark_proteins= "${project_id}_genemark_proteins.faa"
+    File genemark_genes= "${project_id}_genemark_genes.fna"
+    File genemark_gff= "${project_id}_genemark.gff"
+    File prodigal_proteins= "${project_id}_prodigal_proteins.faa"
+    File prodigal_genes = "${project_id}_prodigal_genes.fna"
+    File prodigal_gff = "${project_id}_prodigal.gff"
     File  proteins= "${project_id}_cds_proteins.faa"
     File  genes= "${project_id}_cds_genes.fna"
     File  gff= "${project_id}_cds.gff"

@@ -171,35 +171,35 @@ workflow annotation {
   }
 
   output{
-    File? proteins_faa = finish_ano.final_proteins_faa
-    File? structural_gff = finish_ano.final_structural_gff
-    File? ko_ec_gff = finish_ano.final_ko_ec_gff
-    File? gene_phylogeny_tsv = finish_ano.final_gene_phylogeny_tsv
-    File? functional_gff = finish_ano.final_functional_gff
-    File? ko_tsv = finish_ano.final_ko_tsv
-    File? ec_tsv = finish_ano.final_ec_tsv
-    File? lineage_tsv = finish_ano.final_lineage_tsv
-    File? stats_tsv = finish_ano.final_tsv
-    #File? stats_json = finish_ano.final_json
-    File? cog_gff = finish_ano.final_cog_gff
-    File? pfam_gff = finish_ano.final_pfam_gff
-    File? tigrfam_gff = finish_ano.final_tigrfam_gff
-    File? smart_gff = finish_ano.final_smart_gff
-    File? supfam_gff = finish_ano.final_supfam_gff
-    File? cath_funfam_gff = finish_ano.final_cath_funfam_gff
-    File? crt_gff = finish_ano.final_crt_gff
-    File? genemark_gff = finish_ano.final_genemark_gff
-    File? prodigal_gff = finish_ano.final_prodigal_gff
-    File? trna_gff = finish_ano.final_trna_gff
-    File? final_rfam_gff = finish_ano.final_rfam_gff
- #   File? proteins_cog_domtblout = finish_ano.final_proteins_cog_domtblout
- #   File? proteins_pfam_domtblout = finish_ano.final_proteins_pfam_domtblout
- #   File? proteins_tigrfam_domtblout = finish_ano.final_proteins_tigrfam_domtblout
- #   File? proteins_smart_domtblout = finish_ano.final_proteins_smart_domtblout
- #   File? proteins_supfam_domtblout = finish_ano.final_proteins_supfam_domtblout
- #   File? proteins_cath_funfam_domtblout = finish_ano.final_proteins_cath_funfam_domtblout
-    File? product_names_tsv = finish_ano.final_product_names_tsv
-    File? crt_crisprs = finish_ano.final_crt_crisprs
+    File proteins_faa = finish_ano.final_proteins_faa
+    File structural_gff = finish_ano.final_structural_gff
+    File ko_ec_gff = finish_ano.final_ko_ec_gff
+    File gene_phylogeny_tsv = finish_ano.final_gene_phylogeny_tsv
+    File functional_gff = finish_ano.final_functional_gff
+    File ko_tsv = finish_ano.final_ko_tsv
+    File ec_tsv = finish_ano.final_ec_tsv
+    File lineage_tsv = finish_ano.final_lineage_tsv
+    File stats_tsv = finish_ano.final_tsv
+    #File stats_json = finish_ano.final_json
+    File cog_gff = finish_ano.final_cog_gff
+    File pfam_gff = finish_ano.final_pfam_gff
+    File tigrfam_gff = finish_ano.final_tigrfam_gff
+    File smart_gff = finish_ano.final_smart_gff
+    File supfam_gff = finish_ano.final_supfam_gff
+    File cath_funfam_gff = finish_ano.final_cath_funfam_gff
+    File crt_gff = finish_ano.final_crt_gff
+    File genemark_gff = finish_ano.final_genemark_gff
+    File prodigal_gff = finish_ano.final_prodigal_gff
+    File trna_gff = finish_ano.final_trna_gff
+    File final_rfam_gff = finish_ano.final_rfam_gff
+ #   File proteins_cog_domtblout = finish_ano.final_proteins_cog_domtblout
+ #   File proteins_pfam_domtblout = finish_ano.final_proteins_pfam_domtblout
+ #   File proteins_tigrfam_domtblout = finish_ano.final_proteins_tigrfam_domtblout
+ #   File proteins_smart_domtblout = finish_ano.final_proteins_smart_domtblout
+ #   File proteins_supfam_domtblout = finish_ano.final_proteins_supfam_domtblout
+ #   File proteins_cath_funfam_domtblout = finish_ano.final_proteins_cath_funfam_domtblout
+    File product_names_tsv = finish_ano.final_product_names_tsv
+    File crt_crisprs = finish_ano.final_crt_crisprs
     File imgap_version = finish_ano.final_version
   }
 
@@ -288,46 +288,46 @@ task split {
 task merge_outputs {
     input {
       String  project_id
-      Array[File?] structural_gffs
-      Array[File?] functional_gffs
-      Array[File?] ko_tsvs
-      Array[File?] ec_tsvs
-      Array[File?] phylo_tsvs
-      Array[File?] last_blasttabs
-      Array[File?] lineage_tsvs
-      Array[File?] proteins
-      Array[File?] genes
-      Array[File?] ko_ec_gffs
-      Array[File?] cog_gffs
-      Array[File?] pfam_gffs
-      Array[File?] tigrfam_gffs
-      Array[File?] smart_gffs
-      Array[File?] supfam_gffs
-      Array[File?] cath_funfam_gffs
-      Array[File?] cog_domtblouts
-      Array[File?] pfam_domtblouts
-      Array[File?] tigrfam_domtblouts
-      Array[File?] smart_domtblouts
-      Array[File?] supfam_domtblouts
-      Array[File?] cath_funfam_domtblouts
-      Array[File?] product_name_tsvs
-      Array[File?] crt_crisprs_s
-      Array[File?] crt_gffs
-      Array[File?] crt_outs
-      Array[File?] genemark_gffs
-      Array[File?] genemark_genes
-      Array[File?] genemark_proteins
-      Array[File?] prodigal_gffs
-      Array[File?] prodigal_genes
-      Array[File?] prodigal_proteins
-      Array[File?] cds_gffs
-      Array[File?] cds_genes
-      Array[File?] cds_proteins
-      Array[File?] trna_gffs
-      Array[File?] trna_bacterial_outs
-      Array[File?] trna_archaeal_outs
-      Array[File?] rfam_gffs
-      Array[File?] rfam_tbls
+      Array[File] structural_gffs
+      Array[File] functional_gffs
+      Array[File] ko_tsvs
+      Array[File] ec_tsvs
+      Array[File] phylo_tsvs
+      Array[File] last_blasttabs
+      Array[File] lineage_tsvs
+      Array[File] proteins
+      Array[File] genes
+      Array[File] ko_ec_gffs
+      Array[File] cog_gffs
+      Array[File] pfam_gffs
+      Array[File] tigrfam_gffs
+      Array[File] smart_gffs
+      Array[File] supfam_gffs
+      Array[File] cath_funfam_gffs
+      Array[File] cog_domtblouts
+      Array[File] pfam_domtblouts
+      Array[File] tigrfam_domtblouts
+      Array[File] smart_domtblouts
+      Array[File] supfam_domtblouts
+      Array[File] cath_funfam_domtblouts
+      Array[File] product_name_tsvs
+      Array[File] crt_crisprs_s
+      Array[File] crt_gffs
+      Array[File] crt_outs
+      Array[File] genemark_gffs
+      Array[File] genemark_genes
+      Array[File] genemark_proteins
+      Array[File] prodigal_gffs
+      Array[File] prodigal_genes
+      Array[File] prodigal_proteins
+      Array[File] cds_gffs
+      Array[File] cds_genes
+      Array[File] cds_proteins
+      Array[File] trna_gffs
+      Array[File] trna_bacterial_outs
+      Array[File] trna_archaeal_outs
+      Array[File] rfam_gffs
+      Array[File] rfam_tbls
       String container
   }
  
@@ -585,7 +585,7 @@ task finish_ano {
        File trna_gff
        File rfam_gff
        File ko_ec_gff
-       File? stats_tsv
+       File stats_tsv
        File stats_json
        File product_names_tsv
        File crt_crisprs
