@@ -162,18 +162,18 @@ task pre_qc {
         String container
     }
 
-  command <<<
+  command {
     set -euo pipefail
-    tmp_fasta="~{input_fasta}.tmp"
-    qced_fasta="~{project_id}_contigs.fna"
+    tmp_fasta=~{input_fasta}.tmp
+    qced_fasta=~{project_id}_contigs.fna
     grep -v '^\s*$' ~{input_fasta} | tr -d '\r' | \
-    sed 's/^>[[:blank:]]*/>/g' > $tmp_fasta
-    acgt_count=`grep -v '^>' $tmp_fasta | grep -o [acgtACGT] | wc -l`
-    n_count=`grep -v '^>' $tmp_fasta | grep -o '[^acgtACGT]' | wc -l`
-    n_ratio=`echo $n_count $acgt_count | awk '{printf "%f", $1 / $2}'`
-    if (( $(echo "$n_ratio >= ~{n_ratio_cutoff}" | bc) ))
+    sed 's/^>[[:blank:]]*/>/g' > ~tmp_fasta
+    acgt_count=`grep -v '^>' ~tmp_fasta | grep -o [acgtACGT] | wc -l`
+    n_count=`grep -v '^>' ~tmp_fasta | grep -o '[^acgtACGT]' | wc -l`
+    n_ratio=`echo ~n_count $acgt_count | awk '{printf "%f", $1 / $2}'`
+    if (( $(echo "~n_ratio >= ~{n_ratio_cutoff}" | bc) ))
     then
-        rm $tmp_fasta
+        rm ~tmp_fasta
         exit 1
     fi
 
@@ -184,26 +184,26 @@ task pre_qc {
         seqs_per_million_bp=$seq_count
         if (( $bp_count > 1000000 ))
         then
-            divisor=$(echo $bp_count | awk '{printf "%.f", $1 / 1000000}')
-            seqs_per_million_bp=$(echo $seq_count $divisor | \
+            divisor=$(echo ~bp_count | awk '{printf "%.f", $1 / 1000000}')
+            seqs_per_million_bp=$(echo ~seq_count $divisor | \
                                   awk '{printf "%.2f", $1 / $2}')
         fi
-        if (( $(echo "$seqs_per_million_bp > ~{seqs_per_million_bp_cutoff}" | bc) ))
+        if (( $(echo "~seqs_per_million_bp > ~{seqs_per_million_bp_cutoff}" | bc) ))
         then
             rm $tmp_fasta
             exit 1
         fi
     fi
 
-    fasta_sanity_cmd="~{bin} $tmp_fasta $qced_fasta"
+    fasta_sanity_cmd="~{bin} ~tmp_fasta ~qced_fasta"
     if [[ ~{rename} == "yes" ]]
     then
-        fasta_sanity_cmd="$fasta_sanity_cmd -p ~{project_id}"
+        fasta_sanity_cmd="~fasta_sanity_cmd -p ~{project_id}"
     fi
-    fasta_sanity_cmd="$fasta_sanity_cmd -l ~{min_seq_length}"
-    $fasta_sanity_cmd
-    rm $tmp_fasta
-  >>>
+    fasta_sanity_cmd="~fasta_sanity_cmd -l ~{min_seq_length}"
+    ~fasta_sanity_cmd
+    rm ~tmp_fasta
+  }
 
   runtime {
     time: "1:00:00"
