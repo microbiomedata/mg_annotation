@@ -160,12 +160,13 @@ task pre_qc {
         Int    seqs_per_million_bp_cutoff = 500
         Int    min_seq_length = 150
         String container
+        String tmp_fasta="{input_fasta}.tmp"
+        String qced_fasta="{project_id}_contigs.fna"
     }
 
   command <<<
     set -euo pipefail
-    tmp_fasta=~{input_fasta}.tmp
-    qced_fasta=~{project_id}_contigs.fna
+
     grep -v '^\s*$' ~{input_fasta} | tr -d '\r' | \
     sed 's/^>[[:blank:]]*/>/g' > $tmp_fasta
     acgt_count=`grep -v '^>' $tmp_fasta | grep -o [acgtACGT] | wc -l`
