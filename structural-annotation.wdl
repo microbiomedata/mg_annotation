@@ -168,9 +168,9 @@ task pre_qc {
     qced_fasta=~{project_id}_contigs.fna
     grep -v '^\s*$' ~{input_fasta} | tr -d '\r' | \
     sed 's/^>[[:blank:]]*/>/g' > $tmp_fasta
-    acgt_count=`grep -v '^>' ~tmp_fasta | grep -o [acgtACGT] | wc -l`
-    n_count=`grep -v '^>' ~tmp_fasta | grep -o '[^acgtACGT]' | wc -l`
-    n_ratio=`echo ~n_count ~acgt_count | awk '{printf "%f", $1 / $2}'`
+    acgt_count=`grep -v '^>' $tmp_fasta | grep -o [acgtACGT] | wc -l`
+    n_count=`grep -v '^>' $tmp_fasta | grep -o '[^acgtACGT]' | wc -l`
+    n_ratio=`echo ~n_count $acgt_count | awk '{printf "%f", $1 / $2}'`
     if (( $(echo "~n_ratio >= ~{n_ratio_cutoff}" | bc) ))
     then
         rm $tmp_fasta
