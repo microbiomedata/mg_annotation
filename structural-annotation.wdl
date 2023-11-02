@@ -117,12 +117,7 @@ workflow s_annotate {
     }
 
 
-    call post_qc {
-      input:
-        input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id,
-        container = container
-    }
+
 
   output {
     File  gff = gff_merge.final_gff 
