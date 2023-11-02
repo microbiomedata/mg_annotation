@@ -160,8 +160,8 @@ task pre_qc {
         Int    seqs_per_million_bp_cutoff = 500
         Int    min_seq_length = 150
         String container
-        File tmp_fasta="{input_fasta}.tmp"
-        File qced_fasta="{project_id}_contigs.fna"
+        File tmp_fasta="~{input_fasta}.tmp"
+        File qced_fasta="~{project_id}_contigs.fna"
     }
 
   command <<<
