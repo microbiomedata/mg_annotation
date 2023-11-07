@@ -2,9 +2,8 @@ version 1.0
 workflow rfam {
     input {
         String cmzscore
-        String imgap_input_fasta
+        File imgap_input_fasta
         String imgap_project_id
-        String imgap_project_type
         Int    additional_threads
         String database_location="/refdata/img/"
         String cm="${database_location}"+"Rfam/13.0/Rfam.cm"

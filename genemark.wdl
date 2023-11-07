@@ -1,7 +1,7 @@
 version 1.0
 workflow genemark {
     input {
-        String imgap_input_fasta
+        File imgap_input_fasta
         String imgap_project_id
         String imgap_project_type
         String container

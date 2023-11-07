@@ -11,11 +11,10 @@ workflow cds_prediction {
         Int? imgap_structural_annotation_translation_table
         String bin="/opt/omics/bin/structural_annotation"
         #if running w/JAWS $HOME is not mounted so need the license file in the execution dir
-        String gm_license
+        File? gm_license
     }
     call run_cds_prediction  {
-       input: imgap_input_fasta=imgap_input_fasta,
-           imgap_project_type=imgap_project_type,
+       input: imgap_project_type=imgap_project_type,
            container=container,
            imgap_structural_annotation_translation_table=imgap_structural_annotation_translation_table,
            bin=bin,
@@ -48,14 +47,13 @@ workflow cds_prediction {
 
 task run_cds_prediction {
      input{
-         File imgap_input_fasta
          String fasta_filename
          String imgap_project_type
          String project_id
          String container
          Int? imgap_structural_annotation_translation_table
          String bin
-         String gm_license
+         File? gm_license
          Boolean genemark_execute
          Boolean prodigal_execute
      }
@@ -93,15 +91,15 @@ task run_cds_prediction {
    }
   
   output { 
-    File genemark_proteins= "${project_id}_genemark_proteins.faa"
-    File genemark_genes= "${project_id}_genemark_genes.fna"
-    File genemark_gff= "${project_id}_genemark.gff"
-    File prodigal_proteins= "${project_id}_prodigal_proteins.faa"
-    File prodigal_genes = "${project_id}_prodigal_genes.fna"
-    File prodigal_gff = "${project_id}_prodigal.gff"
-    File  proteins= "${project_id}_cds_proteins.faa"
-    File  genes= "${project_id}_cds_genes.fna"
-    File  gff= "${project_id}_cds.gff"
+    File genemark_proteins= "~{project_id}_genemark_proteins.faa"
+    File genemark_genes= "~{project_id}_genemark_genes.fna"
+    File genemark_gff= "~{project_id}_genemark.gff"
+    File prodigal_proteins= "~{project_id}_prodigal_proteins.faa"
+    File prodigal_genes = "~{project_id}_prodigal_genes.fna"
+    File prodigal_gff = "~{project_id}_prodigal.gff"
+    File  proteins= "~{project_id}_cds_proteins.faa"
+    File  genes= "~{project_id}_cds_genes.fna"
+    File  gff= "~{project_id}_cds.gff"
   }
 
 }

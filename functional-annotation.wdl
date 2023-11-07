@@ -8,30 +8,30 @@ workflow f_annotate {
         File    input_fasta
         String  database_location
         Boolean ko_ec_execute=true
-        String  ko_ec_img_nr_db="${database_location}"+"/IMG-NR/20230629/img_nr"
-        String  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20230629/md5Hash2Data.tsv"
-        String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20230629/taxonOId2Taxonomy.tsv"
+        String  ko_ec_img_nr_db="~{database_location}"+"/IMG-NR/20230629/img_nr"
+        String  ko_ec_md5_mapping="~{database_location}"+"/IMG-NR/20230629/md5Hash2Data.tsv"
+        String  ko_ec_taxon_to_phylo_mapping="~{database_location}"+"/IMG-NR/20230629/taxonOId2Taxonomy.tsv"
         String  lastal_bin="/opt/omics/bin/lastal"
         String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
         Boolean smart_execute=true
         Int?    par_hmm_inst
         Int?    approx_num_proteins
-        String  smart_db="${database_location}"+"/SMART/01_06_2016/SMART.hmm"
+        String  smart_db="~{database_location}"+"/SMART/01_06_2016/SMART.hmm"
         String  hmmsearch_bin="/opt/omics/bin/hmmsearch"
         String  frag_hits_filter_bin="/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
         Boolean cog_execute=true
-        String  cog_db="${database_location}"+"/COG/HMMs/2003/COG.hmm"
+        String  cog_db="~{database_location}"+"/COG/HMMs/2003/COG.hmm"
         Boolean tigrfam_execute=true
-        String  tigrfam_db="${database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
+        String  tigrfam_db="~{database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
         String  hit_selector_bin="/opt/omics/bin/functional_annotation/hmmsearch_hit_selector.py"
         Boolean superfam_execute=true
-        String  superfam_db="${database_location}"+"/SuperFamily/v1.75/supfam.hmm"
+        String  superfam_db="~{database_location}"+"/SuperFamily/v1.75/supfam.hmm"
         Boolean pfam_execute=true
-        String  pfam_db="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.v34.0.hmm"
-        String  pfam_claninfo_tsv="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
+        String  pfam_db="~{database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.v34.0.hmm"
+        String  pfam_claninfo_tsv="~{database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
         String  pfam_clan_filter="/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
         Boolean cath_funfam_execute=true
-        String  cath_funfam_db="${database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
+        String  cath_funfam_db="~{database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
         #  Boolean signalp_execute=true
         #  String  signalp_gram_stain="GRAM_STAIN"
         #  String  signalp_bin="/opt/omics/bin/signalp"
@@ -41,7 +41,7 @@ workflow f_annotate {
         #  String  tmhmm_decode_parser="/opt/omics/bin/functional_annotation/decodeanhmm_parser.py"
         File    sa_gff
         String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
-        String  product_names_mapping_dir="${database_location}"+"/Product_Name_Mappings/latest"
+        String  product_names_mapping_dir="~{database_location}"+"/Product_Name_Mappings/latest"
         String  container
         String  hmm_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
         String  last_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
@@ -239,12 +239,12 @@ task ko_ec {
   }
 
   output {
-    File last_blasttab = "${project_id}_proteins.img_nr.last.blasttab"
-    File ko_tsv = "${project_id}_ko.tsv"
-    File ec_tsv = "${project_id}_ec.tsv"
-    File phylo_tsv = "${project_id}_gene_phylogeny.tsv"
-    File gff = "${project_id}_ko_ec.gff"
-    File lineage_tsv = "${project_id}_scaffold_lineage.tsv"
+    File last_blasttab = "~{project_id}_proteins.img_nr.last.blasttab"
+    File ko_tsv = "~{project_id}_ko.tsv"
+    File ec_tsv = "~{project_id}_ec.tsv"
+    File phylo_tsv = "~{project_id}_gene_phylogeny.tsv"
+    File gff = "~{project_id}_ko_ec.gff"
+    File lineage_tsv = "~{project_id}_scaffold_lineage.tsv"
     String lastal_ver = read_string(lastal_version_file)
     String img_nr_db_ver = read_string(img_nr_db_version_file)
   }
@@ -290,8 +290,8 @@ task smart {
   }
 
   output {
-    File gff = "${project_id}_smart.gff"
-    File domtblout = "${project_id}_proteins.smart.domtblout"
+    File gff = "~{project_id}_smart.gff"
+    File domtblout = "~{project_id}_proteins.smart.domtblout"
     String hmmsearch_smart_ver = read_string(hmmsearch_version_file)
     String smart_db_ver = read_string(smart_db_version_file)
   }
@@ -337,8 +337,8 @@ task cog {
   }
 
   output {
-    File gff = "${project_id}_cog.gff"
-    File domtblout = "${project_id}_proteins.cog.domtblout"
+    File gff = "~{project_id}_cog.gff"
+    File domtblout = "`{project_id}_proteins.cog.domtblout"
     String hmmsearch_cog_ver = read_string(hmmsearch_version_file)
     String cog_db_ver = read_string(cog_db_version_file)
   }
@@ -383,8 +383,8 @@ task tigrfam {
   }
 
   output {
-    File gff = "${project_id}_tigrfam.gff"
-    File domtblout = "${project_id}_proteins.tigrfam.domtblout"
+    File gff = "~{project_id}_tigrfam.gff"
+    File domtblout = "~{project_id}_proteins.tigrfam.domtblout"
     String hmmsearch_tigrfam_ver = read_string(hmmsearch_version_file)
     String tigrfam_db_ver = read_string(tigrfam_db_version_file)
 
@@ -432,8 +432,8 @@ task superfam {
   }
 
   output {
-    File gff = "${project_id}_supfam.gff"
-    File domtblout = "${project_id}_proteins.supfam.domtblout"
+    File gff = "~{project_id}_supfam.gff"
+    File domtblout = "~{project_id}_proteins.supfam.domtblout"
     String hmmsearch_superfam_ver = read_string(hmmsearch_version_file)
     String superfam_db_ver = read_string(superfam_db_version_file)
   }
@@ -477,8 +477,8 @@ task pfam {
   }
 
   output {
-    File gff = "${project_id}_pfam.gff"
-    File domtblout = "${project_id}_proteins.pfam.domtblout"
+    File gff = "~{project_id}_pfam.gff"
+    File domtblout = "~{project_id}_proteins.pfam.domtblout"
     String hmmsearch_pfam_ver = read_string(hmmsearch_version_file)
     String pfam_db_ver = read_string(pfam_db_version_file)
   }
@@ -522,8 +522,8 @@ task cath_funfam {
   }
   
   output {
-      File gff = "${project_id}_cath_funfam.gff"
-      File domtblout = "${project_id}_proteins.cath_funfam.domtblout"
+      File gff = "~{project_id}_cath_funfam.gff"
+      File domtblout = "~{project_id}_proteins.cath_funfam.domtblout"
       String hmmsearch_cath_funfam_ver = read_string(hmmsearch_version_file)
       String cath_funfam_db_ver = read_string(cath_funfam_db_version_file)
   }
@@ -554,7 +554,7 @@ task signalp {
   }
 
   output {
-    File gff = "${project_id}_cleavage_sites.gff"
+    File gff = "~{project_id}_cleavage_sites.gff"
   }
 }
 
@@ -585,7 +585,7 @@ task tmhmm {
   }
 
   output {
-    File gff = "${project_id}_tmh.gff"
+    File gff = "~{project_id}_tmh.gff"
   }
 }
 
@@ -623,8 +623,8 @@ task product_name {
   }
 
   output {
-    File gff = "${project_id}_functional_annotation.gff"
-    File tsv = "${project_id}_product_names.tsv"
+    File gff = "~{project_id}_functional_annotation.gff"
+    File tsv = "~{project_id}_product_names.tsv"
   }
 }
 

@@ -1,21 +1,24 @@
+version 1.0
 import "structural-annotation.wdl" as sa
 import "functional-annotation.wdl" as fa
 
 workflow annotation {
-  String   cmzscore
-  File    imgap_input_fasta
-  String  imgap_project_id="GaXXXXXXX_contigs.fna"
-  String database_location="/refdata/img/"
-  String  imgap_project_type="metagenome"
-  Int     additional_threads=16
-  
-  # structural annotation
-  Boolean sa_execute=true
-  # functional annotation
-  Boolean fa_execute=true
+  input {
+    String   cmzscore
+    File    imgap_input_fasta
+    String  imgap_project_id="GaXXXXXXX_contigs.fna"
+    String database_location="/refdata/img/"
+    String  imgap_project_type="metagenome"
+    Int     additional_threads=16
+    
+    # structural annotation
+    Boolean sa_execute=true
+    # functional annotation
+    Boolean fa_execute=true  
+    Int?    fa_approx_num_proteins
+    File? gm_license
+    }
 
-  Int?    fa_approx_num_proteins
-  File? gm_license
   if(sa_execute) {
       call sa.s_annotate {
         input:

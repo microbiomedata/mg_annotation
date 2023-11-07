@@ -1,7 +1,7 @@
 version 1.0
 workflow crt {
     input {
-        String imgap_input_fasta
+        File imgap_input_fasta
         String imgap_project_id
         String container
     }

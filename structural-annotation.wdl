@@ -23,7 +23,7 @@ workflow s_annotate {
       Boolean gff_and_fasta_stats_execute=true
       String  database_location
       String  container
-      String gm_license
+      File? gm_license
     }
 
     call pre_qc {
@@ -39,7 +39,6 @@ workflow s_annotate {
       input:
         imgap_input_fasta = imgap_input_fasta,
         imgap_project_id = imgap_project_id,
-        imgap_project_type = imgap_project_type,
         additional_threads = additional_threads,
         container=container
     }
@@ -50,7 +49,6 @@ workflow s_annotate {
         cmzscore = cmzscore,
         imgap_input_fasta = imgap_input_fasta,
         imgap_project_id = imgap_project_id,
-        imgap_project_type = imgap_project_type,
         database_location = database_location,
         additional_threads = additional_threads,
         container=container
@@ -274,7 +272,7 @@ task gff_merge {
   }
 
   output {
-    File final_gff = "${project_id}_structural_annotation.gff"
+    File final_gff = "~{project_id}_structural_annotation.gff"
   }
 }
 
@@ -291,10 +289,10 @@ task fasta_merge {
     }
   command {
    set -euo pipefail
-   cp ${final_gff} .
-   cp ${cds_genes} .
-   cp ${cds_proteins} .
-   ${bin} ${final_gff} ${genes_filename} ${proteins_filename}
+   cp ~{final_gff} .
+   cp ~{cds_genes} .
+   cp ~{cds_proteins} .
+   ~{bin} ~{final_gff} ~{genes_filename} ~{proteins_filename}
   }
 
   runtime {
@@ -304,8 +302,8 @@ task fasta_merge {
   }
     
   output {
-    File final_genes = "${project_id}_genes.fna"
-    File final_proteins = "${project_id}_proteins.faa"
+    File final_genes = "~{project_id}_genes.fna"
+    File final_proteins = "~{project_id}_proteins.faa"
   }
 }
 
@@ -347,6 +345,6 @@ task post_qc {
   }
     
   output {
-    File out = "${project_id}_structural_annotation.gff"
+    File out = "~{project_id}_structural_annotation.gff"
   }
 }

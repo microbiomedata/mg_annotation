@@ -1,9 +1,8 @@
 version 1.0
 workflow trnascan {
     input {
-        String imgap_input_fasta
+        File imgap_input_fasta
         String imgap_project_id
-        String imgap_project_type
         Int    additional_threads
         String container = "microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
     }
@@ -28,7 +27,6 @@ workflow trnascan {
 
 task trnascan_ba {
     input {
-        String bin="/opt/omics/bin/tRNAscan-SE"
         File input_fasta
         String project_id
         Int    threads
