@@ -36,7 +36,7 @@ workflow annotation {
       call sa.s_annotate {
         input:
           cmzscore = split.cmzscore,
-          imgap_input_fasta = stage.imgap_input_fasta,
+        #  imgap_input_fasta = stage.imgap_input_fasta,
           imgap_input_fasta = pathname,
           imgap_project_id = imgap_project_id,
           additional_threads = additional_threads,

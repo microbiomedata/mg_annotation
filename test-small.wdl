@@ -1,11 +1,13 @@
+version 1.0
 import "annotation_full.wdl" as awf
 
 workflow test_small {
-  String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
-  String  proj="Testsmall"
-  String  database="/refdata/img/"
-  String  url="https://portal.nersc.gov/project/m3408/test_data"
-
+  input {
+    String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
+    String  proj="Testsmall"
+    String  database="/refdata/img/"
+    String  url="https://portal.nersc.gov/project/m3408/test_data"
+    }
   call prepare {
     input: container=container,
            url=url,
@@ -32,10 +34,11 @@ workflow test_small {
 }
 
 task prepare {
-   String container
-   String proj
-   String url
-
+   input {
+     String container
+     String proj
+     String url
+   } 
    command{
        wget ${url}/${proj}_contigs.fna
    }
@@ -53,12 +56,13 @@ task prepare {
 
 
 task validate {
-   String container
-   File   func_gff
-   File   struct_gff
-   String url
-   String proj
-
+   input {
+     String container
+     File   func_gff
+     File   struct_gff
+     String url
+     String proj
+     }
    command{
        set -e
        wget ${url}/${proj}_functional_annotation.gff
