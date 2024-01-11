@@ -7,9 +7,9 @@ workflow rfam {
   Boolean gcloud_env
   Int    additional_threads
   String database_location="/refdata/img/"
-  File cm="${database_location}"+"Rfam/13.0_2020/Rfam.cm"
-  File claninfo_tsv="${database_location}"+"Rfam/13.0_2020/Rfam.claninfo"
-  File feature_lookup_tsv="${database_location}"+"Rfam/13.0_2020/Rfam_feature_lookup.tsv"
+  String cm="${database_location}"+"Rfam/13.0_2020/Rfam.cm"
+  String claninfo_tsv="${database_location}"+"Rfam/13.0_2020/Rfam.claninfo"
+  String feature_lookup_tsv="${database_location}"+"Rfam/13.0_2020/Rfam_feature_lookup.tsv"
   String container
   
 
@@ -46,8 +46,8 @@ task run {
   Array[File]? gcloud_db= if (gcloud_env) then [database] else []
   String db_path_img = "/cromwell_root/workflows_refdata/refdata/img/"
   String cmzscore
-  File claninfo_tsv
-  File feature_lookup_tsv
+  String claninfo_tsv
+  String feature_lookup_tsv
   Int    threads
   String container
   String rfam_version_file = "rfam_version.txt"
