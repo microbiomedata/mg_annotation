@@ -22,7 +22,7 @@ workflow s_annotate {
   Boolean gcloud_env
   String  database_location
   String  container
-  File gm_license
+  String gm_license
 
   if(pre_qc_execute) {
     call pre_qc {

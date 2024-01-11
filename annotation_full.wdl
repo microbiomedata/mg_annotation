@@ -8,7 +8,7 @@ workflow annotation {
   String database
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
-  File   gm_license
+  String   gm_license
   Int     additional_threads=16
   String  stage_container="mbabinski17/gcputils:0.1"
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"

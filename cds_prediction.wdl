@@ -11,7 +11,7 @@ workflow cds_prediction {
   Int? imgap_structural_annotation_translation_table
   String bin="/opt/omics/bin/structural_annotation"
   #if running w/JAWS $HOME is not mounted so need the license file in the execution dir
-  File gm_license 
+  String gm_license 
 
     call run_cds_prediction  {
        input: imgap_input_fasta=imgap_input_fasta,
@@ -60,7 +60,7 @@ task run_cds_prediction {
    String db_path_license = "/cromwell_root/workflows_refdata/refdata/licenses/"
    Int? imgap_structural_annotation_translation_table
    String bin
-   File gm_license
+   String gm_license
    Boolean genemark_execute
    Boolean prodigal_execute
 
