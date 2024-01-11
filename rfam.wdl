@@ -39,7 +39,7 @@ task run {
   String bin="/opt/omics/bin/cmsearch"
   String clan_filter_bin="/opt/omics/bin/structural_annotation/rfam_clan_filter.py"
   File   input_fasta
-  File cm
+  String cm
   String project_id
   Boolean gcloud_env
   String database
