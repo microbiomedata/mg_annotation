@@ -9,7 +9,7 @@ workflow cds_prediction {
   Int? imgap_structural_annotation_translation_table
   String bin="/opt/omics/bin/structural_annotation"
   #if running w/JAWS $HOME is not mounted so need the license file in the execution dir
-  String? gm_license 
+  File gm_license 
 
     call run_cds_prediction  {
        input: imgap_input_fasta=imgap_input_fasta,

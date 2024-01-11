@@ -35,11 +35,11 @@ task run {
   String bin="/opt/omics/bin/cmsearch"
   String clan_filter_bin="/opt/omics/bin/structural_annotation/rfam_clan_filter.py"
   File   input_fasta
-  String cm
+  File cm
   String project_id
   String cmzscore
-  String claninfo_tsv
-  String feature_lookup_tsv
+  File claninfo_tsv
+  File feature_lookup_tsv
   Int    threads
   String container
   String rfam_version_file = "rfam_version.txt"
