@@ -52,7 +52,7 @@ task run_cds_prediction {
    String container
    Int? imgap_structural_annotation_translation_table
    String bin
-   String gm_license
+   File gm_license
    Boolean genemark_execute
    Boolean prodigal_execute
 
@@ -62,7 +62,7 @@ task run_cds_prediction {
        #set name for log, code needs fasta to be in working dir, set varaiables, run cds_prediction.sh  
        cds_log=${project_id}_cds.log
        #copy file to cromwell execution dir to get outputs in this folder
-       cp ../inputs/*/${fasta_filename} ./${project_id}_contigs.fna
+       cp ${imgap_input_fasta} ${project_id}_contigs.fna
        #set env variables
        genemark_execute_bash=${genemark_execute}
        prodigal_execute_bash=${prodigal_execute}

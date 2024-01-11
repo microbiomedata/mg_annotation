@@ -5,9 +5,9 @@ workflow rfam {
   String imgap_project_type
   Int    additional_threads
   String database_location="/refdata/img/"
-  File cm="${database_location}"+"Rfam/13.0/Rfam.cm"
-  File claninfo_tsv="${database_location}"+"Rfam/13.0/Rfam.claninfo"
-  File feature_lookup_tsv="${database_location}"+"Rfam/13.0/Rfam_feature_lookup.tsv"
+  File cm="${database_location}"+"Rfam/13.0_2020/Rfam.cm"
+  File claninfo_tsv="${database_location}"+"Rfam/13.0_2020/Rfam.claninfo"
+  File feature_lookup_tsv="${database_location}"+"Rfam/13.0_2020/Rfam_feature_lookup.tsv"
   String container
   
 
