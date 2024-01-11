@@ -2,6 +2,7 @@
   "annotation.input_file": "https://portal.nersc.gov/project/m3408/test_data/Testsmall_contigs.fna",
   "annotation.database": "gs://workflows_refdata/refdata/README.md",
   "annotation.database_location": "gs://workflows_refdata/refdata/img",
+  "annotation.gm_license": "gs://workflows_refdata/license",
   "annotation.imgap_project_id": "Ga0587029",
   "annotation.proj": "Ga0587029",
   "annotation.gcloud_env": true

@@ -4,6 +4,8 @@ workflow cds_prediction {
   String imgap_project_type
   String imgap_project_id
   String container
+  String database
+  Boolean gcloud_env
   Boolean prodigal_execute=true
   Boolean genemark_execute=true
   Int? imgap_structural_annotation_translation_table
@@ -20,6 +22,8 @@ workflow cds_prediction {
            project_id=imgap_project_id,
            fasta_filename=fasta_filename,
            gm_license=gm_license,
+           database = database,
+           gcloud_env = gcloud_env,
            prodigal_execute=prodigal_execute,
            genemark_execute=genemark_execute
     }
@@ -49,7 +53,11 @@ task run_cds_prediction {
    String fasta_filename
    String imgap_project_type
    String project_id
+   String database
    String container
+   Boolean gcloud_env
+   Array[File]? gcloud_db= if (gcloud_env) then [database] else []
+   String db_path_img = "/cromwell_root/workflows_refdata/refdata/img/"
    Int? imgap_structural_annotation_translation_table
    String bin
    File gm_license
@@ -64,6 +72,15 @@ task run_cds_prediction {
        #copy file to cromwell execution dir to get outputs in this folder
        cp ${imgap_input_fasta} ${project_id}_contigs.fna
        #set env variables
+      if ${gcloud_env}; then
+          dbdir=$(find /mnt -type d -name img)
+          if [ -n $dbdir ]; then
+              ln -s $dbdir ${db_path_img}
+          else
+              echo "Cannot find gcloud refdb" 1>&2
+          fi
+      fi
+
        genemark_execute_bash=${genemark_execute}
        prodigal_execute_bash=${prodigal_execute}
        if [[ "$prodigal_execute_bash" = true ]] ; then

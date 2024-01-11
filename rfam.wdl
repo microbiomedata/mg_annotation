@@ -3,6 +3,8 @@ workflow rfam {
   String imgap_input_fasta
   String imgap_project_id
   String imgap_project_type
+  String database
+  Boolean gcloud_env
   Int    additional_threads
   String database_location="/refdata/img/"
   File cm="${database_location}"+"Rfam/13.0_2020/Rfam.cm"
@@ -19,6 +21,8 @@ workflow rfam {
       cmzscore=cmzscore,
       feature_lookup_tsv = feature_lookup_tsv,
       claninfo_tsv = claninfo_tsv,
+      database = database,
+      gcloud_env = gcloud_env,
       threads = additional_threads,
       container=container
   }
@@ -37,6 +41,10 @@ task run {
   File   input_fasta
   File cm
   String project_id
+  Boolean gcloud_env
+  String database
+  Array[File]? gcloud_db= if (gcloud_env) then [database] else []
+  String db_path_img = "/cromwell_root/workflows_refdata/refdata/img/"
   String cmzscore
   File claninfo_tsv
   File feature_lookup_tsv
@@ -46,6 +54,15 @@ task run {
 
   command <<<
     set -euo pipefail
+    if ${gcloud_env}; then
+          dbdir=$(find /mnt -type d -name img)
+          if [ -n $dbdir ]; then
+              ln -s $dbdir ${db_path_img}
+          else
+              echo "Cannot find gcloud refdb" 1>&2
+          fi
+      fi
+    
     ${bin} --notextw --cut_tc --cpu ${threads} -Z ${cmzscore} --tblout ${project_id}_rfam.tbl ${cm} ${input_fasta}
     tool_and_version=$(${bin} -h | grep INFERNAL | perl -pne 's/^.*INFERNAL/INFERNAL/' )
     if [ $(grep -c -v \# ${project_id}_rfam.tbl) -eq 0 ] ; then

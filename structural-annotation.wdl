@@ -50,6 +50,8 @@ workflow s_annotate {
         imgap_input_fasta = imgap_input_fasta,
         imgap_project_id = imgap_project_id,
         imgap_project_type = imgap_project_type,
+        database = database,
+        gcloud_env = gcloud_env,
         database_location = database_location,
         additional_threads = additional_threads,
         container=container
@@ -71,13 +73,14 @@ workflow s_annotate {
          imgap_project_id = imgap_project_id,
          imgap_project_type = imgap_project_type,
          prodigal_execute = prodigal_execute,
+         database = database,
+         gcloud_env = gcloud_env,
          genemark_execute = genemark_execute,
          imgap_structural_annotation_translation_table = imgap_structural_annotation_translation_table,
          container = container,
          gm_license = gm_license
     }
   }
-
 
     call gff_merge {
       input:
