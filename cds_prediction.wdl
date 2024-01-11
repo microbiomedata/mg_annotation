@@ -57,7 +57,7 @@ task run_cds_prediction {
    String container
    Boolean gcloud_env
    Array[File]? gcloud_db= if (gcloud_env) then [database] else []
-   String db_path_img = "/cromwell_root/workflows_refdata/refdata/img/"
+   String db_path_license = "/cromwell_root/workflows_refdata/refdata/licenses/"
    Int? imgap_structural_annotation_translation_table
    String bin
    File gm_license
@@ -73,9 +73,9 @@ task run_cds_prediction {
        cp ${imgap_input_fasta} ${project_id}_contigs.fna
        #set env variables
       if ${gcloud_env}; then
-          dbdir=$(find /mnt -type d -name img)
+          dbdir=$(find /mnt -type d -name licenses)
           if [ -n $dbdir ]; then
-              ln -s $dbdir ${db_path_img}
+              ln -s $dbdir ${db_path_license}
           else
               echo "Cannot find gcloud refdb" 1>&2
           fi
