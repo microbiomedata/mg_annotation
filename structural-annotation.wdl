@@ -18,6 +18,8 @@ workflow s_annotate {
   Boolean prodigal_execute=true
   Boolean genemark_execute=true
   Boolean gff_and_fasta_stats_execute=true
+  String database
+  Boolean gcloud_env
   String  database_location
   String  container
   String? gm_license

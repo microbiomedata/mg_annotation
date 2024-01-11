@@ -4,32 +4,34 @@ workflow f_annotate {
   Int     additional_threads
   File?    input_contigs_fasta
   File    input_fasta
+  String database
   String  database_location
+  Boolean gcloud_env
   Boolean ko_ec_execute=true
   String  ko_ec_img_nr_db="${database_location}"+"/IMG-NR/20230629/img_nr"
-  String  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20230629/md5Hash2Data.tsv"
-  String  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20230629/taxonOId2Taxonomy.tsv"
+  File  ko_ec_md5_mapping="${database_location}"+"/IMG-NR/20230629/md5Hash2Data.tsv"
+  File  ko_ec_taxon_to_phylo_mapping="${database_location}"+"/IMG-NR/20230629/taxonOId2Taxonomy.tsv"
   String  lastal_bin="/opt/omics/bin/lastal"
   String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
   Boolean smart_execute=true
   Int?    par_hmm_inst
   Int?    approx_num_proteins
-  String  smart_db="${database_location}"+"/SMART/01_06_2016/SMART.hmm"
+  File  smart_db="${database_location}"+"/SMART/01_06_2016/SMART.hmm"
   String  hmmsearch_bin="/opt/omics/bin/hmmsearch"
   String  frag_hits_filter_bin="/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
   Boolean cog_execute=true
   String  cog_db="${database_location}"+"/COG/HMMs/2003/COG.hmm"
   Boolean tigrfam_execute=true
-  String  tigrfam_db="${database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
+  File  tigrfam_db="${database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
   String  hit_selector_bin="/opt/omics/bin/functional_annotation/hmmsearch_hit_selector.py"
   Boolean superfam_execute=true
-  String  superfam_db="${database_location}"+"/SuperFamily/v1.75/supfam.hmm"
+  File  superfam_db="${database_location}"+"/SuperFamily/v1.75/supfam.hmm"
   Boolean pfam_execute=true
   String  pfam_db="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.v34.0.hmm"
-  String  pfam_claninfo_tsv="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
+  File  pfam_claninfo_tsv="${database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
   String  pfam_clan_filter="/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
   Boolean cath_funfam_execute=true
-  String  cath_funfam_db="${database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
+  File  cath_funfam_db="${database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
 #  Boolean signalp_execute=true
 #  String  signalp_gram_stain="GRAM_STAIN"
 #  String  signalp_bin="/opt/omics/bin/signalp"
@@ -51,6 +53,8 @@ workflow f_annotate {
         project_type = imgap_project_type,
         input_fasta = input_fasta,
         threads = additional_threads,
+        database = database,
+        gcloud_env = gcloud_env,
         nr_db = ko_ec_img_nr_db,
         md5 = ko_ec_md5_mapping,
         phylo = ko_ec_taxon_to_phylo_mapping,
@@ -150,6 +154,8 @@ workflow f_annotate {
         project_id = imgap_project_id,
         sa_gff = sa_gff,
         product_assign = product_assign_bin,
+        gcloud_env = gcloud_env,
+        database = database,
         map_dir = product_names_mapping_dir,
         ko_ec_gff = ko_ec.gff,
         smart_gff = smart.gff,
@@ -209,6 +215,10 @@ task ko_ec {
   Int    threads = 2
   File   input_fasta
   String nr_db
+  Boolean gcloud_env=false
+  String database
+  String gcloud_db_path_nr = "/cromwell_root/workflows_refdata/refdata/IMG-NR/20230629/img_nr"
+  Array[File]? gcloud_db= if (gcloud_env) then [database] else []
   String   md5
   String   phylo
   Int    top_hits = 5
@@ -222,7 +232,17 @@ task ko_ec {
 
   command {
     set -euo pipefail
-    ${lastal} -f blasttab+ -P ${threads} ${nr_db} ${input_fasta} 1> ${project_id}_proteins.img_nr.last.blasttab
+
+    if ${gcloud_env}; then
+            dbdir=$(find /mnt -type d -name IMG-NR)
+            if [ -n $dbdir ]; then
+                ln -s $dbdir ${gcloud_db_path_nr}
+            else
+                echo "Cannot find gcloud refdb" 1>&2
+            fi
+        fi
+
+    ${lastal} -f blasttab+ -P ${threads} ${gcloud_db_path_nr} ${input_fasta} 1> ${project_id}_proteins.img_nr.last.blasttab
     ${selector} -l ${aln_length_ratio} -m ${min_ko_hits} -n ${top_hits} \
                 ${project_type} ${md5} ${phylo} \
                 ${project_id}_ko.tsv ${project_id}_ec.tsv \
@@ -259,7 +279,7 @@ task smart {
   
   String project_id
   File   input_fasta
-  String   smart_db
+  File   smart_db
   Int    threads = 62
   Int    par_hmm_inst = 15
   Int    approx_num_proteins = 0
@@ -275,6 +295,7 @@ task smart {
 
   command <<<
      set -euo pipefail
+
      cp ${input_fasta} ${base}
      /opt/omics/bin/functional_annotation/hmmsearch_smart.sh ${base} \
      ${smart_db} \
@@ -305,7 +326,7 @@ task smart {
 task cog {
   String project_id
   File   input_fasta
-  String   cog_db
+  File   cog_db
   Int    threads = 62
   Int    par_hmm_inst = 15
   Int    approx_num_proteins = 0
@@ -321,6 +342,7 @@ task cog {
 
   command <<<
      set -euo pipefail
+
      cp ${input_fasta} ${base}
      /opt/omics/bin/functional_annotation/hmmsearch_cogs.sh ${base} \
      ${cog_db} \
@@ -352,7 +374,7 @@ task tigrfam {
   
   String project_id
   File   input_fasta
-  String   tigrfam_db
+  File   tigrfam_db
   Int    threads = 62
   Int    par_hmm_inst = 15
   Int    approx_num_proteins = 0
@@ -367,6 +389,7 @@ task tigrfam {
 
   command <<<
      set -euo pipefail
+
      cp ${input_fasta} ${base}
      /opt/omics/bin/functional_annotation/hmmsearch_tigrfams.sh ${base} \
      ${tigrfam_db} \
@@ -399,7 +422,7 @@ task superfam {
 
   String project_id
   File   input_fasta
-  String   superfam_db
+  File   superfam_db
   Int    threads = 62
   Int    par_hmm_inst = 15
   Int    approx_num_proteins = 0
@@ -447,7 +470,7 @@ task pfam {
 
   String project_id
   File   input_fasta
-  String   pfam_db
+  File   pfam_db
   String   pfam_claninfo_tsv
   Int    threads = 62
   Int    par_hmm_inst = 15
@@ -492,7 +515,7 @@ task cath_funfam {
  
   String project_id
   File   input_fasta
-  String   cath_funfam_db
+  File   cath_funfam_db
   Int    threads=62
   Int    par_hmm_inst=15
   Int    approx_num_proteins=0
@@ -598,6 +621,10 @@ task product_name {
   File   sa_gff
   String product_assign
   String map_dir
+  Boolean gcloud_env=false
+  String database
+  String gcloud_db_path_product = "/cromwell_root/workflows_refdata/refdata/Product_Name_Mappings"
+  Array[File]? gcloud_db= if (gcloud_env) then [map_dir] else []
   File?  ko_ec_gff
   File?  smart_gff
   File?  cog_gff
@@ -611,6 +638,15 @@ task product_name {
 
   command {
     set -euo pipefail
+
+    if ${gcloud_env}; then
+      dbdir=$(find /mnt -type d -name Product_Name_Mappings)
+      if [ -n $dbdir ]; then
+          ln -s $dbdir ${gcloud_db_path_product}
+      else
+          echo "Cannot find gcloud refdb" 1>&2
+      fi
+    fi
     ${product_assign} ${"-k " + ko_ec_gff} ${"-s " + smart_gff} ${"-c " + cog_gff} \
                       ${"-t " + tigrfam_gff} ${"-u " + supfam_gff} ${"-p " + pfam_gff} \
                       ${"-f " + cath_funfam_gff}  \

@@ -5,11 +5,15 @@ workflow annotation {
   String  proj
   String  input_file
   String  imgap_project_id
+  String database
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   String?  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
+  String  stage_container="mbabinski17/gcputils:0.1"
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
+  #gogole env
+  Boolean gcloud_env=false
 
   # structural annotation
   Boolean sa_execute=true
@@ -18,7 +22,7 @@ workflow annotation {
   Boolean fa_execute=true
 
  call stage {
-      input: container=container,
+      input: container=stage_container,
           input_file=input_file
     }
 
@@ -31,6 +35,8 @@ workflow annotation {
     if(sa_execute) {
       call sa.s_annotate {
         input:
+          gcloud_env=gcloud_env,
+          database=database,
           cmzscore = split.cmzscore,
           imgap_input_fasta = stage.imgap_input_fasta,
           imgap_input_fasta = pathname,
@@ -51,6 +57,8 @@ workflow annotation {
           imgap_project_type = imgap_project_type,
           additional_threads = additional_threads,
           input_fasta = s_annotate.proteins,
+          gcloud_env=gcloud_env,
+          database=database,
           database_location = database_location,
           sa_gff = s_annotate.gff,
           container=container
@@ -223,8 +231,12 @@ task stage {
 
    command <<<
        set -e
-       if [ $( echo ${input_file}|egrep -c "https*:") -gt 0 ] ; then
+       # Check if the input file is an HTTP(s) URL
+       if [ $(echo ${input_file} | egrep -c "^https*://") -gt 0 ] ; then
            wget ${input_file} -O ${target}
+       # Check if the input file is a Google Cloud Storage URL
+       elif [ $(echo ${input_file} | egrep -c "^gs://") -gt 0 ] ; then
+           gsutil cp ${input_file} ${target}
        else
            ln ${input_file} ${target} || cp ${input_file} ${target}
        fi
