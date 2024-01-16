@@ -1,8 +1,23 @@
 FROM debian:bullseye as buildbase
 
-RUN apt-get -y update && apt-get -y install git gcc make wget time autoconf unzip curl
+RUN apt-get -y update && apt-get -y install git gcc make wget time autoconf unzip curl gnupg lsb-release
 
 RUN apt-get -y install libz-dev
+
+# Set up the repository for Google Cloud SDK
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
+    apt-get update -y && apt-get install google-cloud-sdk -y
+
+
+# Add gcsfuse distribution URI as a package source
+RUN export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s` && \
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.asc] https://packages.cloud.google.com/apt $GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | tee /usr/share/keyrings/cloud.google.asc && \
+    apt-get update && apt-get install gcsfuse -y
+
+# # Clean up APT when done
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 #
 # Build prodigal
 #
