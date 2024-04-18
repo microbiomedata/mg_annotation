@@ -17,14 +17,27 @@ workflow annotation {
   # functional annotation
   Boolean fa_execute=true
 
+  # generate mapping file
+  Boolean map_execute = false
+  String map_container = "microbiomedata/mg-annotation:0.1.2"
+
  call stage {
       input: container=container,
           input_file=input_file
     }
 
+call make_map_file {
+    input:
+    project_id = proj,
+    map_execute = map_execute,
+    input_file = stage.imgap_input_fasta,
+    container = map_container
+  }
+
   call split {
-    input: infile=stage.imgap_input_fasta,
-           container=container
+    input: 
+    infile=make_map_file.out_fasta,
+    container=container
   }
 
   scatter(pathname in split.files) {
@@ -107,6 +120,9 @@ workflow annotation {
        container=container,
        sa_execute = sa_execute,
        fa_execute = fa_execute,
+       map_container = map_container,
+       map_execute = map_execute,
+       map_info = make_map_file.out_log,
        structural_gff  = merge_outputs.structural_gff,
        imgap_version = split.imgap_version,
        rfam_version = s_annotate.rfam_version,
@@ -197,6 +213,7 @@ workflow annotation {
     File? product_names_tsv = finish_ano.final_product_names_tsv
     File? crt_crisprs = finish_ano.final_crt_crisprs
     File imgap_version = finish_ano.final_version
+    File? map_file = make_map_file.map_file
   }
 
   parameter_meta {
@@ -243,6 +260,39 @@ task stage {
      maxRetries: 1
      docker: container
    }
+}
+
+task make_map_file {
+
+    String project_id
+    String  prefix=sub(project_id, ":", "_")
+    Boolean map_execute
+    File input_file
+    String container 
+    String output_file = "${prefix}_map.fasta"
+
+  command <<<
+  set -euo pipefail
+  if [[ "${map_execute}" = true ]] 
+  then
+    fasta_sanity.py -v 
+    fasta_sanity.py -p ${project_id} ${input_file} ${output_file}
+  else
+    ln -s ${input_file} ${output_file}
+  fi 
+  >>>
+
+  output{
+    File? map_file = "${prefix}_contig_names_mapping.tsv"
+    File  out_fasta = "${prefix}_map.fasta"
+    File  out_log = stdout()
+ }
+  runtime {
+    memory: "120G"
+     cpu:  16
+     maxRetries: 1
+     docker: container
+  }
 }
 
 task split {
@@ -421,6 +471,9 @@ task merge_outputs {
 task make_info_file {
   String container
   String imgap_version
+  String map_container
+  Boolean map_execute 
+  File map_info
   Boolean fa_execute
   Boolean sa_execute
   String project_id
@@ -450,6 +503,12 @@ task make_info_file {
   command <<<
     set -euo pipefail
      echo "IMGAP Version: ${imgap_version}" > ${project_id}_imgap.info
+     #mapping
+     if [[ "${map_execute}" = true ]]
+      then
+      map_version=`grep 'fasta_sanity.py' ${map_info}` 
+      echo -e "\nMapping Program used: $map_version"  >> ${project_id}_imgap.info
+      echo -e "Container: ${map_container}" >> ${project_id}_imgap.info
      #get structual annotation versions
      if [[ "${sa_execute}" = true ]]
        then
