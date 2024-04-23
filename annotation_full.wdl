@@ -4,7 +4,7 @@ import "./functional-annotation.wdl" as fa
 workflow annotation {
   String  proj
   String  input_file
-  String  imgap_project_id
+  String  imgap_project_id = "${proj}"
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   String?  gm_license="/refdata/licenses/.gmhmmp2_key"
@@ -45,7 +45,7 @@ call make_map_file {
       call sa.s_annotate {
         input:
           cmzscore = split.cmzscore,
-          imgap_input_fasta = stage.imgap_input_fasta,
+          imgap_input_fasta = make_map_file.out_fasta,
           imgap_input_fasta = pathname,
           imgap_project_id = imgap_project_id,
           additional_threads = additional_threads,
@@ -146,14 +146,14 @@ call make_map_file {
     input:
        project_id = imgap_project_id,
        structural_gff = merge_outputs.structural_gff,
-       input_fasta = stage.imgap_input_fasta,
+       input_fasta = make_map_file.out_fasta,
        container=container
   }
 
   call finish_ano {
     input:
       container="microbiomedata/workflowmeta:1.1.1",
-      input_file=stage.imgap_input_fasta,
+      input_file=make_map_file.out_fasta,
       proj=proj,
       start=stage.start,
       ano_info_file=make_info_file.imgap_info,
@@ -239,7 +239,7 @@ task stage {
    String input_file
 
    command <<<
-       set -e
+       set -euo pipefail
        if [ $( echo ${input_file}|egrep -c "https*:") -gt 0 ] ; then
            wget ${input_file} -O ${target}
        else
@@ -373,7 +373,7 @@ task merge_outputs {
  
 
   command <<<
-
+    set -euo pipefail
      #combine files
      cat ${sep=" " structural_gffs} > "${project_id}_structural_annotation.gff"
      cat ${sep=" " functional_gffs} > "${project_id}_functional_annotation.gff"
@@ -416,7 +416,7 @@ task merge_outputs {
      cat ${sep=" " crt_gffs} > "${project_id}_crt.gff"
      cat ${sep=" " crt_outs} > "${project_id}_crt.out"
 
-  >>>
+ >>>
   output {
     File functional_gff = "${project_id}_functional_annotation.gff"
     File structural_gff = "${project_id}_structural_annotation.gff"
@@ -500,25 +500,25 @@ task make_info_file {
   String sa_version_file = "sa_tool_version.txt"
   String sa_db_version_file = "sa_db_version.txt"
 
-  command <<<
+    command <<<
     set -euo pipefail
-     echo "IMGAP Version: ${imgap_version}" > ${project_id}_imgap.info
-     #mapping
-     if [[ "${map_execute}" = true ]]
-      then
-      map_version=`grep 'fasta_sanity.py' ${map_info}` 
-      echo -e "\nMapping Program used: $map_version"  >> ${project_id}_imgap.info
-      echo -e "Container: ${map_container}" >> ${project_id}_imgap.info
-     #get structual annotation versions
-     if [[ "${sa_execute}" = true ]]
+     echo "IMGAP Version: ~{imgap_version}" > ~{project_id}_imgap.info
+     #get mapping script version
+     if [[ "~{map_execute}" = true]]
        then
-       sa_version=`cut -f2 ${structural_gff}  | sort | uniq | perl -pe 's/\n/; /g' | sed -E 's/(.*)\; /\1/'`
+       map_version=`grep "fasta_sanity.py" ~{map_info}`
+       map_version="Mapping Program Used: $map_version; Docker Image Used: ~{map_container}"
+       echo $map_version >> ~{project_id}_imgap.info
+     #get structual annotation versions
+     if [[ "~{sa_execute}" = true ]]
+       then
+       sa_version=`cut -f2 ~{structural_gff}  | sort | uniq | perl -pe 's/\n/; /g' | sed -E 's/(.*)\; /\1/'`
        sa_version="Structural Annotation Programs Used: $sa_version"
-       echo $sa_version >> ${project_id}_imgap.info
-       if [[ "${rfam_executed}" = true ]]
+       echo $sa_version >> ~{project_id}_imgap.info
+       if [[ "~{rfam_executed}" = true ]]
          then
-         echo ${sep="," rfam_version} > ${rfam_version_file}
-         cat  ${rfam_version_file} | tr ',' '\n' | sort | uniq  > rfam_version_uniq.txt
+         echo ~{sep="," rfam_version} > ~{rfam_version_file}
+         cat  ~{rfam_version_file} | tr ',' '\n' | sort | uniq  > rfam_version_uniq.txt
 
          rfam_db_version="Structural Annotation DBs Used:"
    #use while instead of for to handle the spaces in values
@@ -526,42 +526,42 @@ task make_info_file {
            rfam_db_version="$rfam_db_version $db_version; "
          done < rfam_version_uniq.txt
          rfam_db_version=`echo $rfam_db_version | sed -E 's/(.*)\;/\1/'`
-         echo  $rfam_db_version  >> ${project_id}_imgap.info
+         echo  $rfam_db_version  >> ~{project_id}_imgap.info
        fi
     fi
      #get functional annotation tool versions
-     if [[ "${fa_execute}" = true ]]
+     if [[ "~{fa_execute}" = true ]]
        then
-       echo ${sep="," lastal_version} > ${fa_version_file}
-       echo ${sep="," hmmsearch_smart_version} >> ${fa_version_file}
-       echo ${sep="," hmmsearch_cog_version} >> ${fa_version_file}
-       echo ${sep="," hmmsearch_cog_version} >> ${fa_version_file}
-       echo ${sep="," hmmsearch_tigrfam_version} >> ${fa_version_file}
-       echo ${sep="," hmmsearch_superfam_version} >> ${fa_version_file}
-       echo ${sep="," hmmsearch_pfam_version} >> ${fa_version_file}
-       echo ${sep="," hmmsearch_cath_funfam_version} >> ${fa_version_file}
-       cat ${fa_version_file} | tr ',' '\n' | sort | uniq  > fa_version_uniq.txt
+       echo ~{sep="," lastal_version} > ~{fa_version_file}
+       echo ~{sep="," hmmsearch_smart_version} >> ~{fa_version_file}
+       echo ~{sep="," hmmsearch_cog_version} >> ~{fa_version_file}
+       echo ~{sep="," hmmsearch_cog_version} >> ~{fa_version_file}
+       echo ~{sep="," hmmsearch_tigrfam_version} >> ~{fa_version_file}
+       echo ~{sep="," hmmsearch_superfam_version} >> ~{fa_version_file}
+       echo ~{sep="," hmmsearch_pfam_version} >> ~{fa_version_file}
+       echo ~{sep="," hmmsearch_cath_funfam_version} >> ~{fa_version_file}
+       cat ~{fa_version_file} | tr ',' '\n' | sort | uniq  > fa_version_uniq.txt
        fa_tool_version="Functional Annotation Programs Used: "
        while read tool ; do
          fa_tool_version="$fa_tool_version $tool; "
        done < fa_version_uniq.txt
        fa_tool_version=`echo $fa_tool_version | sed -E 's/(.*)\;/\1/'`
-       echo $fa_tool_version >> ${project_id}_imgap.info
+       echo $fa_tool_version >> ~{project_id}_imgap.info
        #get functional annotation db versions
-       echo ${sep="," img_nr_db_version} > ${fa_db_version_file}
-       echo ${sep="," smart_db_version} >> ${fa_db_version_file}
-       echo ${sep="," cog_db_version} >> ${fa_db_version_file}
-       echo ${sep="," tigrfam_db_version} >> ${fa_db_version_file}
-       echo ${sep="," superfam_db_version} >> ${fa_db_version_file}
-       echo ${sep="," pfam_db_version} >> ${fa_db_version_file}
-       echo ${sep=","cath_funfam_db_version} >> ${fa_db_version_file}
-       cat ${fa_db_version_file} | tr ',' '\n' | sort | uniq  > fa_db_version_uniq.txt
+       echo ~{sep="," img_nr_db_version} > ~{fa_db_version_file}
+       echo ~{sep="," smart_db_version} >> ~{fa_db_version_file}
+       echo ~{sep="," cog_db_version} >> ~{fa_db_version_file}
+       echo ~{sep="," tigrfam_db_version} >> ~{fa_db_version_file}
+       echo ~{sep="," superfam_db_version} >> ~{fa_db_version_file}
+       echo ~{sep="," pfam_db_version} >> ~{fa_db_version_file}
+       echo ~{sep=","cath_funfam_db_version} >> ~{fa_db_version_file}
+       cat ~{fa_db_version_file} | tr ',' '\n' | sort | uniq  > fa_db_version_uniq.txt
        fa_db_version="Functional Annotation DBs Used: "
        while read db ; do
          fa_db_version="$fa_db_version $db; "
        done < fa_db_version_uniq.txt
        fa_db_version=`echo $fa_db_version | sed -E 's/(.*)\;/\1/'`
-       echo $fa_db_version >> ${project_id}_imgap.info
+       echo $fa_db_version >> ~{project_id}_imgap.info
     fi
   >>>
 
@@ -639,7 +639,7 @@ task finish_ano {
 
    command{
 
-      set -e
+      set -euo pipefail
       end=`date --iso-8601=seconds`
       #Generate annotation objects
 
