@@ -509,6 +509,7 @@ task make_info_file {
        map_version=`grep "fasta_sanity.py" ${map_info}`
        map_version="Mapping Programs Used: $map_version in ${map_container}"
        echo $map_version >> ${project_id}_imgap.info 
+     fi
      #get structual annotation versions
      if [[ "${sa_execute}" = true ]]
        then
