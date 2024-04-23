@@ -502,23 +502,23 @@ task make_info_file {
 
     command <<<
     set -euo pipefail
-     echo "IMGAP Version: ~{imgap_version}" > ~{project_id}_imgap.info
-     #get mapping script version
-     if [[ "~{map_execute}" = true]]
+     echo "IMGAP Version: ${imgap_version}" > ${project_id}_imgap.info
+     #get map script version
+     if [[ "${map_execute}" = true ]]
        then
-       map_version=`grep "fasta_sanity.py" ~{map_info}`
-       map_version="Mapping Program Used: $map_version; Docker Image Used: ~{map_container}"
-       echo $map_version >> ~{project_id}_imgap.info
+       map_version=`grep "fasta_sanity.py" ${map_info}`
+       map_version="Mapping Programs Used: $map_version in ${map_container}"
+       echo $map_version >> ${project_id}_imgap.info 
      #get structual annotation versions
-     if [[ "~{sa_execute}" = true ]]
+     if [[ "${sa_execute}" = true ]]
        then
-       sa_version=`cut -f2 ~{structural_gff}  | sort | uniq | perl -pe 's/\n/; /g' | sed -E 's/(.*)\; /\1/'`
+       sa_version=`cut -f2 ${structural_gff}  | sort | uniq | perl -pe 's/\n/; /g' | sed -E 's/(.*)\; /\1/'`
        sa_version="Structural Annotation Programs Used: $sa_version"
-       echo $sa_version >> ~{project_id}_imgap.info
-       if [[ "~{rfam_executed}" = true ]]
+       echo $sa_version >> ${project_id}_imgap.info
+       if [[ "${rfam_executed}" = true ]]
          then
-         echo ~{sep="," rfam_version} > ~{rfam_version_file}
-         cat  ~{rfam_version_file} | tr ',' '\n' | sort | uniq  > rfam_version_uniq.txt
+         echo ${sep="," rfam_version} > ${rfam_version_file}
+         cat  ${rfam_version_file} | tr ',' '\n' | sort | uniq  > rfam_version_uniq.txt
 
          rfam_db_version="Structural Annotation DBs Used:"
    #use while instead of for to handle the spaces in values
@@ -526,42 +526,42 @@ task make_info_file {
            rfam_db_version="$rfam_db_version $db_version; "
          done < rfam_version_uniq.txt
          rfam_db_version=`echo $rfam_db_version | sed -E 's/(.*)\;/\1/'`
-         echo  $rfam_db_version  >> ~{project_id}_imgap.info
+         echo  $rfam_db_version  >> ${project_id}_imgap.info
        fi
     fi
      #get functional annotation tool versions
-     if [[ "~{fa_execute}" = true ]]
+     if [[ "${fa_execute}" = true ]]
        then
-       echo ~{sep="," lastal_version} > ~{fa_version_file}
-       echo ~{sep="," hmmsearch_smart_version} >> ~{fa_version_file}
-       echo ~{sep="," hmmsearch_cog_version} >> ~{fa_version_file}
-       echo ~{sep="," hmmsearch_cog_version} >> ~{fa_version_file}
-       echo ~{sep="," hmmsearch_tigrfam_version} >> ~{fa_version_file}
-       echo ~{sep="," hmmsearch_superfam_version} >> ~{fa_version_file}
-       echo ~{sep="," hmmsearch_pfam_version} >> ~{fa_version_file}
-       echo ~{sep="," hmmsearch_cath_funfam_version} >> ~{fa_version_file}
-       cat ~{fa_version_file} | tr ',' '\n' | sort | uniq  > fa_version_uniq.txt
+       echo ${sep="," lastal_version} > ${fa_version_file}
+       echo ${sep="," hmmsearch_smart_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_cog_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_cog_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_tigrfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_superfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_pfam_version} >> ${fa_version_file}
+       echo ${sep="," hmmsearch_cath_funfam_version} >> ${fa_version_file}
+       cat ${fa_version_file} | tr ',' '\n' | sort | uniq  > fa_version_uniq.txt
        fa_tool_version="Functional Annotation Programs Used: "
        while read tool ; do
          fa_tool_version="$fa_tool_version $tool; "
        done < fa_version_uniq.txt
        fa_tool_version=`echo $fa_tool_version | sed -E 's/(.*)\;/\1/'`
-       echo $fa_tool_version >> ~{project_id}_imgap.info
+       echo $fa_tool_version >> ${project_id}_imgap.info
        #get functional annotation db versions
-       echo ~{sep="," img_nr_db_version} > ~{fa_db_version_file}
-       echo ~{sep="," smart_db_version} >> ~{fa_db_version_file}
-       echo ~{sep="," cog_db_version} >> ~{fa_db_version_file}
-       echo ~{sep="," tigrfam_db_version} >> ~{fa_db_version_file}
-       echo ~{sep="," superfam_db_version} >> ~{fa_db_version_file}
-       echo ~{sep="," pfam_db_version} >> ~{fa_db_version_file}
-       echo ~{sep=","cath_funfam_db_version} >> ~{fa_db_version_file}
-       cat ~{fa_db_version_file} | tr ',' '\n' | sort | uniq  > fa_db_version_uniq.txt
+       echo ${sep="," img_nr_db_version} > ${fa_db_version_file}
+       echo ${sep="," smart_db_version} >> ${fa_db_version_file}
+       echo ${sep="," cog_db_version} >> ${fa_db_version_file}
+       echo ${sep="," tigrfam_db_version} >> ${fa_db_version_file}
+       echo ${sep="," superfam_db_version} >> ${fa_db_version_file}
+       echo ${sep="," pfam_db_version} >> ${fa_db_version_file}
+       echo ${sep=","cath_funfam_db_version} >> ${fa_db_version_file}
+       cat ${fa_db_version_file} | tr ',' '\n' | sort | uniq  > fa_db_version_uniq.txt
        fa_db_version="Functional Annotation DBs Used: "
        while read db ; do
          fa_db_version="$fa_db_version $db; "
        done < fa_db_version_uniq.txt
        fa_db_version=`echo $fa_db_version | sed -E 's/(.*)\;/\1/'`
-       echo $fa_db_version >> ~{project_id}_imgap.info
+       echo $fa_db_version >> ${project_id}_imgap.info
     fi
   >>>
 
