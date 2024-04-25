@@ -270,13 +270,20 @@ task make_map_file {
     File input_file
     String container 
     String output_file = "${prefix}_map.fasta"
+    Int min_seq_length = 150      # default value
+    Int unknown_gap_length = 100  # default value
+
 
   command <<<
   set -euo pipefail
   if [[ "${map_execute}" = true ]] 
   then
     fasta_sanity.py -v 
-    fasta_sanity.py -p ${project_id} ${input_file} ${output_file}
+    fasta_sanity.py \
+    -p ${project_id} \
+    -l ${min_seq_length} \
+    -u ${unknown_gap_length} \
+    ${input_file} ${output_file}
   else
     ln -s ${input_file} ${output_file}
   fi 
