@@ -179,7 +179,9 @@ call make_map_file {
       trna_gff = merge_outputs.trna_gff,
       rfam_gff = merge_outputs.rfam_gff,
       product_names_tsv = merge_outputs.product_names_tsv,
-      crt_crisprs = merge_outputs.crt_crisprs
+      crt_crisprs = merge_outputs.crt_crisprs,
+      map_file = make_map_file.map_file,
+      renamed_fasta = make_map_file.out_fasta
   }
 
   output{
@@ -213,7 +215,8 @@ call make_map_file {
     File? product_names_tsv = finish_ano.final_product_names_tsv
     File? crt_crisprs = finish_ano.final_crt_crisprs
     File imgap_version = finish_ano.final_version
-    File? map_file = make_map_file.map_file
+    File? renamed_fasta = finish_ano.final_renamed_fasta
+    File? map_file = finish_ano.final_map_file
   }
 
   parameter_meta {
@@ -642,10 +645,13 @@ task finish_ano {
    File stats_json
    File product_names_tsv
    File crt_crisprs
+   Boolean map_execute
+   File? map_file
+   File? renamed_fasta
    String orig_prefix="scaffold"
    String sed="s/${orig_prefix}_/${proj}_/g"
 
-   command{
+   command <<<
 
       set -euo pipefail
       end=`date --iso-8601=seconds`
@@ -675,9 +681,14 @@ task finish_ano {
        cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
        cat ${stats_json} | sed ${sed} > ${prefix}_stats.json
 
-       ln ${ano_info_file} ${prefix}_imgap.info
+       ln -s ${ano_info_file} ${prefix}_imgap.info
 
-   }
+       if [[ "${map_execute}" = true ]] 
+        then
+        ln -s ${map_file} ${prefix}_contig_names_mapping.tsv
+        ln -s ${renamed_fasta} ${prefix}_contigs.fna
+       fi
+  >>>
 
    output {
         File final_functional_gff = "${prefix}_functional_annotation.gff"
@@ -707,6 +718,8 @@ task finish_ano {
         File final_product_names_tsv = "${prefix}_product_names.tsv"
         File final_lineage_tsv = "${prefix}_scaffold_lineage.tsv"
         File final_crt_crisprs = "${prefix}_crt.crisprs"
+        File? final_renamed_fasta = "${prefix}_contigs.fna"
+        File? final_map_file = "${prefix}_contig_names_mapping.tsv"
         File final_tsv = "${prefix}_stats.tsv"
         File final_version = "${prefix}_imgap.info"
  
