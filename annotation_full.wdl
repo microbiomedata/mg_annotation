@@ -4,15 +4,19 @@ import "./functional-annotation.wdl" as fa
 workflow annotation {
   String  proj
   String  input_file
-  String  imgap_project_id = "${proj}"
+  String  imgap_project_id 
+  String  assembly_id
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   String?  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
-
+  String  finish_ano_container = "microbiomedata/workflowmeta:1.1.1"
+  String  finish_ano_orig_prefix = "${assembly_id}"
+  
   # structural annotation
   Boolean sa_execute=true
+  Boolean sa_pre_qc_execute = true
 
   # functional annotation
   Boolean fa_execute=true
@@ -28,7 +32,7 @@ workflow annotation {
 
 call make_map_file {
     input:
-    project_id = proj,
+    project_id = proj, # confused whether to use assembly or annotation id
     map_execute = map_execute,
     input_file = stage.imgap_input_fasta,
     container = map_container
@@ -45,9 +49,10 @@ call make_map_file {
       call sa.s_annotate {
         input:
           cmzscore = split.cmzscore,
+          pre_qc_execute = sa_pre_qc_execute,
           imgap_input_fasta = make_map_file.out_fasta,
           imgap_input_fasta = pathname,
-          imgap_project_id = imgap_project_id,
+          imgap_project_id = assembly_id, #confused for assembly or annotation id replacement
           additional_threads = additional_threads,
           imgap_project_type = imgap_project_type,
           database_location = database_location,
@@ -152,9 +157,10 @@ call make_map_file {
 
   call finish_ano {
     input:
-      container="microbiomedata/workflowmeta:1.1.1",
+      container=finish_ano_container,
       input_file=make_map_file.out_fasta,
       proj=proj,
+      orig_prefix = imgap_project_id = assembly_id, # confused
       start=stage.start,
       ano_info_file=make_info_file.imgap_info,
       proteins_faa = merge_outputs.proteins_faa,
