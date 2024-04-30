@@ -29,10 +29,10 @@ workflow annotation {
       input: container=container,
           input_file=input_file
     }
-
+ # confused whether to use assembly or annotation id
 call make_map_file {
     input:
-    project_id = proj, # confused whether to use assembly or annotation id
+    project_id = proj,
     map_execute = map_execute,
     input_file = stage.imgap_input_fasta,
     container = map_container
@@ -43,7 +43,7 @@ call make_map_file {
     infile=make_map_file.out_fasta,
     container=container
   }
-
+#confused for assembly or annotation id replacement
   scatter(pathname in split.files) {
     if(sa_execute) {
       call sa.s_annotate {
@@ -52,7 +52,7 @@ call make_map_file {
           pre_qc_execute = sa_pre_qc_execute,
           imgap_input_fasta = make_map_file.out_fasta,
           imgap_input_fasta = pathname,
-          imgap_project_id = assembly_id, #confused for assembly or annotation id replacement
+          imgap_project_id = assembly_id, 
           additional_threads = additional_threads,
           imgap_project_type = imgap_project_type,
           database_location = database_location,
@@ -154,13 +154,13 @@ call make_map_file {
        input_fasta = make_map_file.out_fasta,
        container=container
   }
-
+# confused what to use for orig prefix
   call finish_ano {
     input:
       container=finish_ano_container,
       input_file=make_map_file.out_fasta,
       proj=proj,
-      orig_prefix = imgap_project_id = assembly_id, # confused
+      orig_prefix = assembly_id, 
       start=stage.start,
       ano_info_file=make_info_file.imgap_info,
       proteins_faa = merge_outputs.proteins_faa,
@@ -186,6 +186,7 @@ call make_map_file {
       rfam_gff = merge_outputs.rfam_gff,
       product_names_tsv = merge_outputs.product_names_tsv,
       crt_crisprs = merge_outputs.crt_crisprs,
+      map_execute = map_execute,
       map_file = make_map_file.map_file,
       renamed_fasta = make_map_file.out_fasta
   }
@@ -252,7 +253,7 @@ task stage {
        if [ $( echo ${input_file}|egrep -c "https*:") -gt 0 ] ; then
            wget ${input_file} -O ${target}
        else
-           ln ${input_file} ${target} || cp ${input_file} ${target}
+           ln -s ${input_file} ${target} || cp ${input_file} ${target}
        fi
        # Capture the start time
        date --iso-8601=seconds > start.txt
