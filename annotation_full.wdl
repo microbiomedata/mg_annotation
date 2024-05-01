@@ -31,7 +31,7 @@ workflow annotation {
  # confused whether to use assembly or annotation id
 call make_map_file {
     input:
-    project_id = assembly_id,
+    assy_id = assembly_id,
     input_file = stage.imgap_input_fasta,
     container = map_container
   }
@@ -55,7 +55,8 @@ call make_map_file {
           imgap_project_type = imgap_project_type,
           database_location = database_location,
           container=container,
-          gm_license=gm_license
+          gm_license=gm_license, 
+          pre_qc_container = map_container
       }
     }
 
@@ -272,8 +273,8 @@ task stage {
 
 task make_map_file {
 
-    String project_id
-    String  prefix=sub(project_id, ":", "_")
+    String assy_id
+    String  prefix=sub(assy_id, ":", "_")
     File input_file
     String container 
     String output_file = "${prefix}_map.fasta"
@@ -283,13 +284,13 @@ task make_map_file {
 
   command <<<
   set -euo pipefail
-  find_prefix=`grep ${prefix} ${input_file}`
+  find_prefix=`grep ${assy_id} ${input_file} | head -1`
   if [[ ! $find_prefix ]] 
   then
     echo "true" > run_map.txt
     fasta_sanity.py -v 
     fasta_sanity.py \
-    -p ${project_id} \
+    -p ${assy_id} \
     -l ${min_seq_length} \
     -u ${unknown_gap_length} \
     ${input_file} ${output_file}

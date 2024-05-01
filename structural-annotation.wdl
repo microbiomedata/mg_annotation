@@ -21,6 +21,7 @@ workflow s_annotate {
   String  database_location
   String  container
   String? gm_license
+  String pre_qc_container
   
 
   call pre_qc {
@@ -29,7 +30,7 @@ workflow s_annotate {
       project_type = imgap_project_type,
       input_fasta = imgap_input_fasta,
       project_id = imgap_project_id,
-      container=container
+      container=pre_qc_container
   }
 
   if(trnascan_se_execute) {
