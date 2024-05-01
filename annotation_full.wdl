@@ -16,13 +16,12 @@ workflow annotation {
   
   # structural annotation
   Boolean sa_execute=true
-  Boolean sa_pre_qc_execute = true
+  Boolean sa_pre_qc_execute = false
 
   # functional annotation
   Boolean fa_execute=true
 
   # generate mapping file
-  Boolean map_execute = false
   String map_container = "microbiomedata/mg-annotation:0.1.2"
 
  call stage {
@@ -32,8 +31,7 @@ workflow annotation {
  # confused whether to use assembly or annotation id
 call make_map_file {
     input:
-    project_id = proj,
-    map_execute = map_execute,
+    project_id = assembly_id,
     input_file = stage.imgap_input_fasta,
     container = map_container
   }
@@ -52,7 +50,7 @@ call make_map_file {
           pre_qc_execute = sa_pre_qc_execute,
           imgap_input_fasta = make_map_file.out_fasta,
           imgap_input_fasta = pathname,
-          imgap_project_id = assembly_id, 
+          imgap_project_id = proj, 
           additional_threads = additional_threads,
           imgap_project_type = imgap_project_type,
           database_location = database_location,
@@ -126,7 +124,7 @@ call make_map_file {
        sa_execute = sa_execute,
        fa_execute = fa_execute,
        map_container = map_container,
-       map_execute = map_execute,
+       map_execute = make_map_file.map_execute,
        map_info = make_map_file.out_log,
        structural_gff  = merge_outputs.structural_gff,
        imgap_version = split.imgap_version,
@@ -186,7 +184,7 @@ call make_map_file {
       rfam_gff = merge_outputs.rfam_gff,
       product_names_tsv = merge_outputs.product_names_tsv,
       crt_crisprs = merge_outputs.crt_crisprs,
-      map_execute = map_execute,
+      map_execute = make_map_file.map_execute,
       map_file = make_map_file.map_file,
       renamed_fasta = make_map_file.out_fasta
   }
@@ -276,7 +274,6 @@ task make_map_file {
 
     String project_id
     String  prefix=sub(project_id, ":", "_")
-    Boolean map_execute
     File input_file
     String container 
     String output_file = "${prefix}_map.fasta"
@@ -286,8 +283,10 @@ task make_map_file {
 
   command <<<
   set -euo pipefail
-  if [[ "${map_execute}" = true ]] 
+  find_prefix=`grep ${prefix} ${input_file}`
+  if [[ ! $find_prefix ]] 
   then
+    echo "true" > run_map.txt
     fasta_sanity.py -v 
     fasta_sanity.py \
     -p ${project_id} \
@@ -295,6 +294,7 @@ task make_map_file {
     -u ${unknown_gap_length} \
     ${input_file} ${output_file}
   else
+    echo "false" > run_map.txt
     ln -s ${input_file} ${output_file}
   fi 
   >>>
@@ -303,6 +303,7 @@ task make_map_file {
     File? map_file = "${prefix}_contig_names_mapping.tsv"
     File  out_fasta = "${prefix}_map.fasta"
     File  out_log = stdout()
+    Boolean map_execute = read_boolean("run_map.txt")
  }
   runtime {
     memory: "120G"
