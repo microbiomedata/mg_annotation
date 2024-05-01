@@ -283,8 +283,9 @@ task make_map_file {
 
 
   command <<<
-  set -euo pipefail
   find_prefix=`grep ${assy_id} ${input_file} | head -1`
+
+  set -euo pipefail
   if [[ ! $find_prefix ]] 
   then
     echo "true" > run_map.txt
