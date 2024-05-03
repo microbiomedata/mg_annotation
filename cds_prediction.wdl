@@ -49,6 +49,7 @@ task run_cds_prediction {
    String fasta_filename
    String imgap_project_type
    String project_id
+   String prefix = sub(project_id, ":", "_")
    String container
    Int? imgap_structural_annotation_translation_table
    String bin
@@ -60,9 +61,9 @@ task run_cds_prediction {
    command {
        set -oeu pipefail
        #set name for log, code needs fasta to be in working dir, set varaiables, run cds_prediction.sh  
-       cds_log=${project_id}_cds.log
+       cds_log=${prefix}_cds.log
        #copy file to cromwell execution dir to get outputs in this folder
-       cp ../inputs/*/${fasta_filename} ./${project_id}_contigs.fna
+       cp ../inputs/*/${fasta_filename} ./${prefix}_contigs.fna
        #set env variables
        genemark_execute_bash=${genemark_execute}
        prodigal_execute_bash=${prodigal_execute}
@@ -78,8 +79,8 @@ task run_cds_prediction {
        fi 
        #copy genemark license to the execution dir
        cp ${gm_license} .
-       /usr/bin/time ${bin}/cds_prediction.sh ${project_id}_contigs.fna ${imgap_project_type} ${imgap_structural_annotation_translation_table} &> $cds_log
-       rm ${project_id}_contigs.fna
+       /usr/bin/time ${bin}/cds_prediction.sh ${prefix}_contigs.fna ${imgap_project_type} ${imgap_structural_annotation_translation_table} &> $cds_log
+       rm ${prefix}_contigs.fna
    }
    
 
@@ -90,15 +91,15 @@ task run_cds_prediction {
    }
   
   output { 
-    File? genemark_proteins= "${project_id}_genemark_proteins.faa"
-    File? genemark_genes= "${project_id}_genemark_genes.fna"
-    File? genemark_gff= "${project_id}_genemark.gff"
-    File? prodigal_proteins= "${project_id}_prodigal_proteins.faa"
-    File? prodigal_genes = "${project_id}_prodigal_genes.fna"
-    File? prodigal_gff = "${project_id}_prodigal.gff"
-    File  proteins= "${project_id}_cds_proteins.faa"
-    File  genes= "${project_id}_cds_genes.fna"
-    File  gff= "${project_id}_cds.gff"
+    File? genemark_proteins= "${prefix}_genemark_proteins.faa"
+    File? genemark_genes= "${prefix}_genemark_genes.fna"
+    File? genemark_gff= "${prefix}_genemark.gff"
+    File? prodigal_proteins= "${prefix}_prodigal_proteins.faa"
+    File? prodigal_genes = "${prefix}_prodigal_genes.fna"
+    File? prodigal_gff = "${prefix}_prodigal.gff"
+    File  proteins= "${prefix}_cds_proteins.faa"
+    File  genes= "${prefix}_cds_genes.fna"
+    File  gff= "${prefix}_cds.gff"
   }
 
 }

@@ -4,7 +4,7 @@ import "./functional-annotation.wdl" as fa
 workflow annotation {
   String  proj
   String  input_file
-  String  imgap_project_id 
+  String  imgap_project_id
   String  assembly_id
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
@@ -13,10 +13,9 @@ workflow annotation {
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
   String  finish_ano_container = "microbiomedata/workflowmeta:1.1.1"
   String  finish_ano_orig_prefix = "${assembly_id}"
-  
+
   # structural annotation
   Boolean sa_execute=true
-  Boolean sa_pre_qc_execute = false
 
   # functional annotation
   Boolean fa_execute=true
@@ -28,35 +27,31 @@ workflow annotation {
       input: container=container,
           input_file=input_file
     }
- # confused whether to use assembly or annotation id
-call make_map_file {
-    input:
-    assy_id = assembly_id,
-    input_file = stage.imgap_input_fasta,
-    container = map_container
+  # confused whether to use assembly or annotation id
+  call make_map_file {
+       input: assy_id = assembly_id,
+              input_file = stage.imgap_input_fasta,
+              container = map_container
   }
 
   call split {
-    input: 
-    infile=make_map_file.out_fasta,
-    container=container
+    input: infile=make_map_file.out_fasta,
+           container=container
   }
-#confused for assembly or annotation id replacement
+  #confused for assembly or annotation id replacement
   scatter(pathname in split.files) {
     if(sa_execute) {
       call sa.s_annotate {
         input:
           cmzscore = split.cmzscore,
-          pre_qc_execute = sa_pre_qc_execute,
           imgap_input_fasta = make_map_file.out_fasta,
           imgap_input_fasta = pathname,
-          imgap_project_id = proj, 
+          imgap_project_id = imgap_project_id,
           additional_threads = additional_threads,
           imgap_project_type = imgap_project_type,
           database_location = database_location,
           container=container,
-          gm_license=gm_license, 
-          pre_qc_container = map_container
+          gm_license=gm_license
       }
     }
 
@@ -159,7 +154,7 @@ call make_map_file {
       container=finish_ano_container,
       input_file=make_map_file.out_fasta,
       proj=proj,
-      orig_prefix = assembly_id, 
+      orig_prefix = assembly_id,
       start=stage.start,
       ano_info_file=make_info_file.imgap_info,
       proteins_faa = merge_outputs.proteins_faa,
@@ -252,7 +247,8 @@ task stage {
        if [ $( echo ${input_file}|egrep -c "https*:") -gt 0 ] ; then
            wget ${input_file} -O ${target}
        else
-           ln -s ${input_file} ${target} || cp ${input_file} ${target}
+           set +o pipefail
+           ln ${input_file} ${target} || cp ${input_file} ${target}
        fi
        # Capture the start time
        date --iso-8601=seconds > start.txt
@@ -276,7 +272,7 @@ task make_map_file {
     String assy_id
     String  prefix=sub(assy_id, ":", "_")
     File input_file
-    String container 
+    String container
     String output_file = "${prefix}_map.fasta"
     Int min_seq_length = 150      # default value
     Int unknown_gap_length = 100  # default value
@@ -286,10 +282,10 @@ task make_map_file {
   find_prefix=`grep ${assy_id} ${input_file} | head -1`
 
   set -euo pipefail
-  if [[ ! $find_prefix ]] 
+  if [[ ! $find_prefix ]]
   then
     echo "true" > run_map.txt
-    fasta_sanity.py -v 
+    fasta_sanity.py -v
     fasta_sanity.py \
     -p ${assy_id} \
     -l ${min_seq_length} \
@@ -297,8 +293,8 @@ task make_map_file {
     ${input_file} ${output_file}
   else
     echo "false" > run_map.txt
-    ln -s ${input_file} ${output_file}
-  fi 
+    ln ${input_file} ${output_file}
+  fi
   >>>
 
   output{
@@ -349,6 +345,7 @@ task split {
 
 task merge_outputs {
   String  project_id
+  String prefix = sub(project_id, ":", "_")
   Array[File?] structural_gffs
   Array[File?] functional_gffs
   Array[File?] ko_tsvs
@@ -390,94 +387,94 @@ task merge_outputs {
   Array[File?] rfam_gffs
   Array[File?] rfam_tbls
   String container
- 
+
 
   command <<<
     set -euo pipefail
      #combine files
-     cat ${sep=" " structural_gffs} > "${project_id}_structural_annotation.gff"
-     cat ${sep=" " functional_gffs} > "${project_id}_functional_annotation.gff"
-     cat ${sep=" " ko_tsvs} >  "${project_id}_ko.tsv"
-     cat ${sep=" " ec_tsvs} >  "${project_id}_ec.tsv"
-     cat ${sep=" " phylo_tsvs} > "${project_id}_gene_phylogeny.tsv"
-     cat ${sep=" " last_blasttabs} > "${project_id}_proteins.img_nr.last.blasttab"
-     cat ${sep=" " lineage_tsvs} > "${project_id}.contigLin.assembled.tsv"
-     cat ${sep=" " proteins} > "${project_id}_proteins.faa"
-     cat ${sep=" " genes} > "${project_id}_genes.fna"
-     cat ${sep=" " ko_ec_gffs} > "${project_id}_ko_ec.gff"
-     cat ${sep=" " cog_gffs} > "${project_id}_cog.gff"
-     cat ${sep=" " pfam_gffs} > "${project_id}_pfam.gff"
-     cat ${sep=" " tigrfam_gffs} > "${project_id}_tigrfam.gff"
-     cat ${sep=" " smart_gffs} > "${project_id}_smart.gff"
-     cat ${sep=" " supfam_gffs} > "${project_id}_supfam.gff"
-     cat ${sep=" " cath_funfam_gffs} > "${project_id}_cath_funfam.gff"
-     cat ${sep=" " product_name_tsvs} > "${project_id}_product_names.tsv"
-     cat ${sep=" " genemark_gffs} > "${project_id}_genemark.gff"
-     cat ${sep=" " genemark_genes} > "${project_id}_genemark_genes.fna"
-     cat ${sep=" " genemark_proteins} > "${project_id}_genemark_proteins.faa"
-     cat ${sep=" " prodigal_gffs} > "${project_id}_prodigal.gff"
-     cat ${sep=" " prodigal_proteins} > "${project_id}_prodigal_proteins.faa"
-     cat ${sep=" " prodigal_genes} > "${project_id}_prodigal_genes.fna"
-     cat ${sep=" " cds_gffs} > "${project_id}_cds.gff"
-     cat ${sep=" " cds_proteins} > "${project_id}_cds_proteins.faa"
-     cat ${sep=" " cds_genes} > "${project_id}_cds_genes.fna"
-     cat ${sep=" " trna_gffs} > "${project_id}_trna.gff"
-     cat ${sep=" " trna_bacterial_outs} > "${project_id}_trnascan_bacterial.out"
-     cat ${sep=" " trna_archaeal_outs} > "${project_id}_trnascan_archaeal.out"
-     cat ${sep=" " rfam_gffs} > "${project_id}_rfam.gff"
-     cat ${sep=" " rfam_tbls} > "${project_id}_rfam.tbl"
-     cat ${sep=" " cog_domtblouts} > "${project_id}_proteins.cog.domtblout"
-     cat ${sep=" " pfam_domtblouts} > "${project_id}_proteins.pfam.domtblout"
-     cat ${sep=" " tigrfam_domtblouts} > "${project_id}_proteins.tigrfam.domtblout"
-     cat ${sep=" " smart_domtblouts} > "${project_id}_proteins.smart.domtblout"
-     cat ${sep=" " supfam_domtblouts} > "${project_id}_proteins.supfam.domtblout"
-     cat ${sep=" " cath_funfam_domtblouts} > "${project_id}_proteins.cath_funfam.domtblout"
-     cat ${sep=" " crt_crisprs_s} > "${project_id}_crt.crisprs"
-     cat ${sep=" " crt_gffs} > "${project_id}_crt.gff"
-     cat ${sep=" " crt_outs} > "${project_id}_crt.out"
+     cat ${sep=" " structural_gffs} > "${prefix}_structural_annotation.gff"
+     cat ${sep=" " functional_gffs} > "${prefix}_functional_annotation.gff"
+     cat ${sep=" " ko_tsvs} >  "${prefix}_ko.tsv"
+     cat ${sep=" " ec_tsvs} >  "${prefix}_ec.tsv"
+     cat ${sep=" " phylo_tsvs} > "${prefix}_gene_phylogeny.tsv"
+     cat ${sep=" " last_blasttabs} > "${prefix}_proteins.img_nr.last.blasttab"
+     cat ${sep=" " lineage_tsvs} > "${prefix}.contigLin.assembled.tsv"
+     cat ${sep=" " proteins} > "${prefix}_proteins.faa"
+     cat ${sep=" " genes} > "${prefix}_genes.fna"
+     cat ${sep=" " ko_ec_gffs} > "${prefix}_ko_ec.gff"
+     cat ${sep=" " cog_gffs} > "${prefix}_cog.gff"
+     cat ${sep=" " pfam_gffs} > "${prefix}_pfam.gff"
+     cat ${sep=" " tigrfam_gffs} > "${prefix}_tigrfam.gff"
+     cat ${sep=" " smart_gffs} > "${prefix}_smart.gff"
+     cat ${sep=" " supfam_gffs} > "${prefix}_supfam.gff"
+     cat ${sep=" " cath_funfam_gffs} > "${prefix}_cath_funfam.gff"
+     cat ${sep=" " product_name_tsvs} > "${prefix}_product_names.tsv"
+     cat ${sep=" " genemark_gffs} > "${prefix}_genemark.gff"
+     cat ${sep=" " genemark_genes} > "${prefix}_genemark_genes.fna"
+     cat ${sep=" " genemark_proteins} > "${prefix}_genemark_proteins.faa"
+     cat ${sep=" " prodigal_gffs} > "${prefix}_prodigal.gff"
+     cat ${sep=" " prodigal_proteins} > "${prefix}_prodigal_proteins.faa"
+     cat ${sep=" " prodigal_genes} > "${prefix}_prodigal_genes.fna"
+     cat ${sep=" " cds_gffs} > "${prefix}_cds.gff"
+     cat ${sep=" " cds_proteins} > "${prefix}_cds_proteins.faa"
+     cat ${sep=" " cds_genes} > "${prefix}_cds_genes.fna"
+     cat ${sep=" " trna_gffs} > "${prefix}_trna.gff"
+     cat ${sep=" " trna_bacterial_outs} > "${prefix}_trnascan_bacterial.out"
+     cat ${sep=" " trna_archaeal_outs} > "${prefix}_trnascan_archaeal.out"
+     cat ${sep=" " rfam_gffs} > "${prefix}_rfam.gff"
+     cat ${sep=" " rfam_tbls} > "${prefix}_rfam.tbl"
+     cat ${sep=" " cog_domtblouts} > "${prefix}_proteins.cog.domtblout"
+     cat ${sep=" " pfam_domtblouts} > "${prefix}_proteins.pfam.domtblout"
+     cat ${sep=" " tigrfam_domtblouts} > "${prefix}_proteins.tigrfam.domtblout"
+     cat ${sep=" " smart_domtblouts} > "${prefix}_proteins.smart.domtblout"
+     cat ${sep=" " supfam_domtblouts} > "${prefix}_proteins.supfam.domtblout"
+     cat ${sep=" " cath_funfam_domtblouts} > "${prefix}_proteins.cath_funfam.domtblout"
+     cat ${sep=" " crt_crisprs_s} > "${prefix}_crt.crisprs"
+     cat ${sep=" " crt_gffs} > "${prefix}_crt.gff"
+     cat ${sep=" " crt_outs} > "${prefix}_crt.out"
 
  >>>
   output {
-    File functional_gff = "${project_id}_functional_annotation.gff"
-    File structural_gff = "${project_id}_structural_annotation.gff"
-    File ko_tsv = "${project_id}_ko.tsv"
-    File ec_tsv = "${project_id}_ec.tsv"
-    File gene_phylogeny_tsv = "${project_id}_gene_phylogeny.tsv"
-    File last_blasttab = "${project_id}_proteins.img_nr.last.blasttab"
-    File lineage_tsv = "${project_id}.contigLin.assembled.tsv"
-    File proteins_faa = "${project_id}_proteins.faa"
-    File genes_fna = "${project_id}_genes.fna"
-    File ko_ec_gff = "${project_id}_ko_ec.gff"
-    File cog_gff = "${project_id}_cog.gff"
-    File pfam_gff = "${project_id}_pfam.gff"
-    File tigrfam_gff = "${project_id}_tigrfam.gff"
-    File smart_gff = "${project_id}_smart.gff"
-    File supfam_gff = "${project_id}_supfam.gff"
-    File cath_funfam_gff = "${project_id}_cath_funfam.gff"
-    File crt_gff = "${project_id}_crt.gff"
-    File genemark_gff = "${project_id}_genemark.gff"
-    File genemark_gene = "${project_id}_genemark_genes.fna"
-    File genemark_protein = "${project_id}_genemark_proteins.faa"
-    File prodigal_gff = "${project_id}_prodigal.gff"
-    File prodigal_gene = "${project_id}_prodigal_genes.fna"
-    File prodigal_protein = "${project_id}_prodigal_proteins.faa"
-    File cds_gff = "${project_id}_cds.gff"
-    File cds_gene = "${project_id}_cds_genes.fna"
-    File cds_protein = "${project_id}_cds_proteins.faa"
-    File trna_gff = "${project_id}_trna.gff"
-    File trna_bacterial_out = "${project_id}_trnascan_bacterial.out"
-    File trna_archaeal_out = "${project_id}_trnascan_archaeal.out"
-    File rfam_gff = "${project_id}_rfam.gff"
-    File rfam_tbl = "${project_id}_rfam.tbl"
-    File proteins_cog_domtblout = "${project_id}_proteins.cog.domtblout"
-    File proteins_pfam_domtblout = "${project_id}_proteins.pfam.domtblout"
-    File proteins_tigrfam_domtblout = "${project_id}_proteins.tigrfam.domtblout"
-    File proteins_smart_domtblout = "${project_id}_proteins.smart.domtblout"
-    File proteins_supfam_domtblout = "${project_id}_proteins.supfam.domtblout"
-    File proteins_cath_funfam_domtblout = "${project_id}_proteins.cath_funfam.domtblout"
-    File product_names_tsv = "${project_id}_product_names.tsv"
-    File crt_crisprs = "${project_id}_crt.crisprs"
-    File crt_out = "${project_id}_crt.out"
+    File functional_gff = "${prefix}_functional_annotation.gff"
+    File structural_gff = "${prefix}_structural_annotation.gff"
+    File ko_tsv = "${prefix}_ko.tsv"
+    File ec_tsv = "${prefix}_ec.tsv"
+    File gene_phylogeny_tsv = "${prefix}_gene_phylogeny.tsv"
+    File last_blasttab = "${prefix}_proteins.img_nr.last.blasttab"
+    File lineage_tsv = "${prefix}.contigLin.assembled.tsv"
+    File proteins_faa = "${prefix}_proteins.faa"
+    File genes_fna = "${prefix}_genes.fna"
+    File ko_ec_gff = "${prefix}_ko_ec.gff"
+    File cog_gff = "${prefix}_cog.gff"
+    File pfam_gff = "${prefix}_pfam.gff"
+    File tigrfam_gff = "${prefix}_tigrfam.gff"
+    File smart_gff = "${prefix}_smart.gff"
+    File supfam_gff = "${prefix}_supfam.gff"
+    File cath_funfam_gff = "${prefix}_cath_funfam.gff"
+    File crt_gff = "${prefix}_crt.gff"
+    File genemark_gff = "${prefix}_genemark.gff"
+    File genemark_gene = "${prefix}_genemark_genes.fna"
+    File genemark_protein = "${prefix}_genemark_proteins.faa"
+    File prodigal_gff = "${prefix}_prodigal.gff"
+    File prodigal_gene = "${prefix}_prodigal_genes.fna"
+    File prodigal_protein = "${prefix}_prodigal_proteins.faa"
+    File cds_gff = "${prefix}_cds.gff"
+    File cds_gene = "${prefix}_cds_genes.fna"
+    File cds_protein = "${prefix}_cds_proteins.faa"
+    File trna_gff = "${prefix}_trna.gff"
+    File trna_bacterial_out = "${prefix}_trnascan_bacterial.out"
+    File trna_archaeal_out = "${prefix}_trnascan_archaeal.out"
+    File rfam_gff = "${prefix}_rfam.gff"
+    File rfam_tbl = "${prefix}_rfam.tbl"
+    File proteins_cog_domtblout = "${prefix}_proteins.cog.domtblout"
+    File proteins_pfam_domtblout = "${prefix}_proteins.pfam.domtblout"
+    File proteins_tigrfam_domtblout = "${prefix}_proteins.tigrfam.domtblout"
+    File proteins_smart_domtblout = "${prefix}_proteins.smart.domtblout"
+    File proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
+    File proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
+    File product_names_tsv = "${prefix}_product_names.tsv"
+    File crt_crisprs = "${prefix}_crt.crisprs"
+    File crt_out = "${prefix}_crt.out"
   }
   runtime {
     memory: "2G"
@@ -492,11 +489,12 @@ task make_info_file {
   String container
   String imgap_version
   String map_container
-  Boolean map_execute 
+  Boolean map_execute
   File map_info
   Boolean fa_execute
   Boolean sa_execute
   String project_id
+  String prefix = sub(project_id, ":", "_")
   Array[String?] rfam_version
   Boolean rfam_executed = if (defined(rfam_version)) then true else false
   File structural_gff
@@ -522,20 +520,20 @@ task make_info_file {
 
     command <<<
     set -euo pipefail
-     echo "IMGAP Version: ${imgap_version}" > ${project_id}_imgap.info
+     echo "IMGAP Version: ${imgap_version}" > ${prefix}_imgap.info
      #get map script version
      if [[ "${map_execute}" = true ]]
        then
        map_version=`grep "fasta_sanity.py" ${map_info}`
        map_version="Mapping Programs Used: $map_version in ${map_container}"
-       echo $map_version >> ${project_id}_imgap.info 
+       echo $map_version >> ${prefix}_imgap.info
      fi
      #get structual annotation versions
      if [[ "${sa_execute}" = true ]]
        then
        sa_version=`cut -f2 ${structural_gff}  | sort | uniq | perl -pe 's/\n/; /g' | sed -E 's/(.*)\; /\1/'`
        sa_version="Structural Annotation Programs Used: $sa_version"
-       echo $sa_version >> ${project_id}_imgap.info
+       echo $sa_version >> ${prefix}_imgap.info
        if [[ "${rfam_executed}" = true ]]
          then
          echo ${sep="," rfam_version} > ${rfam_version_file}
@@ -547,7 +545,7 @@ task make_info_file {
            rfam_db_version="$rfam_db_version $db_version; "
          done < rfam_version_uniq.txt
          rfam_db_version=`echo $rfam_db_version | sed -E 's/(.*)\;/\1/'`
-         echo  $rfam_db_version  >> ${project_id}_imgap.info
+         echo  $rfam_db_version  >> ${prefix}_imgap.info
        fi
     fi
      #get functional annotation tool versions
@@ -567,7 +565,7 @@ task make_info_file {
          fa_tool_version="$fa_tool_version $tool; "
        done < fa_version_uniq.txt
        fa_tool_version=`echo $fa_tool_version | sed -E 's/(.*)\;/\1/'`
-       echo $fa_tool_version >> ${project_id}_imgap.info
+       echo $fa_tool_version >> ${prefix}_imgap.info
        #get functional annotation db versions
        echo ${sep="," img_nr_db_version} > ${fa_db_version_file}
        echo ${sep="," smart_db_version} >> ${fa_db_version_file}
@@ -582,12 +580,12 @@ task make_info_file {
          fa_db_version="$fa_db_version $db; "
        done < fa_db_version_uniq.txt
        fa_db_version=`echo $fa_db_version | sed -E 's/(.*)\;/\1/'`
-       echo $fa_db_version >> ${project_id}_imgap.info
+       echo $fa_db_version >> ${prefix}_imgap.info
     fi
   >>>
 
   output {
-    File imgap_info = "${project_id}_imgap.info"
+    File imgap_info = "${prefix}_imgap.info"
   }
   runtime {
     memory: "2G"
@@ -603,7 +601,8 @@ task final_stats {
   String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
   File   input_fasta
   String project_id
-  String fna="${project_id}_contigs.fna"
+  String prefix = sub(project_id, ":", "_")
+  String fna="${prefix}_contigs.fna"
   File   structural_gff
   String container
 
@@ -614,8 +613,8 @@ task final_stats {
   }
 
   output {
-    File tsv = "${project_id}_structural_annotation_stats.tsv"
-    File json = "${project_id}_structural_annotation_stats.json"
+    File tsv = "${prefix}_structural_annotation_stats.tsv"
+    File json = "${prefix}_structural_annotation_stats.json"
   }
 
   runtime {
@@ -691,12 +690,12 @@ task finish_ano {
        cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
        cat ${stats_json} | sed ${sed} > ${prefix}_stats.json
 
-       ln -s ${ano_info_file} ${prefix}_imgap.info
+       ln ${ano_info_file} ${prefix}_imgap.info
 
-       if [[ "${map_execute}" = true ]] 
+       if [[ "${map_execute}" = true ]]
         then
-        ln -s ${map_file} ${prefix}_contig_names_mapping.tsv
-        ln -s ${renamed_fasta} ${prefix}_contigs.fna
+        ln ${map_file} ${prefix}_contig_names_mapping.tsv
+        ln ${renamed_fasta} ${prefix}_contigs.fna
        fi
   >>>
 
@@ -732,7 +731,7 @@ task finish_ano {
         File? final_map_file = "${prefix}_contig_names_mapping.tsv"
         File final_tsv = "${prefix}_stats.tsv"
         File final_version = "${prefix}_imgap.info"
- 
+
     }
     runtime {
         memory: "10G"

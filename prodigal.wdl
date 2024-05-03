@@ -82,15 +82,16 @@ task iso_big {
   File   input_fasta
   Int?   translation_table = 11
   String project_id
-  File   train = "${project_id}_prodigal.trn"
+  String prefix = sub(project_id, ":", "_")
+  File   train = "${prefix}_prodigal.trn"
   String container
 
   command {
     set -euo pipefail
     ${bin} -i ${input_fasta} -t ${train} -g ${translation_table} -q
     ${bin} -f gff -g ${translation_table} -p single -m -i ${input_fasta} \
-    -t ${train} -o ${project_id}_prodigal.gff \
-    -d ${project_id}_prodigal_genes.fna -a ${project_id}_prodigal_proteins.faa
+    -t ${train} -o ${prefix}_prodigal.gff \
+    -d ${prefix}_prodigal_genes.fna -a ${prefix}_prodigal_proteins.faa
   }
 
   runtime {
@@ -100,9 +101,9 @@ task iso_big {
   }
 
   output {
-    File gff = "${project_id}_prodigal.gff"
-    File genes = "${project_id}_prodigal_genes.fna"
-    File proteins = "${project_id}_prodigal_proteins.faa"
+    File gff = "${prefix}_prodigal.gff"
+    File genes = "${prefix}_prodigal_genes.fna"
+    File proteins = "${prefix}_prodigal_proteins.faa"
   }
 }
 
@@ -111,12 +112,13 @@ task iso_small {
   String bin="/opt/omics/bin/prodigal"
   File   input_fasta
   String project_id
+  String prefix = sub(project_id, ":", "_")
   String container
 
   command {
     ${bin} -f gff -p meta -m -i ${input_fasta} \
-    -o ${project_id}_prodigal.gff -d ${project_id}_prodigal_genes.fna \
-    -a ${project_id}_prodigal_proteins.faa
+    -o ${prefix}_prodigal.gff -d ${prefix}_prodigal_genes.fna \
+    -a ${prefix}_prodigal_proteins.faa
   }
 
   runtime {
@@ -126,9 +128,9 @@ task iso_small {
   }
 
   output {
-    File gff = "${project_id}_prodigal.gff"
-    File genes = "${project_id}_prodigal_genes.fna"
-    File proteins = "${project_id}_prodigal_proteins.faa"
+    File gff = "${prefix}_prodigal.gff"
+    File genes = "${prefix}_prodigal_genes.fna"
+    File proteins = "${prefix}_prodigal_proteins.faa"
   }
 }
 
@@ -137,12 +139,13 @@ task metag {
   String bin="/opt/omics/bin/prodigal"
   File   input_fasta
   String project_id
+  String prefix = sub(project_id, ":", "_")
   String container
 
   command {
     ${bin} -f gff -p meta -m -i ${input_fasta} \
-    -o ${project_id}_prodigal.gff -d ${project_id}_prodigal_genes.fna \
-    -a ${project_id}_prodigal_proteins.faa
+    -o ${prefix}_prodigal.gff -d ${prefix}_prodigal_genes.fna \
+    -a ${prefix}_prodigal_proteins.faa
   }
 
   runtime {
@@ -152,9 +155,9 @@ task metag {
   }
 
   output {
-    File gff = "${project_id}_prodigal.gff"
-    File genes = "${project_id}_prodigal_genes.fna"
-    File proteins = "${project_id}_prodigal_proteins.faa"
+    File gff = "${prefix}_prodigal.gff"
+    File genes = "${prefix}_prodigal_genes.fna"
+    File proteins = "${prefix}_prodigal_proteins.faa"
   }
 }
 
@@ -171,6 +174,7 @@ task clean_and_unify {
   File?  meta_gff
   String unify_bin="/opt/omics/bin/structural_annotation/unify_gene_ids.py"
   String project_id
+  String prefix = sub(project_id, ":", "_")
   String container
 
   command {
@@ -197,9 +201,9 @@ task clean_and_unify {
   }
 
   output {
-    File gff = "${project_id}_prodigal.gff"
-    File genes = "${project_id}_prodigal_genes.fna"
-    File proteins = "${project_id}_prodigal_proteins.faa"
+    File gff = "${prefix}_prodigal.gff"
+    File genes = "${prefix}_prodigal_genes.fna"
+    File proteins = "${prefix}_prodigal_proteins.faa"
   }
 }
 

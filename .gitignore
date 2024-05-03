@@ -1,2 +1,5 @@
 *zip
 test/
+cromwell*
+slurm*
+.gitignore
