@@ -154,7 +154,6 @@ workflow annotation {
       container=finish_ano_container,
       input_file=make_map_file.out_fasta,
       proj=proj,
-      orig_prefix = assembly_id,
       start=stage.start,
       ano_info_file=make_info_file.imgap_info,
       proteins_faa = merge_outputs.proteins_faa,
