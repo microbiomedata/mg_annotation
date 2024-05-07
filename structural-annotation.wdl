@@ -157,7 +157,6 @@ task pre_qc {
   String project_type
   File   input_fasta
   String project_id
-  String prefix = sub(project_id, ":", "_")
   String rename = "no"
   Float  n_ratio_cutoff = 0.5
   Int    seqs_per_million_bp_cutoff = 500
@@ -167,7 +166,7 @@ task pre_qc {
   command <<<
     set -euo pipefail
     tmp_fasta="${input_fasta}.tmp"
-    qced_fasta="${prefix}_contigs.fna"
+    qced_fasta="${project_id}_contigs.fna"
     grep -v '^\s*$' ${input_fasta} | tr -d '\r' | \
     sed 's/^>[[:blank:]]*/>/g' > $tmp_fasta
     acgt_count=`grep -v '^>' $tmp_fasta | grep -o [acgtACGT] | wc -l`
@@ -198,10 +197,7 @@ task pre_qc {
     fi
 
     fasta_sanity_cmd="${bin} $tmp_fasta $qced_fasta"
-    if [[ ${rename} == "yes" ]]
-    then
-        fasta_sanity_cmd="$fasta_sanity_cmd -p ${project_id}"
-    fi
+
     fasta_sanity_cmd="$fasta_sanity_cmd -l ${min_seq_length}"
     ${bin} -v
     $fasta_sanity_cmd
@@ -215,8 +211,7 @@ task pre_qc {
   }
 
   output {
-    File fasta = "${prefix}_contigs.fna"
-    File? map_file = "${prefix}_contig_names_mapping.tsv"
+    File fasta = "${project_id}_contigs.fna"
     File  out_log = stdout()
   }
 }
@@ -226,7 +221,6 @@ task gff_merge {
   String bin="/opt/omics/bin/structural_annotation/gff_files_merger.py"
   File   input_fasta
   String project_id
-  String prefix = sub(project_id, ":", "_")
   File?  rrna_gff
   File?  trna_gff
   File?  rfam_gff
@@ -259,7 +253,7 @@ task gff_merge {
     fi
 
     if [[ ("$prodigal_execute" = true || "$genemark_execute" = true) ]] && [[ "$crt_execute" = true ]] ; then
-       merger_args="$merger_args --log_file ${prefix}_gff_merge.log"
+       merger_args="$merger_args --log_file ${project_id}_gff_merge.log"
     fi
 
     if [[ "$rfam_execute" = true ]] ; then
@@ -271,7 +265,7 @@ task gff_merge {
     fi
 
     #excute gff_files_merger.py
-    ${bin} $merger_args 1> ${prefix}_structural_annotation.gff
+    ${bin} $merger_args 1> ${project_id}_structural_annotation.gff
 
 
   }
@@ -283,7 +277,7 @@ task gff_merge {
   }
 
   output {
-    File final_gff = "${prefix}_structural_annotation.gff"
+    File final_gff = "${project_id}_structural_annotation.gff"
   }
 }
 
@@ -291,7 +285,6 @@ task fasta_merge {
 
   String bin="/opt/omics/bin/structural_annotation/finalize_fasta_files.py"
   String project_id
-  String prefix = sub(project_id, ":", "_")
   File   final_gff
   File cds_genes
   File cds_proteins
@@ -314,8 +307,8 @@ task fasta_merge {
   }
  
   output {
-    File final_genes = "${prefix}_genes.fna"
-    File final_proteins = "${prefix}_proteins.faa"
+    File final_genes = "${project_id}_genes.fna"
+    File final_proteins = "${project_id}_proteins.faa"
   }
 }
 
@@ -323,8 +316,6 @@ task gff_and_fasta_stats {
 
   String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
   File   input_fasta
-  String project_id
-  String prefix = sub(project_id, ":", "_")
   File   final_gff
   String container
 
@@ -345,11 +336,10 @@ task post_qc {
   String qc_bin="/opt/omics/bin/qc/post-annotation/genome_structural_annotation_sanity.py"
   File   input_fasta
   String project_id
-  String prefix = sub(project_id, ":", "_")
   String container
 
   command {
-    ${qc_bin} ${input_fasta} "${prefix}_structural_annotation.gff"
+    ${qc_bin} ${input_fasta} "${project_id}_structural_annotation.gff"
   }
 
   runtime {
@@ -359,6 +349,6 @@ task post_qc {
   }
  
   output {
-    File out = "${prefix}_structural_annotation.gff"
+    File out = "${project_id}_structural_annotation.gff"
   }
 }
