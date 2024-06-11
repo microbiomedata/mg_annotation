@@ -5,14 +5,12 @@ workflow annotation {
   String  proj
   String  input_file
   String  imgap_project_id
-  String  assembly_id
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
   String?  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
   String  finish_ano_container = "microbiomedata/workflowmeta:1.1.1"
-  String  finish_ano_orig_prefix = "${assembly_id}"
 
   # structural annotation
   Boolean sa_execute=true
@@ -29,7 +27,7 @@ workflow annotation {
     }
   # confused whether to use assembly or annotation id
   call make_map_file {
-       input: assy_id = assembly_id,
+       input: proj_id = proj,
               input_file = stage.imgap_input_fasta,
               container = map_container
   }
@@ -268,8 +266,8 @@ task stage {
 
 task make_map_file {
 
-    String assy_id
-    String  prefix=sub(assy_id, ":", "_")
+    String proj_id
+    String  prefix=sub(proj_id, ":", "_")
     File input_file
     String container
     String output_file = "${prefix}_map.fasta"
@@ -278,21 +276,21 @@ task make_map_file {
 
 
   command <<<
-  find_prefix=`grep ${assy_id} ${input_file} | head -1`
+  find_prefix=`grep ${proj_id} ${input_file} | head -1`
 
   set -euo pipefail
-  if [[ ! $find_prefix ]]
+  if [[ $find_prefix ]]
   then
+    echo "false" > run_map.txt
+    ln ${input_file} ${output_file} || ln -s ${input_file} ${output_file}
+  else
     echo "true" > run_map.txt
     fasta_sanity.py -v
     fasta_sanity.py \
-    -p ${assy_id} \
+    -p ${proj_id} \
     -l ${min_seq_length} \
     -u ${unknown_gap_length} \
     ${input_file} ${output_file}
-  else
-    echo "false" > run_map.txt
-    ln ${input_file} ${output_file}
   fi
   >>>
 

@@ -198,10 +198,7 @@ task pre_qc {
     fi
 
     fasta_sanity_cmd="${bin} $tmp_fasta $qced_fasta"
-    if [[ ${rename} == "yes" ]]
-    then
-        fasta_sanity_cmd="$fasta_sanity_cmd -p ${project_id}"
-    fi
+    
     fasta_sanity_cmd="$fasta_sanity_cmd -l ${min_seq_length}"
     ${bin} -v
     $fasta_sanity_cmd
