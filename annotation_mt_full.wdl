@@ -16,7 +16,7 @@ workflow annotation {
 
     # functional annotation
     #Boolean fa_execute=true
-    File? gm_license
+    String? gm_license
     }
   call split {
     input: infile=imgap_input_fasta,
@@ -133,7 +133,7 @@ task split{
      String zfile="zscore.txt"
      String cmzfile="cmzscore.txt"
      String container
-     File? gm_license
+     String? gm_license
    }
    command{
      set -euo pipefail

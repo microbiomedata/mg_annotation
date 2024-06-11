@@ -12,7 +12,7 @@ workflow annotation {
     Int     additional_threads=16
     
     Int?    fa_approx_num_proteins
-    File? gm_license
+    String? gm_license
     }
 
   

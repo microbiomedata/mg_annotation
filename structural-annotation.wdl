@@ -23,7 +23,7 @@ workflow s_annotate {
       Boolean gff_and_fasta_stats_execute=true
       String  database_location
       String  container
-      File? gm_license
+      String? gm_license
     }
 
     call pre_qc {
