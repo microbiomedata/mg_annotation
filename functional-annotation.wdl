@@ -200,6 +200,7 @@ workflow f_annotate {
 task ko_ec {
     input {
         String project_id
+        String prefix=sub(project_id, ":", "_")
         String project_type
         Int    threads = 2
         File   input_fasta
@@ -217,13 +218,13 @@ task ko_ec {
     }
   command {
     set -euo pipefail
-    ~{lastal} -f blasttab+ -P ~{threads} ~{nr_db} ~{input_fasta} 1> ~{project_id}_proteins.img_nr.last.blasttab
+    ~{lastal} -f blasttab+ -P ~{threads} ~{nr_db} ~{input_fasta} 1> ~{prefix}_proteins.img_nr.last.blasttab
     ~{selector} -l ~{aln_length_ratio} -m ~{min_ko_hits} -n ~{top_hits} \
                 ~{project_type} ~{md5} ~{phylo} \
-                ~{project_id}_ko.tsv ~{project_id}_ec.tsv \
-                ~{project_id}_gene_phylogeny.tsv ~{project_id}_ko_ec.gff \
-                ~{project_id}_proteins.img_nr.last.blasttab && \
-    python /opt/omics/bin/functional_annotation/create_scaffold_lineage.py ~{project_id}_gene_phylogeny.tsv ~{project_id}_scaffold_lineage.tsv
+                ~{prefix}_ko.tsv ~{prefix}_ec.tsv \
+                ~{prefix}_gene_phylogeny.tsv ~{prefix}_ko_ec.gff \
+                ~{prefix}_proteins.img_nr.last.blasttab && \
+    python /opt/omics/bin/functional_annotation/create_scaffold_lineage.py ~{prefix}_gene_phylogeny.tsv ~{prefix}_scaffold_lineage.tsv
 
    #get version information
    lastal_version="`~{lastal} -V`"
@@ -239,12 +240,12 @@ task ko_ec {
   }
 
   output {
-    File last_blasttab = "~{project_id}_proteins.img_nr.last.blasttab"
-    File ko_tsv = "~{project_id}_ko.tsv"
-    File ec_tsv = "~{project_id}_ec.tsv"
-    File phylo_tsv = "~{project_id}_gene_phylogeny.tsv"
-    File gff = "~{project_id}_ko_ec.gff"
-    File lineage_tsv = "~{project_id}_scaffold_lineage.tsv"
+    File last_blasttab = "~{prefix}_proteins.img_nr.last.blasttab"
+    File ko_tsv = "~{prefix}_ko.tsv"
+    File ec_tsv = "~{prefix}_ec.tsv"
+    File phylo_tsv = "~{prefix}_gene_phylogeny.tsv"
+    File gff = "~{prefix}_ko_ec.gff"
+    File lineage_tsv = "~{prefix}_scaffold_lineage.tsv"
     String lastal_ver = read_string(lastal_version_file)
     String img_nr_db_ver = read_string(img_nr_db_version_file)
   }
@@ -253,6 +254,7 @@ task ko_ec {
 task smart {
     input {
         String project_id
+        String prefix=sub(project_id, ":", "_")
         File   input_fasta
         String   smart_db
         Int    threads = 62
@@ -290,8 +292,8 @@ task smart {
   }
 
   output {
-    File gff = "~{project_id}_smart.gff"
-    File domtblout = "~{project_id}_proteins.smart.domtblout"
+    File gff = "~{prefix}_smart.gff"
+    File domtblout = "~{prefix}_proteins.smart.domtblout"
     String hmmsearch_smart_ver = read_string(hmmsearch_version_file)
     String smart_db_ver = read_string(smart_db_version_file)
   }
@@ -300,6 +302,7 @@ task smart {
 task cog {
     input {
         String project_id
+        String prefix=sub(project_id, ":", "_")
         File   input_fasta
         String   cog_db
         Int    threads = 62
@@ -337,8 +340,8 @@ task cog {
   }
 
   output {
-    File gff = "~{project_id}_cog.gff"
-    File domtblout = "`{project_id}_proteins.cog.domtblout"
+    File gff = "~{prefix}_cog.gff"
+    File domtblout = "`{prefix}_proteins.cog.domtblout"
     String hmmsearch_cog_ver = read_string(hmmsearch_version_file)
     String cog_db_ver = read_string(cog_db_version_file)
   }
@@ -347,6 +350,7 @@ task cog {
 task tigrfam {
     input {
       String project_id
+      String prefix=sub(project_id, ":", "_")
       File   input_fasta
       String   tigrfam_db
       Int    threads = 62
@@ -383,8 +387,8 @@ task tigrfam {
   }
 
   output {
-    File gff = "~{project_id}_tigrfam.gff"
-    File domtblout = "~{project_id}_proteins.tigrfam.domtblout"
+    File gff = "~{prefix}_tigrfam.gff"
+    File domtblout = "~{prefix}_proteins.tigrfam.domtblout"
     String hmmsearch_tigrfam_ver = read_string(hmmsearch_version_file)
     String tigrfam_db_ver = read_string(tigrfam_db_version_file)
 
@@ -394,6 +398,7 @@ task tigrfam {
 task superfam {
     input {
         String project_id
+        String prefix=sub(project_id, ":", "_")
         File   input_fasta
         String   superfam_db
         Int    threads = 62
@@ -432,8 +437,8 @@ task superfam {
   }
 
   output {
-    File gff = "~{project_id}_supfam.gff"
-    File domtblout = "~{project_id}_proteins.supfam.domtblout"
+    File gff = "~{prefix}_supfam.gff"
+    File domtblout = "~{prefix}_proteins.supfam.domtblout"
     String hmmsearch_superfam_ver = read_string(hmmsearch_version_file)
     String superfam_db_ver = read_string(superfam_db_version_file)
   }
@@ -442,6 +447,7 @@ task superfam {
 task pfam {
     input {
         String project_id
+        String prefix=sub(project_id, ":", "_")
         File   input_fasta
         String   pfam_db
         String   pfam_claninfo_tsv
@@ -477,8 +483,8 @@ task pfam {
   }
 
   output {
-    File gff = "~{project_id}_pfam.gff"
-    File domtblout = "~{project_id}_proteins.pfam.domtblout"
+    File gff = "~{prefix}_pfam.gff"
+    File domtblout = "~{prefix}_proteins.pfam.domtblout"
     String hmmsearch_pfam_ver = read_string(hmmsearch_version_file)
     String pfam_db_ver = read_string(pfam_db_version_file)
   }
@@ -487,6 +493,7 @@ task pfam {
 task cath_funfam {
     input {
         String project_id
+        String prefix=sub(project_id, ":", "_")
         File   input_fasta
         String   cath_funfam_db
         Int    threads=62
@@ -522,8 +529,8 @@ task cath_funfam {
   }
   
   output {
-      File gff = "~{project_id}_cath_funfam.gff"
-      File domtblout = "~{project_id}_proteins.cath_funfam.domtblout"
+      File gff = "~{prefix}_cath_funfam.gff"
+      File domtblout = "~{prefix}_proteins.cath_funfam.domtblout"
       String hmmsearch_cath_funfam_ver = read_string(hmmsearch_version_file)
       String cath_funfam_db_ver = read_string(cath_funfam_db_version_file)
   }
@@ -532,6 +539,7 @@ task cath_funfam {
 task signalp {
     input {
         String project_id
+        String prefix=sub(project_id, ":", "_")
         File   input_fasta
         String gram_stain
         String signalp
@@ -544,7 +552,7 @@ task signalp {
     grep -v '^#' | \
     awk -v sv="$signalp_version" -v ot="~{gram_stain}" \
         '$10 == "Y" {print $1"\t"sv"\tcleavage_site\t"$3-1"\t"$3"\t"$2\
-        "\t.\t.\tD-score="$9";network="$12";organism_type="ot}' > ~{project_id}_cleavage_sites.gff
+        "\t.\t.\tD-score="$9";network="$12";organism_type="ot}' > ~{prefix}_cleavage_sites.gff
   >>>
 
   runtime {
@@ -554,13 +562,14 @@ task signalp {
   }
 
   output {
-    File gff = "~{project_id}_cleavage_sites.gff"
+    File gff = "~{prefix}_cleavage_sites.gff"
   }
 }
 
 task tmhmm {
     input {
         String project_id
+        String prefix=sub(project_id, ":", "_")
         File   input_fasta
         String model
         String decode
@@ -575,7 +584,7 @@ task tmhmm {
     background="$background 0.045 0.049 0.039 0.057 0.068 0.058 0.067 0.013 0.032"
     sed 's/\*/X/g' ~{input_fasta} | \
     ~{decode} -N 1 -background $background -PrintNumbers \
-    ~{model} 2> /dev/null | ~{decode_parser} "$tool_and_version" > ~{project_id}_tmh.gff
+    ~{model} 2> /dev/null | ~{decode_parser} "$tool_and_version" > ~{prefix}_tmh.gff
   >>>
 
   runtime {
@@ -585,13 +594,14 @@ task tmhmm {
   }
 
   output {
-    File gff = "~{project_id}_tmh.gff"
+    File gff = "~{prefix}_tmh.gff"
   }
 }
 
 task product_name {
     input {
         String project_id
+        String prefix=sub(project_id, ":", "_")
         File   sa_gff
         String product_assign
         String map_dir
@@ -623,8 +633,8 @@ task product_name {
   }
 
   output {
-    File gff = "~{project_id}_functional_annotation.gff"
-    File tsv = "~{project_id}_product_names.tsv"
+    File gff = "~{prefix}_functional_annotation.gff"
+    File tsv = "~{prefix}_product_names.tsv"
   }
 }
 

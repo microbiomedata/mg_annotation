@@ -25,13 +25,14 @@ task run {
         String transform_bin="/opt/omics/bin/structural_annotation/transform_crt_output.py"
         File   input_fasta
         String project_id
+        String prefix=sub(project_id, ":", "_")
         String container
     }
   command {
-    ~{jar} ~{input_fasta} ~{project_id}_crt.out
+    ~{jar} ~{input_fasta} ~{prefix}_crt.out
     set -uo pipefail  # java returns error code 1 even apon success so remove set -e
     tool_and_version=$(~{jar} -version | cut -d' ' -f1,6)
-    ~{transform_bin} ~{project_id}_crt.out "$tool_and_version"
+    ~{transform_bin} ~{prefix}_crt.out "$tool_and_version"
   }
 
   runtime {
@@ -41,9 +42,9 @@ task run {
   }
 
   output {
-    File crisprs = "${project_id}_crt.crisprs"
-    File gff = "${project_id}_crt.gff"
-    File crt_out = "${project_id}_crt.out"
+    File crisprs = "${prefix}_crt.crisprs"
+    File gff = "${prefix}_crt.gff"
+    File crt_out = "${prefix}_crt.out"
   }
 }
 

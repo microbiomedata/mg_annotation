@@ -159,6 +159,7 @@ task split{
 task merge_outputs {
   input{
     String  project_id
+    String prefix=sub(project_id, ":", "_")
     Array[File?] structural_gffs
     Array[File?] functional_gffs
     Array[File?] ko_tsvs
@@ -183,53 +184,53 @@ task merge_outputs {
     String container
     }
   command {
-     cat ${sep=" " structural_gffs} > "~{project_id}_structural_annotation.gff"
-     cat ${sep=" " functional_gffs} > "~{project_id}_functional_annotation.gff"
-     cat ${sep=" " ko_tsvs} >  "~{project_id}_ko.tsv"
-     cat ${sep=" " ec_tsvs} >  "~{project_id}_ec.tsv"
-     cat ${sep=" " phylo_tsvs} > "~{project_id}_gene_phylogeny.tsv"
-     cat ${sep=" " proteins} > "~{project_id}.faa"
-     cat ${sep=" " ko_ec_gffs} > "~{project_id}_ko_ec.gff"
-     cat ${sep=" " cog_gffs} > "~{project_id}_cog.gff"
-     cat ${sep=" " pfam_gffs} > "~{project_id}_pfam.gff"
-     cat ${sep=" " tigrfam_gffs} > "~{project_id}_tigrfam.gff"
-     cat ${sep=" " smart_gffs} > "~{project_id}_smart.gff"
-     cat ${sep=" " supfam_gffs} > "~{project_id}_supfam.gff"
-     cat ${sep=" " cath_funfam_gffs} > "~{project_id}_cath_funfam.gff"
+     cat ${sep=" " structural_gffs} > "~{prefix}_structural_annotation.gff"
+     cat ${sep=" " functional_gffs} > "~{prefix}_functional_annotation.gff"
+     cat ${sep=" " ko_tsvs} >  "~{prefix}_ko.tsv"
+     cat ${sep=" " ec_tsvs} >  "~{prefix}_ec.tsv"
+     cat ${sep=" " phylo_tsvs} > "~{prefix}_gene_phylogeny.tsv"
+     cat ${sep=" " proteins} > "~{prefix}.faa"
+     cat ${sep=" " ko_ec_gffs} > "~{prefix}_ko_ec.gff"
+     cat ${sep=" " cog_gffs} > "~{prefix}_cog.gff"
+     cat ${sep=" " pfam_gffs} > "~{prefix}_pfam.gff"
+     cat ${sep=" " tigrfam_gffs} > "~{prefix}_tigrfam.gff"
+     cat ${sep=" " smart_gffs} > "~{prefix}_smart.gff"
+     cat ${sep=" " supfam_gffs} > "~{prefix}_supfam.gff"
+     cat ${sep=" " cath_funfam_gffs} > "~{prefix}_cath_funfam.gff"
 
-     cat ${sep=" " cog_domtblouts} > "~{project_id}_proteins.cog.domtblout"
-     cat ${sep=" " pfam_domtblouts} > "~{project_id}_proteins.pfam.domtblout"
-     cat ${sep=" " tigrfam_domtblouts} > "~{project_id}_proteins.tigrfam.domtblout"
-     cat ${sep=" " smart_domtblouts} > "~{project_id}_proteins.smart.domtblout"
-     cat ${sep=" " supfam_domtblouts} > "~{project_id}_proteins.supfam.domtblout"
-     cat ${sep=" " cath_funfam_domtblouts} > "~{project_id}_proteins.cath_funfam.domtblout"
+     cat ${sep=" " cog_domtblouts} > "~{prefix}_proteins.cog.domtblout"
+     cat ${sep=" " pfam_domtblouts} > "~{prefix}_proteins.pfam.domtblout"
+     cat ${sep=" " tigrfam_domtblouts} > "~{prefix}_proteins.tigrfam.domtblout"
+     cat ${sep=" " smart_domtblouts} > "~{prefix}_proteins.smart.domtblout"
+     cat ${sep=" " supfam_domtblouts} > "~{prefix}_proteins.supfam.domtblout"
+     cat ${sep=" " cath_funfam_domtblouts} > "~{prefix}_proteins.cath_funfam.domtblout"
 
-     cat ${sep=" " product_name_tsvs} > "~{project_id}_product_names.tsv"
-     cat ${sep=" " crt_crisprs_s} > "~{project_id}_crt.crisprs"
+     cat ${sep=" " product_name_tsvs} > "~{prefix}_product_names.tsv"
+     cat ${sep=" " crt_crisprs_s} > "~{prefix}_crt.crisprs"
   }
   output {
-    File functional_gff = "~{project_id}_functional_annotation.gff"
-    File structural_gff = "~{project_id}_structural_annotation.gff"
-    File ko_tsv = "~{project_id}_ko.tsv"
-    File ec_tsv = "~{project_id}_ec.tsv"
-    File gene_phylogeny_tsv = "~{project_id}_gene_phylogeny.tsv"
-    File proteins_faa = "~{project_id}.faa"
-    File ko_ec_gff = "~{project_id}_ko_ec.gff"
-    File cog_gff = "~{project_id}_cog.gff"
-    File pfam_gff = "~{project_id}_pfam.gff"
-    File tigrfam_gff = "~{project_id}_tigrfam.gff"
-    File smart_gff = "~{project_id}_smart.gff"
-    File supfam_gff = "~{project_id}_supfam.gff"
-    File cath_funfam_gff = "~{project_id}_cath_funfam.gff"
+    File functional_gff = "~{prefix}_functional_annotation.gff"
+    File structural_gff = "~{prefix}_structural_annotation.gff"
+    File ko_tsv = "~{prefix}_ko.tsv"
+    File ec_tsv = "~{prefix}_ec.tsv"
+    File gene_phylogeny_tsv = "~{prefix}_gene_phylogeny.tsv"
+    File proteins_faa = "~{prefix}.faa"
+    File ko_ec_gff = "~{prefix}_ko_ec.gff"
+    File cog_gff = "~{prefix}_cog.gff"
+    File pfam_gff = "~{prefix}_pfam.gff"
+    File tigrfam_gff = "~{prefix}_tigrfam.gff"
+    File smart_gff = "~{prefix}_smart.gff"
+    File supfam_gff = "~{prefix}_supfam.gff"
+    File cath_funfam_gff = "~{prefix}_cath_funfam.gff"
 
-    File proteins_cog_domtblout = "~{project_id}_proteins.cog.domtblout"
-    File proteins_pfam_domtblout = "~{project_id}_proteins.pfam.domtblout"
-    File proteins_tigrfam_domtblout = "~{project_id}_proteins.tigrfam.domtblout"
-    File proteins_smart_domtblout = "~{project_id}_proteins.smart.domtblout"
-    File proteins_supfam_domtblout = "~{project_id}_proteins.supfam.domtblout"
-    File proteins_cath_funfam_domtblout = "~{project_id}_proteins.cath_funfam.domtblout"
-    File product_names_tsv = "~{project_id}_product_names.tsv"
-    File crt_crisprs = "~{project_id}_crt.crisprs"
+    File proteins_cog_domtblout = "~{prefix}_proteins.cog.domtblout"
+    File proteins_pfam_domtblout = "~{prefix}_proteins.pfam.domtblout"
+    File proteins_tigrfam_domtblout = "~{prefix}_proteins.tigrfam.domtblout"
+    File proteins_smart_domtblout = "~{prefix}_proteins.smart.domtblout"
+    File proteins_supfam_domtblout = "~{prefix}_proteins.supfam.domtblout"
+    File proteins_cath_funfam_domtblout = "~{prefix}_proteins.cath_funfam.domtblout"
+    File product_names_tsv = "~{prefix}_product_names.tsv"
+    File crt_crisprs = "~{prefix}_crt.crisprs"
   }
   runtime {
     memory: "2G"
@@ -249,7 +250,8 @@ task final_stats {
     String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
     File   input_fasta
     String project_id
-    String fna="~{project_id}_contigs.fna"
+    String prefix=sub(project_id, ":", "_")
+    String fna="~{prefix}_contigs.fna"
     File   structural_gff
     String container
   }
@@ -260,8 +262,8 @@ task final_stats {
   }
 
   output {
-    File tsv = "~{project_id}_structural_annotation_stats.tsv"
-    File json = "~{project_id}_structural_annotation_stats.json"
+    File tsv = "~{prefix}_structural_annotation_stats.tsv"
+    File json = "~{prefix}_structural_annotation_stats.json"
   }
 
   runtime {

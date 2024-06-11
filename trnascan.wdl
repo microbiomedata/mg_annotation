@@ -29,13 +29,14 @@ task trnascan_ba {
     input {
         File input_fasta
         String project_id
+        String prefix=sub(project_id, ":", "_")
         Int    threads
         String container
     }
   command <<<
      set -euo pipefail
-     cp ~{input_fasta} ./~{project_id}_contigs.fna
-     /opt/omics/bin/structural_annotation/trnascan-se_trnas.sh ~{project_id}_contigs.fna ~{threads}
+     cp ~{input_fasta} ./~{prefix}_contigs.fna
+     /opt/omics/bin/structural_annotation/trnascan-se_trnas.sh ~{prefix}_contigs.fna ~{threads}
   >>>
 
   runtime {
@@ -46,8 +47,8 @@ task trnascan_ba {
   }
 
   output {
-    File bacterial_out = "${project_id}_trnascan_bacterial.out"
-    File archaeal_out  = "${project_id}_trnascan_archaeal.out"
-    File gff = "${project_id}_trna.gff"
+    File bacterial_out = "${prefix}_trnascan_bacterial.out"
+    File archaeal_out  = "${prefix}_trnascan_archaeal.out"
+    File gff = "${prefix}_trna.gff"
   }
 }

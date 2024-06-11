@@ -50,6 +50,7 @@ task run_cds_prediction {
          File imgap_input_fasta
          String imgap_project_type
          String project_id
+         String prefix=sub(project_id, ":", "_")
          String container
          Int? imgap_structural_annotation_translation_table
          String bin
@@ -61,7 +62,7 @@ task run_cds_prediction {
    command <<<
        set -oeu pipefail
 
-       ln ~{imgap_input_fasta} ~{project_id}_contigs.fna || ln -s ~{imgap_input_fasta} ~{project_id}_contigs.fna
+       ln ~{imgap_input_fasta} ~{prefix}_contigs.fna || ln -s ~{imgap_input_fasta} ~{prefix}_contigs.fna
 
        if [[ "~{prodigal_execute}" = true ]] ; then
            export imgap_structural_annotation_prodigal_execute="True"
@@ -75,8 +76,8 @@ task run_cds_prediction {
        fi 
        #copy genemark license to the execution dir
        cp ~{gm_license} .
-       /usr/bin/time ~{bin}/cds_prediction.sh ~{project_id}_contigs.fna ~{imgap_project_type} ~{imgap_structural_annotation_translation_table} &> ~{project_id}_cds.log
-       rm ~{project_id}_contigs.fna
+       /usr/bin/time ~{bin}/cds_prediction.sh ~{prefix}_contigs.fna ~{imgap_project_type} ~{imgap_structural_annotation_translation_table} &> ~{prefix}_cds.log
+       rm ~{prefix}_contigs.fna
    >>>
    
 
@@ -87,15 +88,15 @@ task run_cds_prediction {
    }
   
   output { 
-    File genemark_proteins= "~{project_id}_genemark_proteins.faa"
-    File genemark_genes= "~{project_id}_genemark_genes.fna"
-    File genemark_gff= "~{project_id}_genemark.gff"
-    File prodigal_proteins= "~{project_id}_prodigal_proteins.faa"
-    File prodigal_genes = "~{project_id}_prodigal_genes.fna"
-    File prodigal_gff = "~{project_id}_prodigal.gff"
-    File  proteins= "~{project_id}_cds_proteins.faa"
-    File  genes= "~{project_id}_cds_genes.fna"
-    File  gff= "~{project_id}_cds.gff"
+    File genemark_proteins= "~{prefix}_genemark_proteins.faa"
+    File genemark_genes= "~{prefix}_genemark_genes.fna"
+    File genemark_gff= "~{prefix}_genemark.gff"
+    File prodigal_proteins= "~{prefix}_prodigal_proteins.faa"
+    File prodigal_genes = "~{prefix}_prodigal_genes.fna"
+    File prodigal_gff = "~{prefix}_prodigal.gff"
+    File  proteins= "~{prefix}_cds_proteins.faa"
+    File  genes= "~{prefix}_cds_genes.fna"
+    File  gff= "~{prefix}_cds.gff"
   }
 
 }
