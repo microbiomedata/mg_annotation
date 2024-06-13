@@ -37,6 +37,7 @@ task run {
   File   input_fasta
   String cm
   String project_id
+  String prefix = sub(project_id, ":", "_")
   String cmzscore
   String claninfo_tsv
   String feature_lookup_tsv
@@ -46,16 +47,16 @@ task run {
 
   command <<<
     set -euo pipefail
-    ${bin} --notextw --cut_tc --cpu ${threads} -Z ${cmzscore} --tblout ${project_id}_rfam.tbl ${cm} ${input_fasta}
+    ${bin} --notextw --cut_tc --cpu ${threads} -Z ${cmzscore} --tblout ${prefix}_rfam.tbl ${cm} ${input_fasta}
     tool_and_version=$(${bin} -h | grep INFERNAL | perl -pne 's/^.*INFERNAL/INFERNAL/' )
-    if [ $(grep -c -v \# ${project_id}_rfam.tbl) -eq 0 ] ; then
-        touch ${project_id}_rfam.gff
+    if [ $(grep -c -v \# ${prefix}_rfam.tbl) -eq 0 ] ; then
+        touch ${prefix}_rfam.gff
     else
-        grep -v '^#' ${project_id}_rfam.tbl | \
+        grep -v '^#' ${prefix}_rfam.tbl | \
             awk '$17 == "!" {print $1,$3,$4,$6,$7,$8,$9,$10,$11,$15,$16}' | \
             sort -k1,1 -k10,10nr -k11,11n | \
             ${clan_filter_bin} "$tool_and_version" \
-            ${claninfo_tsv} ${feature_lookup_tsv} > ${project_id}_rfam.gff
+            ${claninfo_tsv} ${feature_lookup_tsv} > ${prefix}_rfam.gff
     fi
  
   #get database version
@@ -70,8 +71,8 @@ task run {
   }
 
   output {
-    File tbl = "${project_id}_rfam.tbl"
-    File rfam_gff = "${project_id}_rfam.gff"
+    File tbl = "${prefix}_rfam.tbl"
+    File rfam_gff = "${prefix}_rfam.gff"
     String rfam_ver = read_string(rfam_version_file)
   }
 }

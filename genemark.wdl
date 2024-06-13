@@ -45,14 +45,15 @@ task gm_isolate {
   String bin="/opt/omics/bin/gms2.pl"
   File   input_fasta
   String project_id
+  String prefix = sub(project_id, ":", "_")
   String container
 
   command {
     set -euo pipefail
     ${bin} --seq ${input_fasta} --genome-type auto \
-           --output ${project_id}_genemark.gff --format gff \
-           --fnn ${project_id}_genemark_genes.fna \
-           --faa ${project_id}_genemark_proteins.faa
+           --output ${prefix}_genemark.gff --format gff \
+           --fnn ${prefix}_genemark_genes.fna \
+           --faa ${prefix}_genemark_proteins.faa
   }
 
   runtime {
@@ -62,9 +63,9 @@ task gm_isolate {
   }
 
   output {
-    File gff = "${project_id}_genemark.gff"
-    File genes = "${project_id}_genemark_genes.fna"
-    File proteins = "${project_id}_genemark_proteins.faa"
+    File gff = "${prefix}_genemark.gff"
+    File genes = "${prefix}_genemark_genes.fna"
+    File proteins = "${prefix}_genemark_proteins.faa"
   }
 }
 
@@ -75,14 +76,15 @@ task gm_meta {
   String model="/opt/omics/programs/gms2_linux_64/mgm_11.mod"
   File   input_fasta
   String project_id
+  String prefix = sub(project_id, ":", "_")
   String container
 
   command {
     set -euo pipefail
     ${bin} --Meta ${model} --incomplete_at_gaps 30 \
-           -o ${project_id}_genemark.gff \
-           --format gff --NT ${project_id}_genemark_genes.fna \
-           --AA ${project_id}_genemark_proteins.faa --seq ${input_fasta}
+           -o ${prefix}_genemark.gff \
+           --format gff --NT ${prefix}_genemark_genes.fna \
+           --AA ${prefix}_genemark_proteins.faa --seq ${input_fasta}
   }
 
   runtime {
@@ -92,9 +94,9 @@ task gm_meta {
   }
 
   output {
-    File gff = "${project_id}_genemark.gff"
-    File genes = "${project_id}_genemark_genes.fna"
-    File proteins = "${project_id}_genemark_proteins.faa"
+    File gff = "${prefix}_genemark.gff"
+    File genes = "${prefix}_genemark_genes.fna"
+    File proteins = "${prefix}_genemark_proteins.faa"
   }
 }
 
@@ -107,6 +109,7 @@ task clean_and_unify {
   File?  meta_gff
   String unify_bin="/opt/omics/bin/structural_annotation/unify_gene_ids.py"
   String project_id
+  String prefix = sub(project_id, ":", "_")
   String container
   
   command {
@@ -130,9 +133,9 @@ task clean_and_unify {
   }
 
   output {
-    File gff = "${project_id}_genemark.gff"
-    File genes = "${project_id}_genemark_genes.fna"
-    File proteins = "${project_id}_genemark_proteins.faa"
+    File gff = "${prefix}_genemark.gff"
+    File genes = "${prefix}_genemark_genes.fna"
+    File proteins = "${prefix}_genemark_proteins.faa"
   }
 }
 

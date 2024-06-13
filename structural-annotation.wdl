@@ -21,6 +21,9 @@ workflow s_annotate {
   String  database_location
   String  container
   String? gm_license
+  String pre_qc_container = "microbiomedata/mg-annotation:0.1.2"
+
+
 
   if(pre_qc_execute) {
     call pre_qc {
@@ -31,6 +34,7 @@ workflow s_annotate {
         container=container
     }
   }
+
   if(trnascan_se_execute) {
     call trnascan.trnascan {
       input:
@@ -83,7 +87,7 @@ workflow s_annotate {
         project_id = imgap_project_id,
         rfam_gff = rfam.rfam_gff,
         trna_gff = trnascan.gff,
-        crt_gff = crt.gff, 
+        crt_gff = crt.gff,
         cds_gff = cds_prediction.gff,
         prodigal_execute = prodigal_execute,
         genemark_execute = genemark_execute,
@@ -123,13 +127,13 @@ workflow s_annotate {
     }
   }
   output {
-    File  gff = gff_merge.final_gff 
+    File  gff = gff_merge.final_gff
     File? crt_gff = crt.gff
-    File? crisprs = crt.crisprs 
+    File? crisprs = crt.crisprs
     File? crt_out = crt.crt_out
     File? genemark_gff = cds_prediction.genemark_gff
     File? genemark_genes = cds_prediction.genemark_genes
-    File? genemark_proteins = cds_prediction.genemark_proteins 
+    File? genemark_proteins = cds_prediction.genemark_proteins
     File? prodigal_gff = cds_prediction.prodigal_gff
     File? prodigal_genes = cds_prediction.prodigal_genes
     File? prodigal_proteins = cds_prediction.prodigal_proteins
@@ -144,6 +148,7 @@ workflow s_annotate {
     String? rfam_version = rfam.rfam_version
     File? proteins = fasta_merge.final_proteins
     File? genes = fasta_merge.final_genes
+    # File? map_file = pre_qc.map_file
   }
 }
 
@@ -152,7 +157,8 @@ task pre_qc {
   String project_type
   File   input_fasta
   String project_id
-  String rename = "yes"
+  String prefix = sub(project_id, ":", "_")
+  String rename = "no"
   Float  n_ratio_cutoff = 0.5
   Int    seqs_per_million_bp_cutoff = 500
   Int    min_seq_length = 150
@@ -161,7 +167,7 @@ task pre_qc {
   command <<<
     set -euo pipefail
     tmp_fasta="${input_fasta}.tmp"
-    qced_fasta="${project_id}_contigs.fna"
+    qced_fasta="${prefix}_contigs.fna"
     grep -v '^\s*$' ${input_fasta} | tr -d '\r' | \
     sed 's/^>[[:blank:]]*/>/g' > $tmp_fasta
     acgt_count=`grep -v '^>' $tmp_fasta | grep -o [acgtACGT] | wc -l`
@@ -192,11 +198,9 @@ task pre_qc {
     fi
 
     fasta_sanity_cmd="${bin} $tmp_fasta $qced_fasta"
-    if [[ ${rename} == "yes" ]]
-    then
-        fasta_sanity_cmd="$fasta_sanity_cmd -p ${project_id}"
-    fi
+    
     fasta_sanity_cmd="$fasta_sanity_cmd -l ${min_seq_length}"
+    ${bin} -v
     $fasta_sanity_cmd
     rm $tmp_fasta
   >>>
@@ -206,9 +210,11 @@ task pre_qc {
     memory: "86G"
     docker: container
   }
-    
+
   output {
-    File fasta = "${project_id}_contigs.fna"
+    File fasta = "${prefix}_contigs.fna"
+    File? map_file = "${prefix}_contig_names_mapping.tsv"
+    File  out_log = stdout()
   }
 }
 
@@ -217,11 +223,12 @@ task gff_merge {
   String bin="/opt/omics/bin/structural_annotation/gff_files_merger.py"
   File   input_fasta
   String project_id
+  String prefix = sub(project_id, ":", "_")
   File?  rrna_gff
   File?  trna_gff
   File?  rfam_gff
   File?  crt_gff
-  File?  cds_gff 
+  File?  cds_gff
   Boolean prodigal_execute
   Boolean genemark_execute
   Boolean crt_execute
@@ -231,7 +238,7 @@ task gff_merge {
   command {
     set -euo pipefail
     # set cromwell booleans as bash variables
-    prodigal_execute=${prodigal_execute}  
+    prodigal_execute=${prodigal_execute}
     genemark_execute=${genemark_execute}
     crt_execute=${crt_execute}
     rfam_execute=${rfam_execute}
@@ -249,7 +256,7 @@ task gff_merge {
     fi
 
     if [[ ("$prodigal_execute" = true || "$genemark_execute" = true) ]] && [[ "$crt_execute" = true ]] ; then
-       merger_args="$merger_args --log_file ${project_id}_gff_merge.log"
+       merger_args="$merger_args --log_file ${prefix}_gff_merge.log"
     fi
 
     if [[ "$rfam_execute" = true ]] ; then
@@ -261,7 +268,7 @@ task gff_merge {
     fi
 
     #excute gff_files_merger.py
-    ${bin} $merger_args 1> ${project_id}_structural_annotation.gff
+    ${bin} $merger_args 1> ${prefix}_structural_annotation.gff
 
 
   }
@@ -273,7 +280,7 @@ task gff_merge {
   }
 
   output {
-    File final_gff = "${project_id}_structural_annotation.gff"
+    File final_gff = "${prefix}_structural_annotation.gff"
   }
 }
 
@@ -281,6 +288,7 @@ task fasta_merge {
 
   String bin="/opt/omics/bin/structural_annotation/finalize_fasta_files.py"
   String project_id
+  String prefix = sub(project_id, ":", "_")
   File   final_gff
   File cds_genes
   File cds_proteins
@@ -301,10 +309,10 @@ task fasta_merge {
     memory: "40G"
     docker: container
   }
-    
+ 
   output {
-    File final_genes = "${project_id}_genes.fna"
-    File final_proteins = "${project_id}_proteins.faa"
+    File final_genes = "${prefix}_genes.fna"
+    File final_proteins = "${prefix}_proteins.faa"
   }
 }
 
@@ -313,6 +321,7 @@ task gff_and_fasta_stats {
   String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
   File   input_fasta
   String project_id
+  String prefix = sub(project_id, ":", "_")
   File   final_gff
   String container
 
@@ -325,7 +334,7 @@ task gff_and_fasta_stats {
     memory: "86G"
     docker: container
   }
-    
+
 }
 
 task post_qc {
@@ -333,10 +342,11 @@ task post_qc {
   String qc_bin="/opt/omics/bin/qc/post-annotation/genome_structural_annotation_sanity.py"
   File   input_fasta
   String project_id
+  String prefix = sub(project_id, ":", "_")
   String container
 
   command {
-    ${qc_bin} ${input_fasta} "${project_id}_structural_annotation.gff"
+    ${qc_bin} ${input_fasta} "${prefix}_structural_annotation.gff"
   }
 
   runtime {
@@ -344,8 +354,8 @@ task post_qc {
     memory: "86G"
     docker: container
   }
-    
+ 
   output {
-    File out = "${project_id}_structural_annotation.gff"
+    File out = "${prefix}_structural_annotation.gff"
   }
 }

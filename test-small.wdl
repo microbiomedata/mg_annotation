@@ -34,14 +34,15 @@ workflow test_small {
 task prepare {
    String container
    String proj
+   String prefix = sub(proj, ":", "_")
    String url
 
    command{
-       wget ${url}/${proj}_contigs.fna
+       wget ${url}/${prefix}_contigs.fna
    }
 
    output{
-      File fasta = "${proj}_contigs.fna"
+      File fasta = "${prefix}_contigs.fna"
    }
    runtime {
      memory: "1G"
@@ -58,11 +59,12 @@ task validate {
    File   struct_gff
    String url
    String proj
+   String prefix = sub(proj, ":", "_")
 
    command{
        set -e
-       wget ${url}/${proj}_functional_annotation.gff
-       wget ${url}/${proj}_structural_annotation.gff
+       wget ${url}/${prefix}_functional_annotation.gff
+       wget ${url}/${prefix}_structural_annotation.gff
        validate.sh ${func_gff}
        validate.sh ${struct_gff}
    }
