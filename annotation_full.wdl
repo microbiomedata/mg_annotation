@@ -10,7 +10,7 @@ workflow annotation {
   String?  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
-  String  finish_ano_container = "microbiomedata/workflowmeta:1.1.1"
+  # String  finish_ano_container = "microbiomedata/workflowmeta:1.1.1"
 
   # structural annotation
   Boolean sa_execute=true
@@ -19,7 +19,7 @@ workflow annotation {
   Boolean fa_execute=true
 
   # generate mapping file
-  String map_container = "microbiomedata/mg-annotation:0.1.2"
+  # String map_container = "microbiomedata/mg-annotation:0.1.2"
 
  call stage {
       input: container=container,
@@ -117,7 +117,6 @@ workflow annotation {
        container=container,
        sa_execute = sa_execute,
        fa_execute = fa_execute,
-       map_container = container,
        map_execute = make_map_file.map_execute,
        map_info = make_map_file.out_log,
        structural_gff  = merge_outputs.structural_gff,
@@ -484,7 +483,6 @@ task merge_outputs {
 task make_info_file {
   String container
   String imgap_version
-  String map_container
   Boolean map_execute
   File map_info
   Boolean fa_execute
@@ -521,7 +519,7 @@ task make_info_file {
      if [[ "${map_execute}" = true ]]
        then
        map_version=`grep "fasta_sanity.py" ${map_info}`
-       map_version="Mapping Programs Used: $map_version in ${map_container}"
+       map_version="Mapping Programs Used: $map_version"
        echo $map_version >> ${prefix}_imgap.info
      fi
      #get structual annotation versions
