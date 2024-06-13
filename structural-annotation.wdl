@@ -31,7 +31,7 @@ workflow s_annotate {
         project_type = imgap_project_type,
         input_fasta = imgap_input_fasta,
         project_id = imgap_project_id,
-        container=pre_qc_container
+        container=container
     }
   }
 

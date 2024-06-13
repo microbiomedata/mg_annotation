@@ -29,7 +29,7 @@ workflow annotation {
   call make_map_file {
        input: proj_id = proj,
               input_file = stage.imgap_input_fasta,
-              container = map_container
+              container = container
   }
 
   call split {
@@ -117,7 +117,7 @@ workflow annotation {
        container=container,
        sa_execute = sa_execute,
        fa_execute = fa_execute,
-       map_container = map_container,
+       map_container = container,
        map_execute = make_map_file.map_execute,
        map_info = make_map_file.out_log,
        structural_gff  = merge_outputs.structural_gff,
@@ -149,7 +149,7 @@ workflow annotation {
 # confused what to use for orig prefix
   call finish_ano {
     input:
-      container=finish_ano_container,
+      container=container,
       input_file=make_map_file.out_fasta,
       proj=proj,
       start=stage.start,
@@ -244,8 +244,7 @@ task stage {
        if [ $( echo ${input_file}|egrep -c "https*:") -gt 0 ] ; then
            wget ${input_file} -O ${target}
        else
-           set +o pipefail
-           ln ${input_file} ${target} || cp ${input_file} ${target}
+           ln ${input_file} ${target} || ln -s ${input_file} ${target}
        fi
        # Capture the start time
        date --iso-8601=seconds > start.txt
@@ -687,12 +686,12 @@ task finish_ano {
        cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
        cat ${stats_json} | sed ${sed} > ${prefix}_stats.json
 
-       ln ${ano_info_file} ${prefix}_imgap.info
+       ln ${ano_info_file} ${prefix}_imgap.info || ln -s ${ano_info_file} ${prefix}_imgap.info 
 
        if [[ "${map_execute}" = true ]]
         then
-        ln ${map_file} ${prefix}_contig_names_mapping.tsv
-        ln ${renamed_fasta} ${prefix}_contigs.fna
+        ln ${map_file} ${prefix}_contig_names_mapping.tsv || ln -s ${map_file} ${prefix}_contig_names_mapping.tsv
+        ln ${renamed_fasta} ${prefix}_contigs.fna || ln -s ${renamed_fasta} ${prefix}_contigs.fna
        fi
   >>>
 

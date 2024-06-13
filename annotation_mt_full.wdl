@@ -255,7 +255,7 @@ task final_stats {
 
   command {
     set -euo pipefail
-    ln ${input_fasta} ${fna}
+    ln ${input_fasta} ${fna} || ln -s ${input_fasta} ${fna}
     ${bin} ${fna} ${structural_gff}
   }
 
