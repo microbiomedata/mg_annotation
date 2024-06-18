@@ -64,7 +64,7 @@ task fasta_len {
         File input_fasta
     }
   command {
-    grep -v '^>' ${input_fasta} | wc -m
+    grep -v '^>' ~{input_fasta} | wc -m
   }
 
   runtime {
@@ -84,15 +84,15 @@ task iso_big {
         Int?   translation_table = 11
         String project_id
         String prefix=sub(project_id, ":", "_")
-        File   train = "${prefix}_prodigal.trn"
+        File   train = "~{prefix}_prodigal.trn"
         String container
     }
   command {
     set -euo pipefail
-    ${bin} -i ${input_fasta} -t ${train} -g ${translation_table} -q
-    ${bin} -f gff -g ${translation_table} -p single -m -i ${input_fasta} \
-    -t ${train} -o ${prefix}_prodigal.gff \
-    -d ${prefix}_prodigal_genes.fna -a ${prefix}_prodigal_proteins.faa
+    ~{bin} -i ~{input_fasta} -t ~{train} -g ~{translation_table} -q
+    ~{bin} -f gff -g ~{translation_table} -p single -m -i ~{input_fasta} \
+    -t ~{train} -o ~{prefix}_prodigal.gff \
+    -d ~{prefix}_prodigal_genes.fna -a ~{prefix}_prodigal_proteins.faa
   }
 
   runtime {
@@ -102,9 +102,9 @@ task iso_big {
   }
 
   output {
-    File gff = "${prefix}_prodigal.gff"
-    File genes = "${prefix}_prodigal_genes.fna"
-    File proteins = "${prefix}_prodigal_proteins.faa"
+    File gff = "~{prefix}_prodigal.gff"
+    File genes = "~{prefix}_prodigal_genes.fna"
+    File proteins = "~{prefix}_prodigal_proteins.faa"
   }
 }
 
@@ -117,9 +117,9 @@ task iso_small {
         String container
     }
   command {
-    ${bin} -f gff -p meta -m -i ${input_fasta} \
-    -o ${prefix}_prodigal.gff -d ${prefix}_prodigal_genes.fna \
-    -a ${prefix}_prodigal_proteins.faa
+    ~{bin} -f gff -p meta -m -i ~{input_fasta} \
+    -o ~{prefix}_prodigal.gff -d ~{prefix}_prodigal_genes.fna \
+    -a ~{prefix}_prodigal_proteins.faa
   }
 
   runtime {
@@ -129,9 +129,9 @@ task iso_small {
   }
 
   output {
-    File gff = "${prefix}_prodigal.gff"
-    File genes = "${prefix}_prodigal_genes.fna"
-    File proteins = "${prefix}_prodigal_proteins.faa"
+    File gff = "~{prefix}_prodigal.gff"
+    File genes = "~{prefix}_prodigal_genes.fna"
+    File proteins = "~{prefix}_prodigal_proteins.faa"
   }
 }
 
@@ -144,11 +144,12 @@ task metag {
         String container
     }
 
-  command {
-    ${bin} -f gff -p meta -m -i ${input_fasta} \
-    -o ${prefix}_prodigal.gff -d ${prefix}_prodigal_genes.fna \
-    -a ${prefix}_prodigal_proteins.faa
-  }
+  command <<<
+    set -eou pipefail
+    ~{bin} -f gff -p meta -m -i ~{input_fasta} \
+    -o ~{prefix}_prodigal.gff -d ~{prefix}_prodigal_genes.fna \
+    -a ~{prefix}_prodigal_proteins.faa
+  >>>
 
   runtime {
     time: "1:00:00"
@@ -157,9 +158,9 @@ task metag {
   }
 
   output {
-    File gff = "${prefix}_prodigal.gff"
-    File genes = "${prefix}_prodigal_genes.fna"
-    File proteins = "${prefix}_prodigal_proteins.faa"
+    File gff = "~{prefix}_prodigal.gff"
+    File genes = "~{prefix}_prodigal_genes.fna"
+    File proteins = "~{prefix}_prodigal_proteins.faa"
   }
 }
 
@@ -179,22 +180,23 @@ task clean_and_unify {
         String prefix=sub(project_id, ":", "_")
         String container
     }
-  command {
-    sed -i 's/\*$//g' ${iso_big_proteins_fasta} ${iso_small_proteins_fasta} ${meta_proteins_fasta}
-    sed -i 's/\*/X/g' ${iso_big_proteins_fasta} ${iso_small_proteins_fasta} ${meta_proteins_fasta}
-    ${unify_bin} ${iso_big_gff} ${iso_small_gff} ${meta_gff} \
-                 ${iso_big_genes_fasta} ${iso_small_genes_fasta} ${meta_genes_fasta} \
-                 ${iso_big_proteins_fasta} ${iso_small_proteins_fasta} ${meta_proteins_fasta}
-    mv ${iso_big_proteins_fasta} . 2> /dev/null
-    mv ${iso_small_proteins_fasta} . 2> /dev/null
-    mv ${meta_proteins_fasta} . 2> /dev/null
-    mv ${iso_big_genes_fasta} . 2> /dev/null
-    mv ${iso_small_genes_fasta} . 2> /dev/null
-    mv ${meta_genes_fasta} . 2> /dev/null
-    mv ${iso_big_gff} . 2> /dev/null
-    mv ${iso_small_gff} . 2> /dev/null
-    mv ${meta_gff} . 2> /dev/null
-  }
+  command <<<
+    set -eou pipefail
+    sed -i 's/\*$//g' ~{iso_big_proteins_fasta} ~{iso_small_proteins_fasta} ~{meta_proteins_fasta}
+    sed -i 's/\*/X/g' ~{iso_big_proteins_fasta} ~{iso_small_proteins_fasta} ~{meta_proteins_fasta}
+    ~{unify_bin} ~{iso_big_gff} ~{iso_small_gff} ~{meta_gff} \
+                 ~{iso_big_genes_fasta} ~{iso_small_genes_fasta} ~{meta_genes_fasta} \
+                 ~{iso_big_proteins_fasta} ~{iso_small_proteins_fasta} ~{meta_proteins_fasta}
+    mv ~{iso_big_proteins_fasta} . 2> /dev/null
+    mv ~{iso_small_proteins_fasta} . 2> /dev/null
+    mv ~{meta_proteins_fasta} . 2> /dev/null
+    mv ~{iso_big_genes_fasta} . 2> /dev/null
+    mv ~{iso_small_genes_fasta} . 2> /dev/null
+    mv ~{meta_genes_fasta} . 2> /dev/null
+    mv ~{iso_big_gff} . 2> /dev/null
+    mv ~{iso_small_gff} . 2> /dev/null
+    mv ~{meta_gff} . 2> /dev/null
+  >>>
 
   runtime {
     time: "1:00:00"
@@ -203,9 +205,9 @@ task clean_and_unify {
   }
 
   output {
-    File gff = "${prefix}_prodigal.gff"
-    File genes = "${prefix}_prodigal_genes.fna"
-    File proteins = "${prefix}_prodigal_proteins.faa"
+    File gff = "~{prefix}_prodigal.gff"
+    File genes = "~{prefix}_prodigal_genes.fna"
+    File proteins = "~{prefix}_prodigal_proteins.faa"
   }
 }
 

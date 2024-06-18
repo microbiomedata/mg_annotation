@@ -6,9 +6,9 @@ workflow rfam {
         String imgap_project_id
         Int    additional_threads
         String database_location="/refdata/img/"
-        String cm="${database_location}"+"Rfam/13.0/Rfam.cm"
-        String claninfo_tsv="${database_location}"+"Rfam/13.0/Rfam.claninfo"
-        String feature_lookup_tsv="${database_location}"+"Rfam/13.0/Rfam_feature_lookup.tsv"
+        String cm="~{database_location}"+"Rfam/13.0/Rfam.cm"
+        String claninfo_tsv="~{database_location}"+"Rfam/13.0/Rfam.claninfo"
+        String feature_lookup_tsv="~{database_location}"+"Rfam/13.0/Rfam_feature_lookup.tsv"
         String container
     }
 
@@ -72,8 +72,8 @@ task run {
   }
 
   output {
-    File tbl = "${prefix}_rfam.tbl"
-    File rfam_gff = "${prefix}_rfam.gff"
+    File tbl = "~{prefix}_rfam.tbl"
+    File rfam_gff = "~{prefix}_rfam.gff"
     String rfam_ver = read_string(rfam_version_file)
   }
 }

@@ -216,7 +216,7 @@ task ko_ec {
         String lastal_version_file = "lastal_version.txt"
         String img_nr_db_version_file = "img_db_version.txt"
     }
-  command {
+  command <<<
     set -euo pipefail
     ~{lastal} -f blasttab+ -P ~{threads} ~{nr_db} ~{input_fasta} 1> ~{prefix}_proteins.img_nr.last.blasttab
     ~{selector} -l ~{aln_length_ratio} -m ~{min_ko_hits} -n ~{top_hits} \
@@ -231,7 +231,7 @@ task ko_ec {
    echo $lastal_version > ~{lastal_version_file}
    img_nr_db_version="IMG-NR $(basename $(realpath $(dirname ~{nr_db})))"
    echo $img_nr_db_version  > ~{img_nr_db_version_file}
-  }
+  >>>
 
   runtime {
     time: "1:00:00"
@@ -341,7 +341,7 @@ task cog {
 
   output {
     File gff = "~{prefix}_cog.gff"
-    File domtblout = "`{prefix}_proteins.cog.domtblout"
+    File domtblout = "~{prefix}_proteins.cog.domtblout"
     String hmmsearch_cog_ver = read_string(hmmsearch_version_file)
     String cog_db_ver = read_string(cog_db_version_file)
   }
@@ -616,7 +616,7 @@ task product_name {
         #  File  tmhmm_gff
         String container
     }
-  command {
+  command <<<
     set -euo pipefail
     ~{product_assign} ~{"-k " + ko_ec_gff} ~{"-s " + smart_gff} ~{"-c " + cog_gff} \
                       ~{"-t " + tigrfam_gff} ~{"-u " + supfam_gff} ~{"-p " + pfam_gff} \
@@ -624,7 +624,7 @@ task product_name {
                       ~{map_dir} ~{sa_gff}
     mv ../inputs/*/*.gff .
     mv ../inputs/*/*.tsv .
-  }
+  >>>
 
   runtime {
     time: "1:00:00"

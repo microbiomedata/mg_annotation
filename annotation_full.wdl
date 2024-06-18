@@ -228,11 +228,11 @@ task stage {
     }
 
    command <<<
-       set -e
+       set -eou pipefail
        if [ $( echo ~{input_file}|egrep -c "https*:") -gt 0 ] ; then
-           wget ~{input_file} -O ${target}
+           wget ~{input_file} -O ~{target}
        else
-           ln ~{input_file} ${target} || cp ~{input_file} ~{target}
+           ln ~{input_file} ~{target} || ln -s ~{input_file} ~{target}
        fi
        # Capture the start time
        date --iso-8601=seconds > start.txt
@@ -240,7 +240,7 @@ task stage {
    >>>
 
    output{
-      File imgap_input_fasta = "${target}"
+      File imgap_input_fasta = "~{target}"
       String start = read_string("start.txt")
    }
    runtime {
@@ -261,13 +261,13 @@ task split {
        String imgap_version_file="imgap_version.txt"
    }
 
-   command{
+   command <<<
      set -euo pipefail
-     /opt/omics/bin/split.py ${infile} ~{blocksize} .
+     /opt/omics/bin/split.py ~{infile} ~{blocksize} .
      echo $(egrep -v "^>" ~{infile} | tr -d '\n' | wc -m) / 500 | bc > ~{zfile}
      echo "scale=6; ($(grep -v '^>' ~{infile} | tr -d '\n' | wc -m) * 2) / 1000000" | bc -l > ~{cmzfile}
      cat /opt/omics/VERSION > ~{imgap_version_file}
-   }
+   >>>
 
    output{
      Array[File] files = read_lines('splits_out.fof')
@@ -334,7 +334,7 @@ task merge_outputs {
  
 
   command <<<
-
+    set -eou pipefail
      #combine files
      cat ~{sep=" " structural_gffs} > "~{prefix}_structural_annotation.gff"
      cat ~{sep=" " functional_gffs} > "~{prefix}_functional_annotation.gff"
@@ -379,46 +379,46 @@ task merge_outputs {
 
   >>>
   output {
-    File functional_gff = "${prefix}_functional_annotation.gff"
-    File structural_gff = "${prefix}_structural_annotation.gff"
-    File ko_tsv = "${prefix}_ko.tsv"
-    File ec_tsv = "${prefix}_ec.tsv"
-    File gene_phylogeny_tsv = "${prefix}_gene_phylogeny.tsv"
-    File last_blasttab = "${prefix}_proteins.img_nr.last.blasttab"
-    File lineage_tsv = "${prefix}.contigLin.assembled.tsv"
-    File proteins_faa = "${prefix}_proteins.faa"
-    File genes_fna = "${prefix}_genes.fna"
-    File ko_ec_gff = "${prefix}_ko_ec.gff"
-    File cog_gff = "${prefix}_cog.gff"
-    File pfam_gff = "${prefix}_pfam.gff"
-    File tigrfam_gff = "${prefix}_tigrfam.gff"
-    File smart_gff = "${prefix}_smart.gff"
-    File supfam_gff = "${prefix}_supfam.gff"
-    File cath_funfam_gff = "${prefix}_cath_funfam.gff"
-    File crt_gff = "${prefix}_crt.gff"
-    File genemark_gff = "${prefix}_genemark.gff"
-    File genemark_gene = "${prefix}_genemark_genes.fna"
-    File genemark_protein = "${prefix}_genemark_proteins.faa"
-    File prodigal_gff = "${prefix}_prodigal.gff"
-    File prodigal_gene = "${prefix}_prodigal_genes.fna"
-    File prodigal_protein = "${prefix}_prodigal_proteins.faa"
-    File cds_gff = "${prefix}_cds.gff"
-    File cds_gene = "${prefix}_cds_genes.fna"
-    File cds_protein = "${prefix}_cds_proteins.faa"
-    File trna_gff = "${prefix}_trna.gff"
-    File trna_bacterial_out = "${prefix}_trnascan_bacterial.out"
-    File trna_archaeal_out = "${prefix}_trnascan_archaeal.out"
-    File rfam_gff = "${prefix}_rfam.gff"
-    File rfam_tbl = "${prefix}_rfam.tbl"
-    File proteins_cog_domtblout = "${prefix}_proteins.cog.domtblout"
-    File proteins_pfam_domtblout = "${prefix}_proteins.pfam.domtblout"
-    File proteins_tigrfam_domtblout = "${prefix}_proteins.tigrfam.domtblout"
-    File proteins_smart_domtblout = "${prefix}_proteins.smart.domtblout"
-    File proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
-    File proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
-    File product_names_tsv = "${prefix}_product_names.tsv"
-    File crt_crisprs = "${prefix}_crt.crisprs"
-    File crt_out = "${prefix}_crt.out"
+    File functional_gff = "~{prefix}_functional_annotation.gff"
+    File structural_gff = "~{prefix}_structural_annotation.gff"
+    File ko_tsv = "~{prefix}_ko.tsv"
+    File ec_tsv = "~{prefix}_ec.tsv"
+    File gene_phylogeny_tsv = "~{prefix}_gene_phylogeny.tsv"
+    File last_blasttab = "~{prefix}_proteins.img_nr.last.blasttab"
+    File lineage_tsv = "~{prefix}.contigLin.assembled.tsv"
+    File proteins_faa = "~{prefix}_proteins.faa"
+    File genes_fna = "~{prefix}_genes.fna"
+    File ko_ec_gff = "~{prefix}_ko_ec.gff"
+    File cog_gff = "~{prefix}_cog.gff"
+    File pfam_gff = "~{prefix}_pfam.gff"
+    File tigrfam_gff = "~{prefix}_tigrfam.gff"
+    File smart_gff = "~{prefix}_smart.gff"
+    File supfam_gff = "~{prefix}_supfam.gff"
+    File cath_funfam_gff = "~{prefix}_cath_funfam.gff"
+    File crt_gff = "~{prefix}_crt.gff"
+    File genemark_gff = "~{prefix}_genemark.gff"
+    File genemark_gene = "~{prefix}_genemark_genes.fna"
+    File genemark_protein = "~{prefix}_genemark_proteins.faa"
+    File prodigal_gff = "~{prefix}_prodigal.gff"
+    File prodigal_gene = "~{prefix}_prodigal_genes.fna"
+    File prodigal_protein = "~{prefix}_prodigal_proteins.faa"
+    File cds_gff = "~{prefix}_cds.gff"
+    File cds_gene = "~{prefix}_cds_genes.fna"
+    File cds_protein = "~{prefix}_cds_proteins.faa"
+    File trna_gff = "~{prefix}_trna.gff"
+    File trna_bacterial_out = "~{prefix}_trnascan_bacterial.out"
+    File trna_archaeal_out = "~{prefix}_trnascan_archaeal.out"
+    File rfam_gff = "~{prefix}_rfam.gff"
+    File rfam_tbl = "~{prefix}_rfam.tbl"
+    File proteins_cog_domtblout = "~{prefix}_proteins.cog.domtblout"
+    File proteins_pfam_domtblout = "~{prefix}_proteins.pfam.domtblout"
+    File proteins_tigrfam_domtblout = "~{prefix}_proteins.tigrfam.domtblout"
+    File proteins_smart_domtblout = "~{prefix}_proteins.smart.domtblout"
+    File proteins_supfam_domtblout = "~{prefix}_proteins.supfam.domtblout"
+    File proteins_cath_funfam_domtblout = "~{prefix}_proteins.cath_funfam.domtblout"
+    File product_names_tsv = "~{prefix}_product_names.tsv"
+    File crt_crisprs = "~{prefix}_crt.crisprs"
+    File crt_out = "~{prefix}_crt.out"
   }
   runtime {
     memory: "2G"
@@ -520,7 +520,7 @@ task make_info_file {
   >>>
 
   output {
-    File imgap_info = "${prefix}_imgap.info"
+    File imgap_info = "~{prefix}_imgap.info"
   }
   runtime {
     memory: "2G"
@@ -538,20 +538,20 @@ task final_stats {
         File   input_fasta
         String project_id
         String prefix=sub(project_id, ":", "_")
-        String fna="${prefix}_contigs.fna"
+        String fna="~{prefix}_contigs.fna"
         File   structural_gff
         String container
     }
 
-  command {
+  command <<<
     set -euo pipefail
-    cp ~{input_fasta} ~{fna}
+    ln ~{input_fasta} ~{fna} || ln -s ~{input_fasta} ~{fna}
     ~{bin} ~{fna} ~{structural_gff}
-  }
+  >>>
 
   output {
-    File tsv = "${prefix}_structural_annotation_stats.tsv"
-    File json = "${prefix}_structural_annotation_stats.json"
+    File tsv = "~{prefix}_structural_annotation_stats.tsv"
+    File json = "~{prefix}_structural_annotation_stats.json"
   }
 
   runtime {
@@ -593,72 +593,72 @@ task finish_ano {
        File product_names_tsv
        File crt_crisprs
        String orig_prefix="scaffold"
-       String sed="s/${orig_prefix}_/${proj}_/g"
+       String sed="s/~{orig_prefix}_/~{proj}_/g"
     }
-   command{
+   command <<<
 
-      set -e
+      set -eou pipefail
       end=`date --iso-8601=seconds`
       #Generate annotation objects
 
-       cat ${proteins_faa} | sed ${sed} > ${prefix}_proteins.faa
-       cat ${structural_gff} | sed ${sed} > ${prefix}_structural_annotation.gff
-       cat ${functional_gff} | sed ${sed} > ${prefix}_functional_annotation.gff
-       cat ${ko_tsv} | sed ${sed} > ${prefix}_ko.tsv
-       cat ${ec_tsv} | sed ${sed} > ${prefix}_ec.tsv
-       cat ${cog_gff} | sed ${sed} > ${prefix}_cog.gff
-       cat ${pfam_gff} | sed ${sed} > ${prefix}_pfam.gff
-       cat ${tigrfam_gff} | sed ${sed} > ${prefix}_tigrfam.gff
-       cat ${smart_gff} | sed ${sed} > ${prefix}_smart.gff
-       cat ${supfam_gff} | sed ${sed} > ${prefix}_supfam.gff
-       cat ${cath_funfam_gff} | sed ${sed} > ${prefix}_cath_funfam.gff
-       cat ${crt_gff} | sed ${sed} > ${prefix}_crt.gff
-       cat ${genemark_gff} | sed ${sed} > ${prefix}_genemark.gff
-       cat ${prodigal_gff} | sed ${sed} > ${prefix}_prodigal.gff
-       cat ${trna_gff} | sed ${sed} > ${prefix}_trna.gff
-       cat ${rfam_gff} | sed ${sed} > ${prefix}_rfam.gff
-       cat ${crt_crisprs} | sed ${sed} > ${prefix}_crt.crisprs
-       cat ${gene_phylogeny_tsv} | sed ${sed} > ${prefix}_gene_phylogeny.tsv
-       cat ${lineage_tsv} | sed ${sed} > ${prefix}_scaffold_lineage.tsv
-       cat ${product_names_tsv} | sed ${sed} > ${prefix}_product_names.tsv
-       cat ${ko_ec_gff} | sed ${sed} > ${prefix}_ko_ec.gff
-       cat ${stats_tsv} | sed ${sed} > ${prefix}_stats.tsv
-       cat ${stats_json} | sed ${sed} > ${prefix}_stats.json
+       cat ~{proteins_faa} | sed ~{sed} > ~{prefix}_proteins.faa
+       cat ~{structural_gff} | sed ~{sed} > ~{prefix}_structural_annotation.gff
+       cat ~{functional_gff} | sed ~{sed} > ~{prefix}_functional_annotation.gff
+       cat ~{ko_tsv} | sed ~{sed} > ~{prefix}_ko.tsv
+       cat ~{ec_tsv} | sed ~{sed} > ~{prefix}_ec.tsv
+       cat ~{cog_gff} | sed ~{sed} > ~{prefix}_cog.gff
+       cat ~{pfam_gff} | sed ~{sed} > ~{prefix}_pfam.gff
+       cat ~{tigrfam_gff} | sed ~{sed} > ~{prefix}_tigrfam.gff
+       cat ~{smart_gff} | sed ~{sed} > ~{prefix}_smart.gff
+       cat ~{supfam_gff} | sed ~{sed} > ~{prefix}_supfam.gff
+       cat ~{cath_funfam_gff} | sed ~{sed} > ~{prefix}_cath_funfam.gff
+       cat ~{crt_gff} | sed ~{sed} > ~{prefix}_crt.gff
+       cat ~{genemark_gff} | sed ~{sed} > ~{prefix}_genemark.gff
+       cat ~{prodigal_gff} | sed ~{sed} > ~{prefix}_prodigal.gff
+       cat ~{trna_gff} | sed ~{sed} > ~{prefix}_trna.gff
+       cat ~{rfam_gff} | sed ~{sed} > ~{prefix}_rfam.gff
+       cat ~{crt_crisprs} | sed ~{sed} > ~{prefix}_crt.crisprs
+       cat ~{gene_phylogeny_tsv} | sed ~{sed} > ~{prefix}_gene_phylogeny.tsv
+       cat ~{lineage_tsv} | sed ~{sed} > ~{prefix}_scaffold_lineage.tsv
+       cat ~{product_names_tsv} | sed ~{sed} > ~{prefix}_product_names.tsv
+       cat ~{ko_ec_gff} | sed ~{sed} > ~{prefix}_ko_ec.gff
+       cat ~{stats_tsv} | sed ~{sed} > ~{prefix}_stats.tsv
+       cat ~{stats_json} | sed ~{sed} > ~{prefix}_stats.json
 
-       ln ${ano_info_file} ${prefix}_imgap.info
+       ln ~{ano_info_file} ~{prefix}_imgap.info || ln -s ~{ano_info_file} ~{prefix}_imgap.info 
 
-   }
+   >>>
 
    output {
-        File final_functional_gff = "${prefix}_functional_annotation.gff"
-        File final_structural_gff = "${prefix}_structural_annotation.gff"
-        File final_ko_tsv = "${prefix}_ko.tsv"
-        File final_ec_tsv = "${prefix}_ec.tsv"
-        File final_gene_phylogeny_tsv = "${prefix}_gene_phylogeny.tsv"
-        File final_proteins_faa = "${prefix}_proteins.faa"
-        File final_ko_ec_gff = "${prefix}_ko_ec.gff"
-        File final_cog_gff = "${prefix}_cog.gff"
-        File final_pfam_gff = "${prefix}_pfam.gff"
-        File final_tigrfam_gff = "${prefix}_tigrfam.gff"
-        File final_smart_gff = "${prefix}_smart.gff"
-        File final_supfam_gff = "${prefix}_supfam.gff"
-        File final_cath_funfam_gff = "${prefix}_cath_funfam.gff"
-        File final_crt_gff = "${prefix}_crt.gff"
-        File final_genemark_gff = "${prefix}_genemark.gff"
-        File final_prodigal_gff = "${prefix}_prodigal.gff"
-        File final_trna_gff = "${prefix}_trna.gff"
-        File final_rfam_gff = "${prefix}_rfam.gff"
-#        File final_proteins_cog_domtblout = "${prefix}_proteins.cog.domtblout"
-#        File final_proteins_pfam_domtblout = "${prefix}_proteins.pfam.domtblout"
-#        File final_proteins_tigrfam_domtblout = "${prefix}_proteins.tigrfam.domtblout"
-#        File final_proteins_smart_domtblout = "${prefix}_proteins.smart.domtblout"
-#        File final_proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
-#        File final_proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
-        File final_product_names_tsv = "${prefix}_product_names.tsv"
-        File final_lineage_tsv = "${prefix}_scaffold_lineage.tsv"
-        File final_crt_crisprs = "${prefix}_crt.crisprs"
-        File final_tsv = "${prefix}_stats.tsv"
-        File final_version = "${prefix}_imgap.info"
+        File final_functional_gff = "~{prefix}_functional_annotation.gff"
+        File final_structural_gff = "~{prefix}_structural_annotation.gff"
+        File final_ko_tsv = "~{prefix}_ko.tsv"
+        File final_ec_tsv = "~{prefix}_ec.tsv"
+        File final_gene_phylogeny_tsv = "~{prefix}_gene_phylogeny.tsv"
+        File final_proteins_faa = "~{prefix}_proteins.faa"
+        File final_ko_ec_gff = "~{prefix}_ko_ec.gff"
+        File final_cog_gff = "~{prefix}_cog.gff"
+        File final_pfam_gff = "~{prefix}_pfam.gff"
+        File final_tigrfam_gff = "~{prefix}_tigrfam.gff"
+        File final_smart_gff = "~{prefix}_smart.gff"
+        File final_supfam_gff = "~{prefix}_supfam.gff"
+        File final_cath_funfam_gff = "~{prefix}_cath_funfam.gff"
+        File final_crt_gff = "~{prefix}_crt.gff"
+        File final_genemark_gff = "~{prefix}_genemark.gff"
+        File final_prodigal_gff = "~{prefix}_prodigal.gff"
+        File final_trna_gff = "~{prefix}_trna.gff"
+        File final_rfam_gff = "~{prefix}_rfam.gff"
+#        File final_proteins_cog_domtblout = "~{prefix}_proteins.cog.domtblout"
+#        File final_proteins_pfam_domtblout = "~{prefix}_proteins.pfam.domtblout"
+#        File final_proteins_tigrfam_domtblout = "~{prefix}_proteins.tigrfam.domtblout"
+#        File final_proteins_smart_domtblout = "~{prefix}_proteins.smart.domtblout"
+#        File final_proteins_supfam_domtblout = "~{prefix}_proteins.supfam.domtblout"
+#        File final_proteins_cath_funfam_domtblout = "~{prefix}_proteins.cath_funfam.domtblout"
+        File final_product_names_tsv = "~{prefix}_product_names.tsv"
+        File final_lineage_tsv = "~{prefix}_scaffold_lineage.tsv"
+        File final_crt_crisprs = "~{prefix}_crt.crisprs"
+        File final_tsv = "~{prefix}_stats.tsv"
+        File final_version = "~{prefix}_imgap.info"
  
     }
     runtime {

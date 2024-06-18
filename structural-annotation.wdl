@@ -26,13 +26,13 @@ workflow s_annotate {
       String? gm_license
     }
 
-    call pre_qc {
-      input:
-        project_type = imgap_project_type,
-        input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id,
-        container=container
-    }
+    # call pre_qc {
+    #   input:
+    #     project_type = imgap_project_type,
+    #     input_fasta = imgap_input_fasta,
+    #     project_id = imgap_project_id,
+    #     container=container
+    # }
 
 
     call trnascan.trnascan {
@@ -189,14 +189,8 @@ task pre_qc {
             exit 1
         fi
     fi
-
-    fasta_sanity_cmd="~{bin} ~tmp_fasta ~qced_fasta"
-    if [[ ~{rename} == "yes" ]]
-    then
-        fasta_sanity_cmd="~fasta_sanity_cmd -p ~{project_id}"
-    fi
-    fasta_sanity_cmd="~fasta_sanity_cmd -l ~{min_seq_length}"
-    ~fasta_sanity_cmd
+    ~{bin} -v
+    ~{bin} ~tmp_fasta ~qced_fasta -l ~{min_seq_length}
     rm ~tmp_fasta
   >>>
 
@@ -207,7 +201,7 @@ task pre_qc {
   }
     
   output {
-    File fasta = "${prefix}_contigs.fna"
+    File fasta = "~{prefix}_contigs.fna"
   }
 }
 
@@ -229,7 +223,7 @@ task gff_merge {
         Boolean trnascan_se_execute
         String container
   }
-  command {
+  command <<<
     set -euo pipefail
     # set cromwell booleans as bash variables
     prodigal_execute=~{prodigal_execute}
@@ -265,7 +259,7 @@ task gff_merge {
     ~{bin} $merger_args 1> ~{prefix}_structural_annotation.gff
 
 
-  }
+  >>>
 
   runtime {
     time: "1:00:00"
@@ -290,13 +284,13 @@ task fasta_merge {
         String proteins_filename = basename(cds_proteins)
         String container
     }
-  command {
+  command <<<
    set -euo pipefail
    cp ~{final_gff} .
    cp ~{cds_genes} .
    cp ~{cds_proteins} .
    ~{bin} ~{final_gff} ~{genes_filename} ~{proteins_filename}
-  }
+  >>>
 
   runtime {
     time: "2:00:00"
@@ -318,9 +312,10 @@ task gff_and_fasta_stats {
         File   final_gff
         String container
     }
-  command {
+  command <<<
+    set -euo pipefail
     ~{bin} ~{input_fasta} ~{final_gff}
-  }
+  >>>
 
   runtime {
     time: "1:00:00"
@@ -338,9 +333,10 @@ task post_qc {
         String prefix=sub(project_id, ":", "_")
         String container
     }
-  command {
+  command <<<
+  set -euo pipefail
     ~{qc_bin} ~{input_fasta} "~{prefix}_structural_annotation.gff"
-  }
+  >>>
 
   runtime {
     time: "1:00:00"

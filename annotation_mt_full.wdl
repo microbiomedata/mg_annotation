@@ -135,12 +135,12 @@ task split{
      String container
      String? gm_license
    }
-   command{
+   command <<<
      set -euo pipefail
-     /opt/omics/bin/split.py ${infile} ${blocksize} .
+     /opt/omics/bin/split.py ~{infile} ~{blocksize} .
      echo $(egrep -v "^>" ~{infile} | tr -d '\n' | wc -m) / 500 | bc > ~{zfile}
      echo "scale=6; ($(grep -v '^>' ~{infile} | tr -d '\n' | wc -m) * 2) / 1000000" | bc -l > ~{cmzfile}
-   }
+   >>>
 
    output{
      Array[File] files = read_lines('splits_out.fof')
@@ -183,31 +183,32 @@ task merge_outputs {
     Array[File?] crt_crisprs_s
     String container
     }
-  command {
-     cat ${sep=" " structural_gffs} > "~{prefix}_structural_annotation.gff"
-     cat ${sep=" " functional_gffs} > "~{prefix}_functional_annotation.gff"
-     cat ${sep=" " ko_tsvs} >  "~{prefix}_ko.tsv"
-     cat ${sep=" " ec_tsvs} >  "~{prefix}_ec.tsv"
-     cat ${sep=" " phylo_tsvs} > "~{prefix}_gene_phylogeny.tsv"
-     cat ${sep=" " proteins} > "~{prefix}.faa"
-     cat ${sep=" " ko_ec_gffs} > "~{prefix}_ko_ec.gff"
-     cat ${sep=" " cog_gffs} > "~{prefix}_cog.gff"
-     cat ${sep=" " pfam_gffs} > "~{prefix}_pfam.gff"
-     cat ${sep=" " tigrfam_gffs} > "~{prefix}_tigrfam.gff"
-     cat ${sep=" " smart_gffs} > "~{prefix}_smart.gff"
-     cat ${sep=" " supfam_gffs} > "~{prefix}_supfam.gff"
-     cat ${sep=" " cath_funfam_gffs} > "~{prefix}_cath_funfam.gff"
+  command <<<
+     set -eou pipefail
+     cat ~{sep=" " structural_gffs} > "~{prefix}_structural_annotation.gff"
+     cat ~{sep=" " functional_gffs} > "~{prefix}_functional_annotation.gff"
+     cat ~{sep=" " ko_tsvs} >  "~{prefix}_ko.tsv"
+     cat ~{sep=" " ec_tsvs} >  "~{prefix}_ec.tsv"
+     cat ~{sep=" " phylo_tsvs} > "~{prefix}_gene_phylogeny.tsv"
+     cat ~{sep=" " proteins} > "~{prefix}.faa"
+     cat ~{sep=" " ko_ec_gffs} > "~{prefix}_ko_ec.gff"
+     cat ~{sep=" " cog_gffs} > "~{prefix}_cog.gff"
+     cat ~{sep=" " pfam_gffs} > "~{prefix}_pfam.gff"
+     cat ~{sep=" " tigrfam_gffs} > "~{prefix}_tigrfam.gff"
+     cat ~{sep=" " smart_gffs} > "~{prefix}_smart.gff"
+     cat ~{sep=" " supfam_gffs} > "~{prefix}_supfam.gff"
+     cat ~{sep=" " cath_funfam_gffs} > "~{prefix}_cath_funfam.gff"
 
-     cat ${sep=" " cog_domtblouts} > "~{prefix}_proteins.cog.domtblout"
-     cat ${sep=" " pfam_domtblouts} > "~{prefix}_proteins.pfam.domtblout"
-     cat ${sep=" " tigrfam_domtblouts} > "~{prefix}_proteins.tigrfam.domtblout"
-     cat ${sep=" " smart_domtblouts} > "~{prefix}_proteins.smart.domtblout"
-     cat ${sep=" " supfam_domtblouts} > "~{prefix}_proteins.supfam.domtblout"
-     cat ${sep=" " cath_funfam_domtblouts} > "~{prefix}_proteins.cath_funfam.domtblout"
+     cat ~{sep=" " cog_domtblouts} > "~{prefix}_proteins.cog.domtblout"
+     cat ~{sep=" " pfam_domtblouts} > "~{prefix}_proteins.pfam.domtblout"
+     cat ~{sep=" " tigrfam_domtblouts} > "~{prefix}_proteins.tigrfam.domtblout"
+     cat ~{sep=" " smart_domtblouts} > "~{prefix}_proteins.smart.domtblout"
+     cat ~{sep=" " supfam_domtblouts} > "~{prefix}_proteins.supfam.domtblout"
+     cat ~{sep=" " cath_funfam_domtblouts} > "~{prefix}_proteins.cath_funfam.domtblout"
 
-     cat ${sep=" " product_name_tsvs} > "~{prefix}_product_names.tsv"
-     cat ${sep=" " crt_crisprs_s} > "~{prefix}_crt.crisprs"
-  }
+     cat ~{sep=" " product_name_tsvs} > "~{prefix}_product_names.tsv"
+     cat ~{sep=" " crt_crisprs_s} > "~{prefix}_crt.crisprs"
+  >>>
   output {
     File functional_gff = "~{prefix}_functional_annotation.gff"
     File structural_gff = "~{prefix}_structural_annotation.gff"
@@ -255,11 +256,11 @@ task final_stats {
     File   structural_gff
     String container
   }
-  command {
+  command <<<
     set -euo pipefail
-    ln ~{input_fasta} ~{fna}
+    ln ~{input_fasta} ~{fna} || ln -s ~{input_fasta} ~{fna}
     ~{bin} ~{fna} ~{structural_gff}
-  }
+  >>>
 
   output {
     File tsv = "~{prefix}_structural_annotation_stats.tsv"

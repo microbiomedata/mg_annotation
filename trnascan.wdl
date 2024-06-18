@@ -47,8 +47,8 @@ task trnascan_ba {
   }
 
   output {
-    File bacterial_out = "${prefix}_trnascan_bacterial.out"
-    File archaeal_out  = "${prefix}_trnascan_archaeal.out"
-    File gff = "${prefix}_trna.gff"
+    File bacterial_out = "~{prefix}_trnascan_bacterial.out"
+    File archaeal_out  = "~{prefix}_trnascan_archaeal.out"
+    File gff = "~{prefix}_trna.gff"
   }
 }
