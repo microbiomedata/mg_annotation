@@ -84,7 +84,7 @@ workflow s_annotate {
         project_id = imgap_project_id,
         rfam_gff = rfam.rfam_gff,
         trna_gff = trnascan.gff,
-        crt_gff = crt.gff, 
+        crt_gff = crt.gff,
         cds_gff = cds_prediction.gff,
         prodigal_execute = prodigal_execute,
         genemark_execute = genemark_execute,
@@ -149,7 +149,6 @@ task pre_qc {
         File   input_fasta
         String project_id
         String prefix=sub(project_id, ":", "_")
-        String rename = "yes"
         Float  n_ratio_cutoff = 0.5
         Int    seqs_per_million_bp_cutoff = 500
         Int    min_seq_length = 150
@@ -199,9 +198,10 @@ task pre_qc {
     memory: "86G"
     docker: container
   }
-    
+
   output {
     File fasta = "~{prefix}_contigs.fna"
+    File  out_log = stdout()
   }
 }
 
@@ -297,7 +297,7 @@ task fasta_merge {
     memory: "40G"
     docker: container
   }
-    
+ 
   output {
     File final_genes = "~{prefix}_genes.fna"
     File final_proteins = "~{prefix}_proteins.faa"
@@ -322,7 +322,7 @@ task gff_and_fasta_stats {
     memory: "86G"
     docker: container
   }
-    
+
 }
 
 task post_qc {
@@ -343,7 +343,7 @@ task post_qc {
     memory: "86G"
     docker: container
   }
-    
+ 
   output {
     File out = "~{prefix}_structural_annotation.gff"
   }

@@ -50,7 +50,7 @@ task run {
     set -euo pipefail
     ~{bin} --notextw --cut_tc --cpu ~{threads} -Z ~{cmzscore} --tblout ~{prefix}_rfam.tbl ~{cm} ~{input_fasta}
     tool_and_version=$(~{bin} -h | grep INFERNAL | perl -pne 's/^.*INFERNAL/INFERNAL/' )
-    if [ $(grep -c -v \ ~{prefix}_rfam.tbl) -eq 0 ] ; then
+    if [ $(grep -c -v '#' ~{prefix}_rfam.tbl) -eq 0 ] ; then
         touch ~{prefix}_rfam.gff
     else
         grep -v '^#' ~{prefix}_rfam.tbl | \

@@ -42,9 +42,12 @@ task run {
   }
 
   output {
-    File crisprs = "${prefix}_crt.crisprs"
-    File gff = "${prefix}_crt.gff"
-    File crt_out = "${prefix}_crt.out"
+    File crisprs = "~{prefix}_crt.crisprs"
+    File gff = "~{prefix}_crt.gff"
+    File crt_out = "~{prefix}_crt.out"
+    File crisprs = "~{prefix}_crt.crisprs"
+    File gff = "~{prefix}_crt.gff"
+    File crt_out = "~{prefix}_crt.out"
   }
 }
 

@@ -4,15 +4,15 @@ import "./structural-annotation.wdl" as sa
 import "./functional-annotation.wdl" as fa
 
 workflow annotation {
-    input {
-        String  proj
-        String  input_file
-        String  imgap_project_id
-        String  database_location="/refdata/img/"
-        String  imgap_project_type="metagenome"
-        String  gm_license="/refdata/licenses/.gmhmmp2_key"
-        Int     additional_threads=16
-        String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
+input {
+  String  proj
+  String  input_file
+  String  imgap_project_id
+  String  database_location="/refdata/img/"
+  String  imgap_project_type="metagenome"
+  String  gm_license="/refdata/licenses/.gmhmmp2_key"
+  Int     additional_threads=16
+  String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
 
         # structural annotation
         Boolean sa_execute=true
@@ -21,22 +21,28 @@ workflow annotation {
         Boolean fa_execute=true
         }
 
+
  call stage {
       input: container=container,
           input_file=input_file
     }
-
-  call split {
-    input: infile=stage.imgap_input_fasta,
-           container=container
+  # confused whether to use assembly or annotation id
+  call make_map_file {
+       input: proj_id = proj,
+              input_file = stage.imgap_input_fasta,
+              container = container
   }
 
+  call split {
+    input: infile=make_map_file.out_fasta,
+           container=container
+  }
+  #confused for assembly or annotation id replacement
   scatter(pathname in split.files) {
 
       call sa.s_annotate {
         input:
           cmzscore = split.cmzscore,
-        #  imgap_input_fasta = stage.imgap_input_fasta,
           imgap_input_fasta = pathname,
           imgap_project_id = imgap_project_id,
           additional_threads = additional_threads,
@@ -111,6 +117,8 @@ workflow annotation {
        container=container,
        sa_execute = sa_execute,
        fa_execute = fa_execute,
+       map_execute = make_map_file.map_execute,
+       map_info = make_map_file.out_log,
        structural_gff  = merge_outputs.structural_gff,
        imgap_version = split.imgap_version,
        rfam_version = s_annotate.rfam_version,
@@ -134,14 +142,14 @@ workflow annotation {
     input:
        project_id = imgap_project_id,
        structural_gff = merge_outputs.structural_gff,
-       input_fasta = stage.imgap_input_fasta,
+       input_fasta = make_map_file.out_fasta,
        container=container
   }
-
+# confused what to use for orig prefix
   call finish_ano {
     input:
-      container="microbiomedata/workflowmeta:1.1.1",
-      input_file=stage.imgap_input_fasta,
+      container=container,
+      input_file=make_map_file.out_fasta,
       proj=proj,
       start=stage.start,
       ano_info_file=make_info_file.imgap_info,
@@ -167,7 +175,10 @@ workflow annotation {
       trna_gff = merge_outputs.trna_gff,
       rfam_gff = merge_outputs.rfam_gff,
       product_names_tsv = merge_outputs.product_names_tsv,
-      crt_crisprs = merge_outputs.crt_crisprs
+      crt_crisprs = merge_outputs.crt_crisprs,
+      map_execute = make_map_file.map_execute,
+      map_file = make_map_file.map_file,
+      renamed_fasta = make_map_file.out_fasta
   }
 
   output{
@@ -201,6 +212,8 @@ workflow annotation {
     File product_names_tsv = finish_ano.final_product_names_tsv
     File crt_crisprs = finish_ano.final_crt_crisprs
     File imgap_version = finish_ano.final_version
+    File? renamed_fasta = finish_ano.final_renamed_fasta
+    File? map_file = finish_ano.final_map_file
   }
 
   parameter_meta {
@@ -249,6 +262,50 @@ task stage {
      maxRetries: 1
      docker: container
    }
+}
+
+task make_map_file {
+  input{
+    String proj_id
+    String  prefix=sub(proj_id, ":", "_")
+    File input_file
+    String container
+    String output_file = "~{prefix}_map.fasta"
+    Int min_seq_length = 150      # default value
+    Int unknown_gap_length = 100  # default value
+  }
+
+  command <<<
+  find_prefix=`grep ~{proj_id} ~{input_file} | head -1`
+
+  set -euo pipefail
+  if [[ $find_prefix ]]
+  then
+    echo "false" > run_map.txt
+    ln ~{input_file} ~{output_file} || ln -s ~{input_file} ~{output_file}
+  else
+    echo "true" > run_map.txt
+    fasta_sanity.py -v
+    fasta_sanity.py \
+    -p ~{proj_id} \
+    -l ~{min_seq_length} \
+    -u ~{unknown_gap_length} \
+    ~{input_file} ~{output_file}
+  fi
+  >>>
+
+  output{
+    File? map_file = "~{prefix}_contig_names_mapping.tsv"
+    File  out_fasta = "~{prefix}_map.fasta"
+    File  out_log = stdout()
+    Boolean map_execute = read_boolean("run_map.txt")
+ }
+  runtime {
+    memory: "120G"
+     cpu:  16
+     maxRetries: 1
+     docker: container
+  }
 }
 
 task split {
@@ -377,7 +434,7 @@ task merge_outputs {
      cat ~{sep=" " crt_gffs} > "~{prefix}_crt.gff"
      cat ~{sep=" " crt_outs} > "~{prefix}_crt.out"
 
-  >>>
+ >>>
   output {
     File functional_gff = "~{prefix}_functional_annotation.gff"
     File structural_gff = "~{prefix}_structural_annotation.gff"
@@ -433,6 +490,8 @@ task make_info_file {
     input {
         String container
         String imgap_version
+        Boolean map_execute
+        File map_info
         Boolean fa_execute
         Boolean sa_execute
         String project_id
@@ -463,6 +522,13 @@ task make_info_file {
   command <<<
     set -euo pipefail
      echo "IMGAP Version: ~{imgap_version}" > ~{prefix}_imgap.info
+     #get map script version
+     if [[ "~{map_execute}" = true ]]
+       then
+       map_version=`grep "fasta_sanity.py" ~{map_info}`
+       map_version="Mapping Programs Used: $map_version"
+       echo $map_version >> ~{prefix}_imgap.info
+     fi
      #get structual annotation versions
      if [[ "~{sa_execute}" = true ]]
        then
@@ -591,9 +657,14 @@ task finish_ano {
        File stats_json
        File product_names_tsv
        File crt_crisprs
+       Boolean map_execute
+       File? map_file
+       File? renamed_fasta
        String orig_prefix="scaffold"
        String sed="s/~{orig_prefix}_/~{proj}_/g"
     }
+
+
    command <<<
 
       set -eou pipefail
@@ -626,7 +697,12 @@ task finish_ano {
 
        ln ~{ano_info_file} ~{prefix}_imgap.info || ln -s ~{ano_info_file} ~{prefix}_imgap.info 
 
-   >>>
+       if [[ "~{map_execute}" = true ]]
+        then
+        ln ~{map_file} ~{prefix}_contig_names_mapping.tsv || ln -s ~{map_file} ~{prefix}_contig_names_mapping.tsv
+        ln ~{renamed_fasta} ~{prefix}_contigs.fna || ln -s ~{renamed_fasta} ~{prefix}_contigs.fna
+       fi
+  >>>
 
    output {
         File final_functional_gff = "~{prefix}_functional_annotation.gff"
@@ -656,6 +732,8 @@ task finish_ano {
         File final_product_names_tsv = "~{prefix}_product_names.tsv"
         File final_lineage_tsv = "~{prefix}_scaffold_lineage.tsv"
         File final_crt_crisprs = "~{prefix}_crt.crisprs"
+        File? final_renamed_fasta = "~{prefix}_contigs.fna"
+        File? final_map_file = "~{prefix}_contig_names_mapping.tsv"
         File final_tsv = "~{prefix}_stats.tsv"
         File final_version = "~{prefix}_imgap.info"
  
