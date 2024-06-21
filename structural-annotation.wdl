@@ -23,7 +23,7 @@ workflow s_annotate {
       Boolean gff_and_fasta_stats_execute=true
       String  database_location
       String  container
-      String? gm_license
+      String gm_license="/refdata/licenses/.gmhmmp2_key"
     }
 
     # call pre_qc {

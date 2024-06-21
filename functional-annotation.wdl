@@ -179,20 +179,20 @@ workflow f_annotate {
     File supfam_domtblout = superfam.domtblout
     File smart_domtblout = smart.domtblout
     File cath_funfam_domtblout = cath_funfam.domtblout
-    String? lastal_version = ko_ec.lastal_ver
-    String? img_nr_db_version = ko_ec.img_nr_db_ver
-    String? hmmsearch_smart_version = smart.hmmsearch_smart_ver
-    String? smart_db_version = smart.smart_db_ver
-    String? hmmsearch_cog_version = cog.hmmsearch_cog_ver
-    String? cog_db_version = cog.cog_db_ver
-    String? hmmsearch_tigrfam_version = tigrfam.hmmsearch_tigrfam_ver
-    String? tigrfam_db_version = tigrfam.tigrfam_db_ver
-    String? hmmsearch_superfam_version = superfam.hmmsearch_superfam_ver
-    String? superfam_db_version = superfam.superfam_db_ver
-    String? hmmsearch_pfam_version = pfam.hmmsearch_pfam_ver
-    String? pfam_db_version = pfam.pfam_db_ver
-    String? hmmsearch_cath_funfam_version = cath_funfam.hmmsearch_cath_funfam_ver
-    String? cath_funfam_db_version = cath_funfam.cath_funfam_db_ver
+    String lastal_version = ko_ec.lastal_ver
+    String img_nr_db_version = ko_ec.img_nr_db_ver
+    String hmmsearch_smart_version = smart.hmmsearch_smart_ver
+    String smart_db_version = smart.smart_db_ver
+    String hmmsearch_cog_version = cog.hmmsearch_cog_ver
+    String cog_db_version = cog.cog_db_ver
+    String hmmsearch_tigrfam_version = tigrfam.hmmsearch_tigrfam_ver
+    String tigrfam_db_version = tigrfam.tigrfam_db_ver
+    String hmmsearch_superfam_version = superfam.hmmsearch_superfam_ver
+    String superfam_db_version = superfam.superfam_db_ver
+    String hmmsearch_pfam_version = pfam.hmmsearch_pfam_ver
+    String pfam_db_version = pfam.pfam_db_ver
+    String hmmsearch_cath_funfam_version = cath_funfam.hmmsearch_cath_funfam_ver
+    String cath_funfam_db_version = cath_funfam.cath_funfam_db_ver
   }
 
 }

@@ -437,23 +437,23 @@ task make_info_file {
         Boolean sa_execute
         String project_id
         String prefix=sub(project_id, ":", "_")
-        Array[String?] rfam_version
+        Array[String] rfam_version
         Boolean rfam_executed = if (defined(rfam_version)) then true else false
         File structural_gff
-        Array[String?] lastal_version
-        Array[String?] img_nr_db_version
-        Array[String?] hmmsearch_smart_version
-        Array[String?] smart_db_version
-        Array[String?] hmmsearch_cog_version
-        Array[String?] cog_db_version
-        Array[String?] hmmsearch_tigrfam_version
-        Array[String?] tigrfam_db_version
-        Array[String?] hmmsearch_superfam_version
-        Array[String?] superfam_db_version
-        Array[String?] hmmsearch_pfam_version
-        Array[String?] pfam_db_version
-        Array[String?] hmmsearch_cath_funfam_version
-        Array[String?] cath_funfam_db_version
+        Array[String] lastal_version
+        Array[String] img_nr_db_version
+        Array[String] hmmsearch_smart_version
+        Array[String] smart_db_version
+        Array[String] hmmsearch_cog_version
+        Array[String] cog_db_version
+        Array[String] hmmsearch_tigrfam_version
+        Array[String] tigrfam_db_version
+        Array[String] hmmsearch_superfam_version
+        Array[String] superfam_db_version
+        Array[String] hmmsearch_pfam_version
+        Array[String] pfam_db_version
+        Array[String] hmmsearch_cath_funfam_version
+        Array[String] cath_funfam_db_version
         String fa_version_file = "fa_tool_version.txt"
         String fa_db_version_file = "fa_db_version.txt"
         String rfam_version_file = "rfam_version.txt"
@@ -538,7 +538,6 @@ task final_stats {
         File   input_fasta
         String project_id
         String prefix=sub(project_id, ":", "_")
-        String fna="~{prefix}_contigs.fna"
         File   structural_gff
         String container
     }
