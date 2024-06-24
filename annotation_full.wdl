@@ -267,10 +267,9 @@ task stage {
 task make_map_file {
   input{
     String proj_id
-    String  prefix=sub(proj_id, ":", "_")
+    String prefix=sub(proj_id, ":", "_")
     File input_file
     String container
-    String output_file = "~{prefix}_map.fasta"
     Int min_seq_length = 150      # default value
     Int unknown_gap_length = 100  # default value
   }
@@ -282,7 +281,7 @@ task make_map_file {
   if [[ $find_prefix ]]
   then
     echo "false" > run_map.txt
-    ln ~{input_file} ~{output_file} || ln -s ~{input_file} ~{output_file}
+    ln ~{input_file} ~{prefix}_map.fasta || ln -s ~{input_file} ~{prefix}_map.fasta
   else
     echo "true" > run_map.txt
     fasta_sanity.py -v
@@ -290,7 +289,7 @@ task make_map_file {
     -p ~{proj_id} \
     -l ~{min_seq_length} \
     -u ~{unknown_gap_length} \
-    ~{input_file} ~{output_file}
+    ~{input_file} ~{prefix}_map.fasta
   fi
   >>>
 
