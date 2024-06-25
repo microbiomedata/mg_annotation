@@ -6,31 +6,24 @@ workflow f_annotate {
         Int     additional_threads
        # File    input_contigs_fasta
         File    input_fasta
-        String  database_location
-        Boolean ko_ec_execute=true
+        String  database_location="/refdata/img/"
         String  ko_ec_img_nr_db="~{database_location}"+"/IMG-NR/20230629/img_nr"
         String  ko_ec_md5_mapping="~{database_location}"+"/IMG-NR/20230629/md5Hash2Data.tsv"
         String  ko_ec_taxon_to_phylo_mapping="~{database_location}"+"/IMG-NR/20230629/taxonOId2Taxonomy.tsv"
         String  lastal_bin="/opt/omics/bin/lastal"
         String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
-        Boolean smart_execute=true
         Int?    par_hmm_inst
         Int?    approx_num_proteins
         String  smart_db="~{database_location}"+"/SMART/01_06_2016/SMART.hmm"
         String  hmmsearch_bin="/opt/omics/bin/hmmsearch"
         String  frag_hits_filter_bin="/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
-        Boolean cog_execute=true
         String  cog_db="~{database_location}"+"/COG/HMMs/2003/COG.hmm"
-        Boolean tigrfam_execute=true
         String  tigrfam_db="~{database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
         String  hit_selector_bin="/opt/omics/bin/functional_annotation/hmmsearch_hit_selector.py"
-        Boolean superfam_execute=true
         String  superfam_db="~{database_location}"+"/SuperFamily/v1.75/supfam.hmm"
-        Boolean pfam_execute=true
         String  pfam_db="~{database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.v34.0.hmm"
         String  pfam_claninfo_tsv="~{database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
         String  pfam_clan_filter="/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
-        Boolean cath_funfam_execute=true
         String  cath_funfam_db="~{database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
         #  Boolean signalp_execute=true
         #  String  signalp_gram_stain="GRAM_STAIN"

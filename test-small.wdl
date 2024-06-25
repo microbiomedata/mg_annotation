@@ -42,6 +42,7 @@ task prepare {
    String url
   }
    command <<<
+       set -eou pipefail
        wget ~{url}/~{prefix}_contigs.fna
    >>>
 
@@ -68,7 +69,7 @@ task validate {
   }
 
    command <<<
-       set -e
+       set -eou pipefail
        wget ~{url}/~{prefix}_functional_annotation.gff
        wget ~{url}/~{prefix}_structural_annotation.gff
        validate.sh ~{func_gff}

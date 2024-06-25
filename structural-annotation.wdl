@@ -13,14 +13,6 @@ workflow s_annotate {
       String  imgap_project_type
       Int     additional_threads
       Int? imgap_structural_annotation_translation_table
-      Boolean pre_qc_execute=false
-      Boolean trnascan_se_execute=true
-      Boolean rfam_execute=true
-      Boolean crt_execute=true
-      Boolean cds_prediction_execute=true
-      Boolean prodigal_execute=true
-      Boolean genemark_execute=true
-      Boolean gff_and_fasta_stats_execute=true
       String  database_location
       String  container
       String gm_license="/refdata/licenses/.gmhmmp2_key"
@@ -69,8 +61,6 @@ workflow s_annotate {
          imgap_input_fasta = imgap_input_fasta,
          imgap_project_id = imgap_project_id,
          imgap_project_type = imgap_project_type,
-         prodigal_execute = prodigal_execute,
-         genemark_execute = genemark_execute,
          imgap_structural_annotation_translation_table = imgap_structural_annotation_translation_table,
          container = container,
          gm_license = gm_license
@@ -86,11 +76,6 @@ workflow s_annotate {
         trna_gff = trnascan.gff,
         crt_gff = crt.gff,
         cds_gff = cds_prediction.gff,
-        prodigal_execute = prodigal_execute,
-        genemark_execute = genemark_execute,
-        crt_execute = crt_execute,
-        rfam_execute = rfam_execute,
-        trnascan_se_execute = trnascan_se_execute,
         container = container
     }
 
@@ -216,47 +201,19 @@ task gff_merge {
         File  rfam_gff
         File  crt_gff
         File  cds_gff
-        Boolean prodigal_execute
-        Boolean genemark_execute
-        Boolean crt_execute
-        Boolean rfam_execute
-        Boolean trnascan_se_execute
         String container
   }
   command <<<
     set -euo pipefail
-    # set cromwell booleans as bash variables
-    prodigal_execute=~{prodigal_execute}
-    genemark_execute=~{genemark_execute}
-    crt_execute=~{crt_execute}
-    rfam_execute=~{rfam_execute}
-    trnascan_se_execute=~{trnascan_se_execute}
 
-    #construct arguments for gff_files_merger.py
-    merger_args="--contigs_fasta ~{input_fasta}"
-
-    if [[ "$prodigal_execute" = true ]] || [[ "$genemark_execute" = true ]] ; then
-       merger_args="$merger_args --cds_gff ~{cds_gff}"
-    fi
-
-    if [[ "$crt_execute" = true ]] ; then
-       merger_args="$merger_args --crt_gff ~{crt_gff}"
-    fi
-
-    if [[ ("$prodigal_execute" = true || "$genemark_execute" = true) ]] && [[ "$crt_execute" = true ]] ; then
-       merger_args="$merger_args --log_file ~{prefix}_gff_merge.log"
-    fi
-
-    if [[ "$rfam_execute" = true ]] ; then
-       merger_args="$merger_args ~{rfam_gff}"
-    fi
-
-    if [[ "$trnascan_se_execute" = true ]] ; then
-       merger_args="$merger_args ~{trna_gff}"
-    fi
-
-    #excute gff_files_merger.py
-    ~{bin} $merger_args 1> ~{prefix}_structural_annotation.gff
+    ~{bin} \
+      --contigs_fasta ~{input_fasta} \
+      --cds_gff ~{cds_gff} \
+      --crt_gff ~{crt_gff} \
+      --log_file ~{prefix}_gff_merge.log \
+      ~{rfam_gff} \
+      ~{trna_gff} \
+     1> ~{prefix}_structural_annotation.gff
 
 
   >>>
