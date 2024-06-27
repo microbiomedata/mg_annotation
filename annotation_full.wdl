@@ -14,11 +14,11 @@ input {
   Int     additional_threads=16
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
 
-        # structural annotation
-        Boolean sa_execute=true
+  # structural annotation
+  Boolean sa_execute=true
 
-        # functional annotation
-        Boolean fa_execute=true
+  # functional annotation
+  Boolean fa_execute=true
         }
 
 
