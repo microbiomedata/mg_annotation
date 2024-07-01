@@ -1,32 +1,33 @@
+version 1.0
 import "./structural-annotation.wdl" as sa
 import "./functional-annotation.wdl" as fa
 
 workflow annotation {
-  File    imgap_input_fasta
-  String  imgap_project_id="GaXXXXXXX_contigs.fna"
-  String  database_location="/refdata/img/"
-  String  imgap_project_type="metagenome"
-  Int     additional_threads=16
-  String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
-  String bc_bin="/miniconda3/bin/bc"
-  # structural annotation
-  Boolean sa_execute=true
+  input{
+    File    imgap_input_fasta
+    String  imgap_project_id="GaXXXXXXX_contigs.fna"
+    String  database_location="/refdata/img/"
+    String  imgap_project_type="metagenome"
+    Int     additional_threads=16
+    String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
+    String bc_bin="/miniconda3/bin/bc"
+    # structural annotation
+    #Boolean sa_execute=true
 
-  # functional annotation
-  Boolean fa_execute=true
-  File? gm_license
-
+    # functional annotation
+    #Boolean fa_execute=true
+    String? gm_license
+    }
   call split {
     input: infile=imgap_input_fasta,
            container=container
   }
 
   scatter(pathname in split.files) {
-    if(sa_execute) {
       call sa.s_annotate {
         input:
           cmzscore = split.cmzscore,
-          imgap_input_fasta = imgap_input_fasta,
+          #imgap_input_fasta = imgap_input_fasta,
           imgap_input_fasta = pathname,
           imgap_project_id = imgap_project_id,
           additional_threads = additional_threads,
@@ -36,9 +37,8 @@ workflow annotation {
           container=container,
           gm_license=gm_license
       }
-    }
 
-    if(fa_execute) {
+
       call fa.f_annotate {
         input:
           approx_num_proteins = split.zscore,
@@ -50,7 +50,6 @@ workflow annotation {
           sa_gff = s_annotate.gff,
           container=container
       }
-    }
   }
   call merge_outputs {
     input:
@@ -128,19 +127,20 @@ workflow annotation {
 }
 
 task split{
-   File infile
-   String blocksize=10
-   String zfile="zscore.txt"
-   String cmzfile="cmzscore.txt"
-   String container
-   File? gm_license
-
-   command{
-     set -euo pipefail
-     /opt/omics/bin/split.py ${infile} ${blocksize} .
-     echo $(egrep -v "^>" ${infile} | tr -d '\n' | wc -m) / 500 | bc > ${zfile}
-     echo "scale=6; ($(grep -v '^>' ${infile} | tr -d '\n' | wc -m) * 2) / 1000000" | bc -l > ${cmzfile}
+   input{
+     File infile
+     String blocksize=10
+     String zfile="zscore.txt"
+     String cmzfile="cmzscore.txt"
+     String container
+     String? gm_license
    }
+   command <<<
+     set -euo pipefail
+     /opt/omics/bin/split.py ~{infile} ~{blocksize} .
+     echo $(egrep -v "^>" ~{infile} | tr -d '\n' | wc -m) / 500 | bc > ~{zfile}
+     echo "scale=6; ($(grep -v '^>' ~{infile} | tr -d '\n' | wc -m) * 2) / 1000000" | bc -l > ~{cmzfile}
+   >>>
 
    output{
      Array[File] files = read_lines('splits_out.fof')
@@ -157,79 +157,81 @@ task split{
 
 
 task merge_outputs {
-  String  project_id
-  String prefix = sub(project_id, ":", "_")
-  Array[File?] structural_gffs
-  Array[File?] functional_gffs
-  Array[File?] ko_tsvs
-  Array[File?] ec_tsvs
-  Array[File?] phylo_tsvs
-  Array[File?] proteins
-  Array[File?] ko_ec_gffs
-  Array[File?] cog_gffs
-  Array[File?] pfam_gffs
-  Array[File?] tigrfam_gffs
-  Array[File?] smart_gffs
-  Array[File?] supfam_gffs
-  Array[File?] cath_funfam_gffs
-  Array[File?] cog_domtblouts
-  Array[File?] pfam_domtblouts
-  Array[File?] tigrfam_domtblouts
-  Array[File?] smart_domtblouts
-  Array[File?] supfam_domtblouts
-  Array[File?] cath_funfam_domtblouts
-  Array[File?] product_name_tsvs
-  Array[File?] crt_crisprs_s
-  String container
+  input{
+    String  project_id
+    String prefix=sub(project_id, ":", "_")
+    Array[File?] structural_gffs
+    Array[File?] functional_gffs
+    Array[File?] ko_tsvs
+    Array[File?] ec_tsvs
+    Array[File?] phylo_tsvs
+    Array[File?] proteins
+    Array[File?] ko_ec_gffs
+    Array[File?] cog_gffs
+    Array[File?] pfam_gffs
+    Array[File?] tigrfam_gffs
+    Array[File?] smart_gffs
+    Array[File?] supfam_gffs
+    Array[File?] cath_funfam_gffs
+    Array[File?] cog_domtblouts
+    Array[File?] pfam_domtblouts
+    Array[File?] tigrfam_domtblouts
+    Array[File?] smart_domtblouts
+    Array[File?] supfam_domtblouts
+    Array[File?] cath_funfam_domtblouts
+    Array[File?] product_name_tsvs
+    Array[File?] crt_crisprs_s
+    String container
+    }
+  command <<<
+     set -eou pipefail
+     cat ~{sep=" " structural_gffs} > "~{prefix}_structural_annotation.gff"
+     cat ~{sep=" " functional_gffs} > "~{prefix}_functional_annotation.gff"
+     cat ~{sep=" " ko_tsvs} >  "~{prefix}_ko.tsv"
+     cat ~{sep=" " ec_tsvs} >  "~{prefix}_ec.tsv"
+     cat ~{sep=" " phylo_tsvs} > "~{prefix}_gene_phylogeny.tsv"
+     cat ~{sep=" " proteins} > "~{prefix}.faa"
+     cat ~{sep=" " ko_ec_gffs} > "~{prefix}_ko_ec.gff"
+     cat ~{sep=" " cog_gffs} > "~{prefix}_cog.gff"
+     cat ~{sep=" " pfam_gffs} > "~{prefix}_pfam.gff"
+     cat ~{sep=" " tigrfam_gffs} > "~{prefix}_tigrfam.gff"
+     cat ~{sep=" " smart_gffs} > "~{prefix}_smart.gff"
+     cat ~{sep=" " supfam_gffs} > "~{prefix}_supfam.gff"
+     cat ~{sep=" " cath_funfam_gffs} > "~{prefix}_cath_funfam.gff"
 
-  command {
-     cat ${sep=" " structural_gffs} > "${prefix}_structural_annotation.gff"
-     cat ${sep=" " functional_gffs} > "${prefix}_functional_annotation.gff"
-     cat ${sep=" " ko_tsvs} >  "${prefix}_ko.tsv"
-     cat ${sep=" " ec_tsvs} >  "${prefix}_ec.tsv"
-     cat ${sep=" " phylo_tsvs} > "${prefix}_gene_phylogeny.tsv"
-     cat ${sep=" " proteins} > "${prefix}.faa"
-     cat ${sep=" " ko_ec_gffs} > "${prefix}_ko_ec.gff"
-     cat ${sep=" " cog_gffs} > "${prefix}_cog.gff"
-     cat ${sep=" " pfam_gffs} > "${prefix}_pfam.gff"
-     cat ${sep=" " tigrfam_gffs} > "${prefix}_tigrfam.gff"
-     cat ${sep=" " smart_gffs} > "${prefix}_smart.gff"
-     cat ${sep=" " supfam_gffs} > "${prefix}_supfam.gff"
-     cat ${sep=" " cath_funfam_gffs} > "${prefix}_cath_funfam.gff"
+     cat ~{sep=" " cog_domtblouts} > "~{prefix}_proteins.cog.domtblout"
+     cat ~{sep=" " pfam_domtblouts} > "~{prefix}_proteins.pfam.domtblout"
+     cat ~{sep=" " tigrfam_domtblouts} > "~{prefix}_proteins.tigrfam.domtblout"
+     cat ~{sep=" " smart_domtblouts} > "~{prefix}_proteins.smart.domtblout"
+     cat ~{sep=" " supfam_domtblouts} > "~{prefix}_proteins.supfam.domtblout"
+     cat ~{sep=" " cath_funfam_domtblouts} > "~{prefix}_proteins.cath_funfam.domtblout"
 
-     cat ${sep=" " cog_domtblouts} > "${prefix}_proteins.cog.domtblout"
-     cat ${sep=" " pfam_domtblouts} > "${prefix}_proteins.pfam.domtblout"
-     cat ${sep=" " tigrfam_domtblouts} > "${prefix}_proteins.tigrfam.domtblout"
-     cat ${sep=" " smart_domtblouts} > "${prefix}_proteins.smart.domtblout"
-     cat ${sep=" " supfam_domtblouts} > "${prefix}_proteins.supfam.domtblout"
-     cat ${sep=" " cath_funfam_domtblouts} > "${prefix}_proteins.cath_funfam.domtblout"
-
-     cat ${sep=" " product_name_tsvs} > "${prefix}_product_names.tsv"
-     cat ${sep=" " crt_crisprs_s} > "${prefix}_crt.crisprs"
-  }
+     cat ~{sep=" " product_name_tsvs} > "~{prefix}_product_names.tsv"
+     cat ~{sep=" " crt_crisprs_s} > "~{prefix}_crt.crisprs"
+  >>>
   output {
-    File functional_gff = "${prefix}_functional_annotation.gff"
-    File structural_gff = "${prefix}_structural_annotation.gff"
-    File ko_tsv = "${prefix}_ko.tsv"
-    File ec_tsv = "${prefix}_ec.tsv"
-    File gene_phylogeny_tsv = "${prefix}_gene_phylogeny.tsv"
-    File proteins_faa = "${prefix}.faa"
-    File ko_ec_gff = "${prefix}_ko_ec.gff"
-    File cog_gff = "${prefix}_cog.gff"
-    File pfam_gff = "${prefix}_pfam.gff"
-    File tigrfam_gff = "${prefix}_tigrfam.gff"
-    File smart_gff = "${prefix}_smart.gff"
-    File supfam_gff = "${prefix}_supfam.gff"
-    File cath_funfam_gff = "${prefix}_cath_funfam.gff"
+    File functional_gff = "~{prefix}_functional_annotation.gff"
+    File structural_gff = "~{prefix}_structural_annotation.gff"
+    File ko_tsv = "~{prefix}_ko.tsv"
+    File ec_tsv = "~{prefix}_ec.tsv"
+    File gene_phylogeny_tsv = "~{prefix}_gene_phylogeny.tsv"
+    File proteins_faa = "~{prefix}.faa"
+    File ko_ec_gff = "~{prefix}_ko_ec.gff"
+    File cog_gff = "~{prefix}_cog.gff"
+    File pfam_gff = "~{prefix}_pfam.gff"
+    File tigrfam_gff = "~{prefix}_tigrfam.gff"
+    File smart_gff = "~{prefix}_smart.gff"
+    File supfam_gff = "~{prefix}_supfam.gff"
+    File cath_funfam_gff = "~{prefix}_cath_funfam.gff"
 
-    File proteins_cog_domtblout = "${prefix}_proteins.cog.domtblout"
-    File proteins_pfam_domtblout = "${prefix}_proteins.pfam.domtblout"
-    File proteins_tigrfam_domtblout = "${prefix}_proteins.tigrfam.domtblout"
-    File proteins_smart_domtblout = "${prefix}_proteins.smart.domtblout"
-    File proteins_supfam_domtblout = "${prefix}_proteins.supfam.domtblout"
-    File proteins_cath_funfam_domtblout = "${prefix}_proteins.cath_funfam.domtblout"
-    File product_names_tsv = "${prefix}_product_names.tsv"
-    File crt_crisprs = "${prefix}_crt.crisprs"
+    File proteins_cog_domtblout = "~{prefix}_proteins.cog.domtblout"
+    File proteins_pfam_domtblout = "~{prefix}_proteins.pfam.domtblout"
+    File proteins_tigrfam_domtblout = "~{prefix}_proteins.tigrfam.domtblout"
+    File proteins_smart_domtblout = "~{prefix}_proteins.smart.domtblout"
+    File proteins_supfam_domtblout = "~{prefix}_proteins.supfam.domtblout"
+    File proteins_cath_funfam_domtblout = "~{prefix}_proteins.cath_funfam.domtblout"
+    File product_names_tsv = "~{prefix}_product_names.tsv"
+    File crt_crisprs = "~{prefix}_crt.crisprs"
   }
   runtime {
     memory: "2G"
@@ -245,23 +247,24 @@ task merge_outputs {
 }
 
 task final_stats {
-  String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
-  File   input_fasta
-  String project_id
-  String prefix = sub(project_id, ":", "_")
-  String fna="${prefix}_contigs.fna"
-  File   structural_gff
-  String container
-
-  command {
-    set -euo pipefail
-    ln ${input_fasta} ${fna} || ln -s ${input_fasta} ${fna}
-    ${bin} ${fna} ${structural_gff}
+  input{
+    String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
+    File   input_fasta
+    String project_id
+    String prefix=sub(project_id, ":", "_")
+    String fna="~{prefix}_contigs.fna"
+    File   structural_gff
+    String container
   }
+  command <<<
+    set -euo pipefail
+    ln ~{input_fasta} ~{fna} || ln -s ~{input_fasta} ~{fna}
+    ~{bin} ~{fna} ~{structural_gff}
+  >>>
 
   output {
-    File tsv = "${prefix}_structural_annotation_stats.tsv"
-    File json = "${prefix}_structural_annotation_stats.json"
+    File tsv = "~{prefix}_structural_annotation_stats.tsv"
+    File json = "~{prefix}_structural_annotation_stats.json"
   }
 
   runtime {

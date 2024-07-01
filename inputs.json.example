@@ -1,7 +1,0 @@
-{
-  "annotation.input_file": "/path/to/example/Ga0587029_contigs.fna",
-  "annotation.imgap_project_id": "Ga0587029",
-  "annotation.proj": "Ga0587029",
-  "annotation.resource": "NERSC - CORI",
-  "annotation.informed_by": "None"
-}

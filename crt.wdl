@@ -1,9 +1,10 @@
+version 1.0
 workflow crt {
-
-  String imgap_input_fasta
-  String imgap_project_id
-  String container
-
+    input {
+        File imgap_input_fasta
+        String imgap_project_id
+        String container
+    }
   call run {
     input:
       input_fasta = imgap_input_fasta,
@@ -19,20 +20,20 @@ workflow crt {
 }
 
 task run {
-
-  String jar="java -Xmx1536m -jar /opt/omics/bin/CRT-CLI.jar"
-  String transform_bin="/opt/omics/bin/structural_annotation/transform_crt_output.py"
-  File   input_fasta
-  String project_id
-  String prefix = sub(project_id, ":", "_")
-  String container
-
-  command {
-    ${jar} ${input_fasta} ${prefix}_crt.out
+    input {
+        String jar="java -Xmx1536m -jar /opt/omics/bin/CRT-CLI.jar"
+        String transform_bin="/opt/omics/bin/structural_annotation/transform_crt_output.py"
+        File   input_fasta
+        String project_id
+        String prefix=sub(project_id, ":", "_")
+        String container
+    }
+  command <<<
+    ~{jar} ~{input_fasta} ~{prefix}_crt.out
     set -uo pipefail  # java returns error code 1 even apon success so remove set -e
-    tool_and_version=$(${jar} -version | cut -d' ' -f1,6)
-    ${transform_bin} ${prefix}_crt.out "$tool_and_version"
-  }
+    tool_and_version=$(~{jar} -version | cut -d' ' -f1,6)
+    ~{transform_bin} ~{prefix}_crt.out "$tool_and_version"
+  >>>
 
   runtime {
     time: "1:00:00"
@@ -41,9 +42,12 @@ task run {
   }
 
   output {
-    File crisprs = "${prefix}_crt.crisprs"
-    File gff = "${prefix}_crt.gff"
-    File crt_out = "${prefix}_crt.out"
+    File crisprs = "~{prefix}_crt.crisprs"
+    File gff = "~{prefix}_crt.gff"
+    File crt_out = "~{prefix}_crt.out"
+    File crisprs = "~{prefix}_crt.crisprs"
+    File gff = "~{prefix}_crt.gff"
+    File crt_out = "~{prefix}_crt.out"
   }
 }
 
