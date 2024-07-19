@@ -25,5 +25,5 @@ jobs:
     - name: Run MiniWDL
       run: |
         # Add the commands to run your MiniWDL workflow
-        miniwdl check annotation_full.wdl
+        miniwdl check --suppress UnknownRuntimeKey annotation_full.wdl
 
