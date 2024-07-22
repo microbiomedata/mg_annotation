@@ -189,7 +189,7 @@ input {
     File ec_tsv = finish_ano.final_ec_tsv
     File lineage_tsv = finish_ano.final_lineage_tsv
     File stats_tsv = finish_ano.final_tsv
-    #File stats_json = finish_ano.final_json
+    File stats_json = finish_ano.final_json
     File cog_gff = finish_ano.final_cog_gff
     File pfam_gff = finish_ano.final_pfam_gff
     File tigrfam_gff = finish_ano.final_tigrfam_gff
@@ -718,6 +718,7 @@ task finish_ano {
         File final_renamed_fasta = "~{prefix}_contigs.fna"
         File final_map_file = "~{prefix}_contig_names_mapping.tsv"
         File final_tsv = "~{prefix}_stats.tsv"
+        File final_json = "~{prefix}_stats.json"
         File final_version = "~{prefix}_imgap.info"
  
     }
