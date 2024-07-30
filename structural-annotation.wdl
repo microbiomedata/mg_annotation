@@ -27,7 +27,7 @@ workflow s_annotate {
     # }
 
 
-    call trnascan.trnascan {
+    call trnascan.trnascan as ts{
       input:
         imgap_input_fasta = imgap_input_fasta,
         imgap_project_id = imgap_project_id,
@@ -36,7 +36,7 @@ workflow s_annotate {
     }
 
 
-    call rfam.rfam {
+    call rfam.rfam as rf{
       input:
         cmzscore = cmzscore,
         imgap_input_fasta = imgap_input_fasta,
@@ -47,7 +47,7 @@ workflow s_annotate {
     }
 
 
-    call crt.crt {
+    call crt.crt as ct {
       input:
         imgap_input_fasta = imgap_input_fasta,
         imgap_project_id = imgap_project_id,
@@ -56,7 +56,7 @@ workflow s_annotate {
 
 
 
-     call cds_prediction.cds_prediction {
+     call cds_prediction.cds_prediction as cds{
        input:
          imgap_input_fasta = imgap_input_fasta,
          imgap_project_id = imgap_project_id,
@@ -72,10 +72,10 @@ workflow s_annotate {
       input:
         input_fasta = imgap_input_fasta,
         project_id = imgap_project_id,
-        rfam_gff = rfam.rfam_gff,
-        trna_gff = trnascan.gff,
-        crt_gff = crt.gff,
-        cds_gff = cds_prediction.gff,
+        rfam_gff = rf.rfam_gff,
+        trna_gff = ts.gff,
+        crt_gff = ct.gff,
+        cds_gff = cds.gff,
         container = container
     }
 
@@ -84,8 +84,8 @@ workflow s_annotate {
        # input_fasta = imgap_input_fasta,
         project_id = imgap_project_id,
         final_gff = gff_merge.final_gff,
-        cds_genes = cds_prediction.genes,
-        cds_proteins = cds_prediction.proteins,
+        cds_genes = cds.genes,
+        cds_proteins = cds.proteins,
         container = container
     }
 
@@ -94,7 +94,6 @@ workflow s_annotate {
     call gff_and_fasta_stats {
       input:
         input_fasta = imgap_input_fasta,
-        project_id = imgap_project_id,
         final_gff = gff_merge.final_gff,
         container = container
     }
@@ -104,24 +103,24 @@ workflow s_annotate {
 
   output {
     File  gff = gff_merge.final_gff 
-    File crt_gff = crt.gff
-    File crisprs = crt.crisprs
-    File crt_out = crt.crt_out
-    File genemark_gff = cds_prediction.genemark_gff
-    File genemark_genes = cds_prediction.genemark_genes
-    File genemark_proteins = cds_prediction.genemark_proteins
-    File prodigal_gff = cds_prediction.prodigal_gff
-    File prodigal_genes = cds_prediction.prodigal_genes
-    File prodigal_proteins = cds_prediction.prodigal_proteins
-    File cds_gff = cds_prediction.gff
-    File cds_proteins = cds_prediction.proteins
-    File cds_genes = cds_prediction.genes
-    File trna_gff = trnascan.gff
-    File trna_bacterial_out = trnascan.bacterial_out
-    File trna_archaeal_out = trnascan.archaeal_out
-    File rfam_gff = rfam.rfam_gff
-    File rfam_tbl = rfam.rfam_tbl
-    String rfam_version = rfam.rfam_version
+    File crt_gff = ct.gff
+    File crisprs = ct.crisprs
+    File crt_out = ct.crt_out
+    File genemark_gff = cds.genemark_gff
+    File genemark_genes = cds.genemark_genes
+    File genemark_proteins = cds.genemark_proteins
+    File prodigal_gff = cds.prodigal_gff
+    File prodigal_genes = cds.prodigal_genes
+    File prodigal_proteins = cds.prodigal_proteins
+    File cds_gff = cds.gff
+    File cds_proteins = cds.proteins
+    File cds_genes = cds.genes
+    File trna_gff = ts.gff
+    File trna_bacterial_out = ts.bacterial_out
+    File trna_archaeal_out = ts.archaeal_out
+    File rfam_gff = rf.rfam_gff
+    File rfam_tbl = rf.rfam_tbl
+    String rfam_version = rf.rfam_version
     File proteins = fasta_merge.final_proteins
     File genes = fasta_merge.final_genes
   }
@@ -138,28 +137,28 @@ task pre_qc {
         Int    seqs_per_million_bp_cutoff = 500
         Int    min_seq_length = 150
         String container
-        File tmp_fasta="~{input_fasta}.tmp"
-        File qced_fasta="~{prefix}_contigs.fna"
+        String tmp_fasta="~{input_fasta}.tmp"
+        String qced_fasta="~{prefix}_contigs.fna"
     }
 
   command <<<
     set -euo pipefail
     echo ~{tmp_fasta}
     grep -v '^\s*$' ~{input_fasta} | tr -d '\r' | \
-    sed 's/^>[[:blank:]]*/>/g' > $tmp_fasta
-    acgt_count=`grep -v '^>' $tmp_fasta | grep -o [acgtACGT] | wc -l`
-    n_count=`grep -v '^>' $tmp_fasta | grep -o '[^acgtACGT]' | wc -l`
+    sed 's/^>[[:blank:]]*/>/g' > ~{tmp_fasta}
+    acgt_count=`grep -v '^>' ~{tmp_fasta} | grep -o [acgtACGT] | wc -l`
+    n_count=`grep -v '^>' ~{tmp_fasta} | grep -o '[^acgtACGT]' | wc -l`
     n_ratio=`echo ~n_count $acgt_count | awk '{printf "%f", $1 / $2}'`
     if (( $(echo "~n_ratio >= ~{n_ratio_cutoff}" | bc) ))
     then
-        rm $tmp_fasta
+        rm ~{tmp_fasta}
         exit 1
     fi
 
     if [[ ~{project_type} == "isolate" ]]
     then
-        seq_count=`grep -c '^>' ~tmp_fasta`
-        bp_count=`grep -v '^>' ~tmp_fasta | tr -d '\n' | wc -m`
+        seq_count=`grep -c '^>' ~{tmp_fasta}`
+        bp_count=`grep -v '^>' ~{tmp_fasta} | tr -d '\n' | wc -m`
         seqs_per_million_bp=$seq_count
         if (( $bp_count > 1000000 ))
         then
@@ -169,13 +168,13 @@ task pre_qc {
         fi
         if (( $(echo "~seqs_per_million_bp > ~{seqs_per_million_bp_cutoff}" | bc) ))
         then
-            rm $tmp_fasta
+            rm ~{tmp_fasta}
             exit 1
         fi
     fi
     ~{bin} -v
-    ~{bin} ~tmp_fasta ~qced_fasta -l ~{min_seq_length}
-    rm ~tmp_fasta
+    ~{bin} ~{tmp_fasta} ~{qced_fasta} -l ~{min_seq_length}
+    rm ~{tmp_fasta}
   >>>
 
   runtime {
@@ -265,7 +264,6 @@ task gff_and_fasta_stats {
     input {
         String bin="/opt/omics/bin/structural_annotation/gff_and_final_fasta_stats.py"
         File   input_fasta
-        String project_id
         File   final_gff
         String container
     }
