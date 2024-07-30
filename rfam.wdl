@@ -5,6 +5,7 @@ workflow rfam {
         File imgap_input_fasta
         String imgap_project_id
         Int    additional_threads
+        Int    additional_memory
         String database_location="/refdata/img/"
         String cm="~{database_location}"+"Rfam/13.0/Rfam.cm"
         String claninfo_tsv="~{database_location}"+"Rfam/13.0/Rfam.claninfo"
@@ -21,7 +22,8 @@ workflow rfam {
       feature_lookup_tsv = feature_lookup_tsv,
       claninfo_tsv = claninfo_tsv,
       threads = additional_threads,
-      container=container
+      container=container,
+      memory = additional_memory
   }
 
   output {

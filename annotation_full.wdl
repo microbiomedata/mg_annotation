@@ -12,6 +12,7 @@ input {
   String  imgap_project_type="metagenome"
   String  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
+  Int     additional_memory = 100
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
 
   # structural annotation
@@ -49,7 +50,8 @@ input {
           imgap_project_type = imgap_project_type,
           database_location = database_location,
           container=container,
-          gm_license=gm_license
+          gm_license=gm_license,
+          additional_memory = additional_memory
       }
 
 
