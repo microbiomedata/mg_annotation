@@ -43,6 +43,7 @@ task run {
         String claninfo_tsv
         String feature_lookup_tsv
         Int    threads
+        Int    memory = 100
         String container
         String rfam_version_file = "rfam_version.txt"
     }
@@ -67,8 +68,9 @@ task run {
 
   runtime {
     time: "1:00:00"
-    memory: "86G"
     docker: container
+    cpu: threads
+    memory: "~{memory} GiB"
   }
 
   output {
