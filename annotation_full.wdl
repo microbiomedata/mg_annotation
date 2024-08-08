@@ -6,7 +6,7 @@ import "./functional-annotation.wdl" as fa
 workflow annotation {
 input {
   String  proj
-  File  input_file
+  String  input_file
   String  imgap_project_id
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
@@ -235,7 +235,7 @@ task stage {
     input {
         String container
         String target="input.fasta"
-        File   input_file
+        String   input_file
     }
 
    command <<<
