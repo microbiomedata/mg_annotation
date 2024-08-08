@@ -15,15 +15,11 @@ workflow f_annotate {
         Int?    par_hmm_inst
         Int?    approx_num_proteins
         String  smart_db="~{database_location}"+"/SMART/01_06_2016/SMART.hmm"
-        String  hmmsearch_bin="/opt/omics/bin/hmmsearch"
-        String  frag_hits_filter_bin="/opt/omics/bin/functional_annotation/hmmsearch_fragmented_hits_filter.py"
         String  cog_db="~{database_location}"+"/COG/HMMs/2003/COG.hmm"
         String  tigrfam_db="~{database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
-        String  hit_selector_bin="/opt/omics/bin/functional_annotation/hmmsearch_hit_selector.py"
         String  superfam_db="~{database_location}"+"/SuperFamily/v1.75/supfam.hmm"
         String  pfam_db="~{database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.v34.0.hmm"
         String  pfam_claninfo_tsv="~{database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
-        String  pfam_clan_filter="/opt/omics/bin/functional_annotation/pfam_clan_filter.py"
         String  cath_funfam_db="~{database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
         #  Boolean signalp_execute=true
         #  String  signalp_gram_stain="GRAM_STAIN"
@@ -61,8 +57,6 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         smart_db = smart_db,
-        hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin,
         container=hmm_container
     }
 
@@ -74,8 +68,6 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         cog_db = cog_db,
-        hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin,
         container=hmm_container
     }
 
@@ -87,8 +79,6 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         tigrfam_db = tigrfam_db,
-        hmmsearch = hmmsearch_bin,
-        hit_selector = hit_selector_bin,
         container=hmm_container
     }
 
@@ -100,8 +90,6 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         superfam_db = superfam_db,
-        hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin,
         container=hmm_container
     }
 
@@ -114,8 +102,6 @@ workflow f_annotate {
         approx_num_proteins = approx_num_proteins,
         pfam_db = pfam_db,
         pfam_claninfo_tsv = pfam_claninfo_tsv,
-        pfam_clan_filter = pfam_clan_filter,
-        hmmsearch = hmmsearch_bin,
         container=hmm_container
     }
 
@@ -127,8 +113,6 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         cath_funfam_db = cath_funfam_db,
-        hmmsearch = hmmsearch_bin,
-        frag_hits_filter = frag_hits_filter_bin,
         container=hmm_container
     }
 
@@ -256,8 +240,6 @@ task smart {
         Float  min_domain_eval_cutoff = 0.01
         Float  aln_length_ratio = 0.7
         Float  max_overlap_ratio = 0.1
-        String hmmsearch
-        String frag_hits_filter
         String base=basename(input_fasta)
         String container
         String hmmsearch_version_file = "hmmsearch_version.txt"
@@ -304,8 +286,6 @@ task cog {
         Float  min_domain_eval_cutoff = 0.01
         Float  aln_length_ratio = 0.7
         Float  max_overlap_ratio = 0.1
-        String hmmsearch
-        String frag_hits_filter
         String base=basename(input_fasta)
         String container
         String hmmsearch_version_file = "hmmsearch_version.txt"
@@ -351,8 +331,6 @@ task tigrfam {
       Int    approx_num_proteins = 0
       Float  aln_length_ratio = 0.7
       Float  max_overlap_ratio = 0.1
-      String hmmsearch
-      String hit_selector
       String base=basename(input_fasta)
       String container
       String hmmsearch_version_file = "hmmsearch_version.txt"
@@ -400,8 +378,6 @@ task superfam {
         Float  min_domain_eval_cutoff = 0.01
         Float  aln_length_ratio = 0.7
         Float  max_overlap_ratio = 0.1
-        String hmmsearch
-        String frag_hits_filter
         String base=basename(input_fasta)
         String container
         String hmmsearch_version_file =  "hmmsearch_version.txt"
@@ -447,8 +423,6 @@ task pfam {
         Int    threads = 62
         Int    par_hmm_inst = 15
         Int    approx_num_proteins = 0
-        String hmmsearch
-        String pfam_clan_filter
         String base=basename(input_fasta)
         String container
         String hmmsearch_version_file = "hmmsearch_version.txt"
@@ -495,8 +469,6 @@ task cath_funfam {
         Float  min_domain_eval_cutoff = 0.01
         Float  aln_length_ratio = 0.7
         Float  max_overlap_ratio = 0.1
-        String hmmsearch
-        String frag_hits_filter
         String base=basename(input_fasta)
         String container
         String hmmsearch_version_file = "hmmsearch_version.txt"
@@ -529,7 +501,7 @@ task cath_funfam {
   }
 }
 
-task signalp {
+task run_signalp {
     input {
         String project_id
         String prefix=sub(project_id, ":", "_")

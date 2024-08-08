@@ -10,8 +10,9 @@ input {
   String  imgap_project_id
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
-  String?  gm_license="/refdata/licenses/.gmhmmp2_key"
+  String  gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
+  Int     additional_memory = 100
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
 
   # structural annotation
@@ -49,7 +50,8 @@ input {
           imgap_project_type = imgap_project_type,
           database_location = database_location,
           container=container,
-          gm_license=gm_license
+          gm_license=gm_license,
+          additional_memory = additional_memory
       }
 
 
@@ -148,9 +150,7 @@ input {
   call finish_ano {
     input:
       container=container,
-      input_file=make_map_file.out_fasta,
       proj=proj,
-      start=stage.start,
       ano_info_file=make_info_file.imgap_info,
       proteins_faa = merge_outputs.proteins_faa,
       structural_gff = merge_outputs.structural_gff,
@@ -235,7 +235,7 @@ task stage {
     input {
         String container
         String target="input.fasta"
-        String input_file
+        String   input_file
     }
 
    command <<<
@@ -300,7 +300,7 @@ task make_map_file {
 task split {
     input {
        File infile
-       String blocksize=100
+       Int blocksize=100
        String zfile="zscore.txt"
        String cmzfile="cmzscore.txt"
        String container
@@ -504,8 +504,6 @@ task make_info_file {
         String fa_version_file = "fa_tool_version.txt"
         String fa_db_version_file = "fa_db_version.txt"
         String rfam_version_file = "rfam_version.txt"
-        String sa_version_file = "sa_tool_version.txt"
-        String sa_db_version_file = "sa_db_version.txt"
     }
   command <<<
     set -euo pipefail
@@ -618,9 +616,7 @@ task finish_ano {
        String container
        String proj
        String prefix=sub(proj, ":", "_")
-       String start
        File ano_info_file
-       File input_file
        File proteins_faa
        File structural_gff
        File functional_gff
