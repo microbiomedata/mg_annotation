@@ -1,16 +1,25 @@
 version 1.0
 workflow jgi_genomad {
     input {
+        Boolean genomad_execute = false
         File input_fasta
-        String project_id
         String container
         Int len_cutoff = 2000
         String db_dir
         String container_run_cmd
         Int threads = 1
-
     }
   
+  call run_genomad {
+    input:
+    genomad_execute = genomad_execute,
+    input_fasta = input_fasta,
+    container = container,
+    len_cutoff = len_cutoff,
+    db_dir = db_dir,
+    container_run_cmd = container_run_cmd,
+    threads = threads
+  }
 
   output {
     File virus_summary = run_genomad.virus_summary
@@ -22,30 +31,45 @@ workflow jgi_genomad {
 
 task run_genomad {
     input {
+        Boolean genomad_execute
         String bin="/opt/omics/bin/genomad.sh"
         File   input_fasta
-        String project_id
-        String prefix=sub(project_id, ":", "_")
+        Int    len_cutoff 
+        String db_dir
+        String container_run_cmd
+        Int    threads 
         String container
+        String genomad_prefix = basename(input_fasta) + ".filtered"
     }
   command <<<
-    set -euo pipefail
-    ~{bin} -len_cutoff ~{input_fasta} --genome-type auto \
-           --database_dir ~{prefix}_genemark.gff --format gff \
-           --container_run_cmd ~{prefix}_genemark_genes.fna \
-           --threads ~{prefix}_genemark_proteins.faa
+    if [[ "~{genomad_execute}" = true ]]
+      then
+      set -euo pipefail
+      ~{bin} -len_cutoff ~{len_cutoff} \
+            --database_dir ~{db_dir} \
+            --container_run_cmd ~{container_run_cmd} \
+            --threads ~{threads} \
+            ~{input_fasta}
+    else
+      echo "NA" > ~{genomad_prefix}_virus_summary.tsv
+      echo "NA" > ~{genomad_prefix}_plasmid_summary.tsv
+      echo "NA" > ~{genomad_prefix}_aggregated_classification.tsv
+    fi
+    echo "container: ~{container}"
+
   >>>
 
   runtime {
     time: "1:00:00"
     memory: "86G"
     docker: container
+    cpu: threads
   }
 
   output {
-    File gff = "~{prefix}_genemark.gff"
-    File genes = "~{prefix}_genemark_genes.fna"
-    File proteins = "~{prefix}_genemark_proteins.faa"
+    File virus_summary = "~{genomad_prefix}_virus_summary.tsv"
+    File plasmid_summary = "~{genomad_prefix}_plasmid_summary.tsv"
+    File aggregated_class = "~{genomad_prefix}_aggregated_classification.tsv"
     File std_out = stdout()
   }
 }
