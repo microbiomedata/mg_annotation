@@ -1,7 +1,7 @@
-Metagenome Annotation Workflow (v1.0.0)
+Metagenome Annotation Workflow (v1.1.4)
 =======================================
 
-.. image:: annotation.png
+.. image:: anno_workflow2024.png
 
 Workflow Overview
 -----------------
@@ -12,7 +12,9 @@ The input assembly is first split into 10MB splits to be processed in parallel. 
 
 Workflow Availability
 ---------------------
-The workflow is available in GitHub: https://github.com/microbiomedata/mg_annotation/ and the corresponding Docker image is available in DockerHub: https://hub.docker.com/r/microbiomedata/mg-annotation.
+The workflow is available in GitHub: https://github.com/microbiomedata/mg_annotation/ and the corresponding Docker image is available in DockerHub: 
+- `microbiomedata/img-omics:5.2.0 <https://hub.docker.com/r/microbiomedata/img-omics>`_
+
 
 Requirements for Execution (recommendations are in bold):  
 ---------------------------------------------------------
@@ -24,6 +26,14 @@ Hardware Requirements:
 ----------------------
 - Disk space: 106 GB for the reference databases
 - Memory: >100 GB RAM
+
+
+IMGAP Version: 5.2.0
+Mapping Programs Used: fasta_sanity.py 1.0.0
+Structural Annotation Programs Used: CRT 1.8.4; GeneMark.hmm-2 v1.25_lic; INFERNAL 1.1.3 (Nov 2019); Prodigal v2.6.3_patched; tRNAscan-SE v.2.0.12 (Nov 2022)
+Structural Annotation DBs Used: Rfam 13.0
+Functional Annotation Programs Used: HMMER 3.1b2; lastal 1456
+Functional Annotation DBs Used: COG 2003; Cath-Funfam v4.2.0; IMG-NR 20230629; Pfam v34.0; SMART 01_06_2016; SuperFamily v1.75; TIGRFAM v15.0
 
 
 Workflow Dependencies
@@ -56,11 +66,11 @@ An example JSON file is shown below:
 
 .. code-block:: JSON
 
-   {
-    "annotation.imgap_input_fasta": "/path/to/fasta.fna",
-    "annotation.imgap_project_id": "samp_xyz123"}
-   }
-
+      {
+      "annotation.input_file": "/global/cfs/cdirs/m3408/aim2/dev/kli_training/mg_annotation/test/assembly.contigs.renamed.fasta",
+      "annotation.proj": "nmdc:wfmgan-xxxxx.1",
+      "annotation.imgap_project_id": "nmdc:wfmgan-xxxxx.1"
+      }
 
 
 **Output:** The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are listed below but additional files are available.
@@ -69,7 +79,7 @@ An example JSON file is shown below:
 - GFF: Functional annotation
 - TSV: KO Summary
 - TSV: EC Summary
-- TSV: Gene Phylogeny Summar
+- TSV: Gene Phylogeny Summary
 
 The output paths can be obtained from the output metadata file from the Cromwell Exectuion.  Here is a snippet from the outputs section
 of the full metadata JSON file.
@@ -77,28 +87,28 @@ of the full metadata JSON file.
 .. code-block:: JSON
 
    {
-     "annotation.cath_funfam_gff": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_cath_funfam.gff",
-     "annotation.cog_gff": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_cog.gff",
-     "annotation.ko_ec_gff": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_ko_ec.gff",
-     "annotation.product_names_tsv": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_product_names.tsv",
-     "annotation.gene_phylogeny_tsv": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_gene_phylogeny.tsv",
-     "annotation.pfam_gff": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_pfam.gff",
-     "annotation.proteins_tigrfam_domtblout": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_proteins.tigrfam.domtblout",
-     "annotation.structural_gff": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_structural_annotation.gff",
-     "annotation.ec_tsv": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_ec.tsv",
-     "annotation.supfam_gff": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_supfam.gff",
-     "annotation.proteins_supfam_domtblout": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_proteins.supfam.domtblout",
-     "annotation.tigrfam_gff": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_tigrfam.gff",
-     "annotation.stats_tsv": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-final_stats/execution/samp_xyz123_structural_annotation_stats.tsv",
-     "annotation.proteins_cog_domtblout": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_proteins.cog.domtblout",
-     "annotation.ko_tsv": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_ko.tsv",
-     "annotation.proteins_pfam_domtblout": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_proteins.pfam.domtblout",
-     "annotation.proteins_smart_domtblout": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_proteins.smart.domtblout",
-     "annotation.crt_crisprs": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_crt.crisprs",
-     "annotation.functional_gff": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_functional_annotation.gff",
-     "annotation.proteins_faa": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123.faa",
-     "annotation.smart_gff": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_smart.gff",
-     "annotation.proteins_cath_funfam_domtblout": "/output/cromwell-executions/annotation/a67a5a0f-1ad7-4469-bb0c-780f4ef20307/call-merge_outputs/execution/samp_xyz123_proteins.cath_funfam.domtblout"
+     "annotation.cath_funfam_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_cath_funfam.gff",
+     "annotation.cog_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_cog.gff",
+     "annotation.ko_ec_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_ko_ec.gff",
+     "annotation.product_names_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_product_names.tsv",
+     "annotation.gene_phylogeny_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_gene_phylogeny.tsv",
+     "annotation.pfam_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_pfam.gff",
+     "annotation.proteins_tigrfam_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.tigrfam.domtblout",
+     "annotation.structural_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_structural_annotation.gff",
+     "annotation.ec_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_ec.tsv",
+     "annotation.supfam_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_supfam.gff",
+     "annotation.proteins_supfam_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.supfam.domtblout",
+     "annotation.tigrfam_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_tigrfam.gff",
+     "annotation.stats_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-final_stats/execution/samp_xyz123_structural_annotation_stats.tsv",
+     "annotation.proteins_cog_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.cog.domtblout",
+     "annotation.ko_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_ko.tsv",
+     "annotation.proteins_pfam_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.pfam.domtblout",
+     "annotation.proteins_smart_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.smart.domtblout",
+     "annotation.crt_crisprs": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_crt.crisprs",
+     "annotation.functional_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_functional_annotation.gff",
+     "annotation.proteins_faa": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123.faa",
+     "annotation.smart_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_smart.gff",
+     "annotation.proteins_cath_funfam_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.cath_funfam.domtblout"
    }
 
 
