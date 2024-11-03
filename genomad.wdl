@@ -5,8 +5,7 @@ workflow jgi_genomad {
         File input_fasta
         String container
         Int len_cutoff = 2000
-        String db_dir
-        String container_run_cmd
+        String db_dir = "/refdata/genomad_db/"
         Int threads = 1
     }
   
@@ -17,7 +16,6 @@ workflow jgi_genomad {
     container = container,
     len_cutoff = len_cutoff,
     db_dir = db_dir,
-    container_run_cmd = container_run_cmd,
     threads = threads
   }
 
@@ -32,11 +30,10 @@ workflow jgi_genomad {
 task run_genomad {
     input {
         Boolean genomad_execute
-        String bin="/opt/omics/bin/genomad.sh"
+        String bin="/usr/local/bin/genomad.sh"
         File   input_fasta
         Int    len_cutoff 
-        String db_dir
-        String container_run_cmd
+        String db_dir 
         Int    threads 
         String container
         String genomad_prefix = basename(input_fasta) + ".filtered"
@@ -45,9 +42,10 @@ task run_genomad {
     if [[ "~{genomad_execute}" = true ]]
       then
       set -euo pipefail
-      ~{bin} -len_cutoff ~{len_cutoff} \
+      docker run 
+      ~{bin} \
+            --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
-            --container_run_cmd ~{container_run_cmd} \
             --threads ~{threads} \
             ~{input_fasta}
     else
