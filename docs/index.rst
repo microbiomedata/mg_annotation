@@ -28,27 +28,18 @@ Hardware Requirements:
 - Memory: >100 GB RAM
 
 
-IMGAP Version: 5.2.0
-Mapping Programs Used: fasta_sanity.py 1.0.0
-Structural Annotation Programs Used: CRT 1.8.4; GeneMark.hmm-2 v1.25_lic; INFERNAL 1.1.3 (Nov 2019); Prodigal v2.6.3_patched; tRNAscan-SE v.2.0.12 (Nov 2022)
-Structural Annotation DBs Used: Rfam 13.0
-Functional Annotation Programs Used: HMMER 3.1b2; lastal 1456
-Functional Annotation DBs Used: COG 2003; Cath-Funfam v4.2.0; IMG-NR 20230629; Pfam v34.0; SMART 01_06_2016; SuperFamily v1.75; TIGRFAM v15.0
-
-
 Workflow Dependencies
 ---------------------
 
 - Third party software (This is included in the Docker image.)  
    - Conda (3-clause BSD)
-   - tRNAscan-SE >= 2.0 (GNU GPL v3)
-   - Infernal 1.1.2 (BSD)
-   - CRT-CLI 1.8 (Public domain software, last official version is 1.2)
-   - Prodigal 2.6.3 (GNU GPL v3)
-   - GeneMarkS-2 >= 1.07 (Academic license for GeneMark family software)
-   - Last >= 983 (GNU GPL v3)
+   - tRNAscan-SE >= 2.0.12 (GNU GPL v3)
+   - Infernal 1.1.3 (BSD)
+   - CRT-CLI 1.8.4 (Public domain software, last official version is 1.2)
+   - Prodigal 2.6.3_patched (GNU GPL v3)
+   - GeneMarkS-2 >= 1.25 (Academic license for GeneMark family software)
+   - Last >= 1456 (GNU GPL v3)
    - HMMER 3.1b2 (3-clause BSD)
-   - TMHMM 2.0 (Academic)
 - Requisite databases: The databases are available by request. Please contact NMDC (support@microbiomedata.org) for access.
 
 
@@ -57,7 +48,9 @@ Sample datasets
 https://raw.githubusercontent.com/microbiomedata/mg_annotation/master/example.fasta
 
 
-**Input:** A JSON file containing the following: 
+Inputs
+------
+A JSON file containing the following: 
 
 1. The path to the assembled contigs fasta file 
 2. The ID to associate with the result products (e.g. sample ID)
@@ -73,7 +66,9 @@ An example JSON file is shown below:
       }
 
 
-**Output:** The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are listed below but additional files are available.
+Output
+------
+ The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are listed below but additional files are available.
 
 - GFF: Structural annotation
 - GFF: Functional annotation
