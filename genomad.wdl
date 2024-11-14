@@ -39,10 +39,9 @@ task run_genomad {
         String genomad_prefix = basename(input_fasta) + ".filtered"
     }
   command <<<
+    set -euo pipefail
     if [[ "~{genomad_execute}" = true ]]
-      then
-      set -euo pipefail
-      docker run 
+     then 
       ~{bin} \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
