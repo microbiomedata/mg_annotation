@@ -32,15 +32,24 @@ Workflow Dependencies
 ---------------------
 
 - Third party software (This is included in the Docker image.)  
-   - Conda (3-clause BSD)
-   - tRNAscan-SE >= 2.0.12 (GNU GPL v3)
-   - Infernal 1.1.3 (BSD)
-   - CRT-CLI 1.8.4 (Public domain software, last official version is 1.2)
-   - Prodigal 2.6.3_patched (GNU GPL v3)
-   - GeneMarkS-2 >= 1.25 (`Academic license for GeneMark family software <http://topaz.gatech.edu/GeneMark/license_download.cgi>`_)
-   - Last >= 1456 (GNU GPL v3)
-   - HMMER 3.1b2 (3-clause BSD, `thread optimized <https://github.com/Larofeticus/hpc_hmmsearch>`_)
-- Requisite databases: The full list of databases is available by request. Please contact NMDC (support@microbiomedata.org) for access.
+  - Conda (3-clause BSD)
+  - tRNAscan-SE >= 2.0.12 (GNU GPL v3)
+  - Infernal 1.1.3 (BSD)
+  - CRT-CLI 1.8.4 (Public domain software, last official version is 1.2)
+  - Prodigal 2.6.3_patched (GNU GPL v3)
+  - GeneMarkS-2 >= 1.25 (`Academic license for GeneMark family software <http://topaz.gatech.edu/GeneMark/license_download.cgi>`_)
+  - Last >= 1456 (GNU GPL v3)
+  - HMMER 3.1b2 (3-clause BSD, `thread optimized <https://github.com/Larofeticus/hpc_hmmsearch>`_)
+- Requisite databases: 
+  - Rfam (public domain/CC0 1.0; [more info](http://reusabledata.org/rfam))
+  - KEGG (paid subscription, getting KOs/ECs indirectly via IMG NR; [more info](http://reusabledata.org/kegg-ftp))
+  - SMART (restrictive license/custom); [more info](http://reusabledata.org/smart)
+  - COG (copyright/unlicensed); [more info](http://reusabledata.org/cogs)
+  - TIGRFAM (copyleft/LGPL 2.0 or later); [more info](http://reusabledata.org/tigrfams)
+  - SUPERFAMILY (permissive/custom); [more info](http://reusabledata.org/supfam)
+  - Pfam (public domain/ CC0 1.0); [more info](http://reusabledata.org/pfam)
+  - Cath-FunFam (permissive/CC BY 4.0); [more info](http://reusabledata.org/cath)
+The full list of databases is available by request. Please contact NMDC (support@microbiomedata.org) for access.
 
 
 Sample datasets
@@ -56,7 +65,9 @@ Inputs
 A JSON file containing the following: 
 
 1. The path to the assembled contigs fasta file 
-2. The ID to associate with the result products (e.g. sample ID)
+2.  output file prefix
+3.	(optional) parameters for memory 
+4.	(optional) number of threads requested
 
 An example JSON file is shown below:
 
@@ -71,14 +82,7 @@ An example JSON file is shown below:
 
 Output
 ------
- The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are listed below but additional files are available.
-
-- GFF: Structural annotation
-- GFF: Functional annotation
-- TSV: KO Summary
-- TSV: EC Summary
-- TSV: Gene Phylogeny Summary
-
+ The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are bolded below but additional files are available.
 
 ==================================== ============================================================================
 FileName                              Description
@@ -89,33 +93,38 @@ prefix_contig_names_mapping.tsv        tsv mapping assembly scaffold IDs to cont
 prefix_contigs.fna                     fasta with contigs renamed to annotation IDs
 prefix_crt.crisprs                     xml file with CRISPR terms
 prefix_crt.gff                         gff structural annotation generated with CRT 
-prefix_ec.tsv                          tsv file for EC annotation 
-prefix_functional_annotation.gff       gff with functional annotations   
+**prefix_ec.tsv                        tsv file for EC annotation 
+prefix_functional_annotation.gff       gff with functional annotations**  
 prefix_genemark.gff                    gff with strunctural annotation by GeneMark
-prefix_gene_phylogeny.tsv              tsv of gene phylogeny 
+**prefix_gene_phylogeny.tsv            tsv of gene phylogeny**
 prefix_imgap.info                      workflow information 
-prefix_ko_ec.gff                       gff annotation with KO and EC terms 
+**prefix_ko_ec.gff                     gff annotation with KO and EC terms**
 prefix_ko.tsv                          tsv of only KO terms 
 prefix_pfam.gff                        gff functional annotation from Pfam database 
 prefix_prodigal.gff                    gff structural annotation by Prodigal
 prefix_product_names.tsv               tsv of annotation products
 prefix_proteins.faa                    fasta of protein sequences 
 prefix_rfam.gff                        gff structural annotation by RFAM 
-prefix_scaffold_lineage.tsv
-prefix_smart.gff
-prefix_stats.json
-prefix_stats.tsv
-prefix_structural_annotation.gff
-prefix_supfam.gff
-prefix_tigrfam.gff
-prefix_trna.gff
+prefix_scaffold_lineage.tsv            tsv of phylogeny at scaffold level
+prefix_smart.gff                       gff functional annotation from SMART database 
+prefix_stats.json                      json of annotation statistics report 
+prefix_stats.tsv                       tsv of annotation statistics report 
+**prefix_structural_annotation.gff     gff structural annotation**
+prefix_supfam.gff                      gff functional annotation from SUPERFAMILY database
+prefix_tigrfam.gff                     gff functional annotation from TIGRFAM database
+prefix_trna.gff                        gff structural annotation by tRNAscan-SE
 ==================================== ============================================================================
 
-**Version History:** 1.0.0 (release data)
+
+Version History
+---------------
+- 1.1.4 (08/09/2024)
+- 1.0.0 (release data)
 
 Point of contact
 ----------------
 
-* Package maintainer: Shane Canon <scanon@lbl.gov>
+- Package maintainer: Shane Canon <scanon@lbl.gov>
+
 
 
