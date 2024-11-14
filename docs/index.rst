@@ -1,11 +1,11 @@
 Metagenome Annotation Workflow (v1.1.4)
 =======================================
 
-.. image:: anno_workflow2024.png
+.. image:: anno_workflow2024.svg
 
 Workflow Overview
 -----------------
-This workflow takes assembled metagenomes and generates structural and functional annotations. The workflow uses a number of open-source tools and databases to generate the structural and functional annotations. 
+This workflow takes assembled metagenomes and generates structural and functional annotations. It is based on the JGI/IMG annotation pipeline (`details <https://github.com/kellyrowland/img-omics-wdl>`_) and uses a number of open-source tools and databases to generate the structural and functional annotations. 
 
 The input assembly is first split into 10MB splits to be processed in parallel. Depending on the workflow engine configuration, the split can be processed in parallel. Each split is first structurally annotated, then those results are used for the functional annotation. The structural annotation uses tRNAscan_se, RFAM, CRT, Prodigal and GeneMarkS. These results are merged to create a consensus structural annotation. The resulting GFF is the input for functional annotation which uses multiple protein family databases (SMART, COG, TIGRFAM, SUPERFAMILY, Pfam and Cath-FunFam) along with custom HMM models. The functional predictions are created using Last and HMM. These annotations are also merged into a consensus GFF file. Finally, the respective split annotations are merged together to generate a single structural annotation file and single functional annotation file. In addition, several summary files are generated in TSV format.
 
@@ -37,16 +37,19 @@ Workflow Dependencies
    - Infernal 1.1.3 (BSD)
    - CRT-CLI 1.8.4 (Public domain software, last official version is 1.2)
    - Prodigal 2.6.3_patched (GNU GPL v3)
-   - GeneMarkS-2 >= 1.25 (Academic license for GeneMark family software)
+   - GeneMarkS-2 >= 1.25 (`Academic license for GeneMark family software <http://topaz.gatech.edu/GeneMark/license_download.cgi>`_)
    - Last >= 1456 (GNU GPL v3)
-   - HMMER 3.1b2 (3-clause BSD)
-- Requisite databases: The databases are available by request. Please contact NMDC (support@microbiomedata.org) for access.
+   - HMMER 3.1b2 (3-clause BSD, `thread optimized <https://github.com/Larofeticus/hpc_hmmsearch>`_)
+- Requisite databases: The full list of databases is available by request. Please contact NMDC (support@microbiomedata.org) for access.
 
 
 Sample datasets
 ---------------
-https://raw.githubusercontent.com/microbiomedata/mg_annotation/master/example.fasta
-
+- Processed Metatranscriptome of soil microbial communities from the East River watershed near Crested Butte, Colorado, United States - ER_RNA_119 (`SRR11678315 <https://www.ncbi.nlm.nih.gov/sra/SRX8239222>`_) with `metadata available in the NMDC Data Portal <https://data.microbiomedata.org/details/study/nmdc:sty-11-dcqce727>`_. 
+  - The zipped raw fastq file is available `here <https://portal.nersc.gov/project/m3408//test_data/metaT/SRR11678315.fastq.gz>`_
+  - The zipped, qc'ed fastq file is available `here <https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315/readsqc_output/SRR11678315-int-0.1_filtered.fastq.gz>`_
+  - The assembled fasta file is available `here <https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315/assembly_output/SRR11678315-int-0.1_contigs.fna>`_
+  - the sample annotation outputs are available `here <https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315/annotation_output/>`_
 
 Inputs
 ------
@@ -60,9 +63,9 @@ An example JSON file is shown below:
 .. code-block:: JSON
 
       {
-      "annotation.input_file": "/global/cfs/cdirs/m3408/aim2/dev/kli_training/mg_annotation/test/assembly.contigs.renamed.fasta",
-      "annotation.proj": "nmdc:wfmgan-xxxxx.1",
-      "annotation.imgap_project_id": "nmdc:wfmgan-xxxxx.1"
+      "annotation.input_file": "https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315/assembly_output/SRR11678315-int-0.1_contigs.fna",
+      "annotation.proj": "SRR11678315-int-0.1",
+      "annotation.imgap_project_id": "SRR11678315-int-0.1"
       }
 
 
@@ -76,37 +79,37 @@ Output
 - TSV: EC Summary
 - TSV: Gene Phylogeny Summary
 
-The output paths can be obtained from the output metadata file from the Cromwell Exectuion.  Here is a snippet from the outputs section
-of the full metadata JSON file.
 
-.. code-block:: JSON
-
-   {
-     "annotation.cath_funfam_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_cath_funfam.gff",
-     "annotation.cog_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_cog.gff",
-     "annotation.ko_ec_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_ko_ec.gff",
-     "annotation.product_names_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_product_names.tsv",
-     "annotation.gene_phylogeny_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_gene_phylogeny.tsv",
-     "annotation.pfam_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_pfam.gff",
-     "annotation.proteins_tigrfam_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.tigrfam.domtblout",
-     "annotation.structural_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_structural_annotation.gff",
-     "annotation.ec_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_ec.tsv",
-     "annotation.supfam_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_supfam.gff",
-     "annotation.proteins_supfam_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.supfam.domtblout",
-     "annotation.tigrfam_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_tigrfam.gff",
-     "annotation.stats_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-final_stats/execution/samp_xyz123_structural_annotation_stats.tsv",
-     "annotation.proteins_cog_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.cog.domtblout",
-     "annotation.ko_tsv": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_ko.tsv",
-     "annotation.proteins_pfam_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.pfam.domtblout",
-     "annotation.proteins_smart_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.smart.domtblout",
-     "annotation.crt_crisprs": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_crt.crisprs",
-     "annotation.functional_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_functional_annotation.gff",
-     "annotation.proteins_faa": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123.faa",
-     "annotation.smart_gff": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_smart.gff",
-     "annotation.proteins_cath_funfam_domtblout": "/output/cromwell-executions/annotation/[execution-id]/call-merge_outputs/execution/samp_xyz123_proteins.cath_funfam.domtblout"
-   }
-
-
+==================================== ============================================================================
+FileName                              Description
+==================================== ============================================================================
+prefix_cath_funfam.gff                 gff functional annotation generated from Cath-FunFam (Functional Families) database
+prefix_cog.gff                         gff functional annotation generated from COG (Clusters of Orthologous Groups) database
+prefix_contig_names_mapping.tsv        tsv mapping assembly scaffold IDs to contig annotation IDs (to be uniform)
+prefix_contigs.fna                     fasta with contigs renamed to annotation IDs
+prefix_crt.crisprs                     xml file with CRISPR terms
+prefix_crt.gff                         gff structural annotation generated with CRT 
+prefix_ec.tsv                          tsv file for EC annotation 
+prefix_functional_annotation.gff       gff with functional annotations   
+prefix_genemark.gff                    gff with strunctural annotation by GeneMark
+prefix_gene_phylogeny.tsv              tsv of gene phylogeny 
+prefix_imgap.info                      workflow information 
+prefix_ko_ec.gff                       gff annotation with KO and EC terms 
+prefix_ko.tsv                          tsv of only KO terms 
+prefix_pfam.gff                        gff functional annotation from Pfam database 
+prefix_prodigal.gff                    gff structural annotation by Prodigal
+prefix_product_names.tsv               tsv of annotation products
+prefix_proteins.faa                    fasta of protein sequences 
+prefix_rfam.gff                        gff structural annotation by RFAM 
+prefix_scaffold_lineage.tsv
+prefix_smart.gff
+prefix_stats.json
+prefix_stats.tsv
+prefix_structural_annotation.gff
+prefix_supfam.gff
+prefix_tigrfam.gff
+prefix_trna.gff
+==================================== ============================================================================
 
 **Version History:** 1.0.0 (release data)
 

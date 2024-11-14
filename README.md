@@ -1,44 +1,48 @@
 ## Workflow for Metagenome annotation                                                                                                                                                                                                                      
-This workflow is based on the JGI/IMG annotation pipeline ([details](https://github.com/kellyrowland/img-omics-wdl)). This is still in progress.  It takes assembled metagenomes and generates structrual and functional annotations.
+This workflow takes assembled metagenomes and generates structural and functional annotations. It is based on the JGI/IMG annotation pipeline (`details <https://github.com/kellyrowland/img-omics-wdl>`_) and uses a number of open-source tools and databases to generate the structural and functional annotations. 
+
+The input assembly is first split into 10MB splits to be processed in parallel. Depending on the workflow engine configuration, the split can be processed in parallel. Each split is first structurally annotated, then those results are used for the functional annotation. The structural annotation uses tRNAscan_se, RFAM, CRT, Prodigal and GeneMarkS. These results are merged to create a consensus structural annotation. The resulting GFF is the input for functional annotation which uses multiple protein family databases (SMART, COG, TIGRFAM, SUPERFAMILY, Pfam and Cath-FunFam) along with custom HMM models. The functional predictions are created using Last and HMM. These annotations are also merged into a consensus GFF file. Finally, the respective split annotations are merged together to generate a single structural annotation file and single functional annotation file. In addition, several summary files are generated in TSV format.
+
 
 ## Running Workflow in Cromwell
 
-This pipeline is being tested.  Instructions will be posted in the future.
+Description of the files:
+ - `.wdl` file: the WDL file for workflow definition
+ - `.json` file: the example input for the workflow
+ - `.conf` file: the conf file for running Cromwell.
+ - `.sh` file: the shell script for running the example workflow
 
 ## The Docker image can be found here
 
-[microbiomedata/mg-annotation](https://hub.docker.com/repository/docker/microbiomedata/mg-annotation)
+[microbiomedata/img-omics:5.2.0](https://hub.docker.com/r/microbiomedata/img-omics)
 
 
 ## Input files
-expects: fasta
+A JSON file containing the following: 
 
-## Output files
-```
-Multiple GFF files.  More details to come.
-```
+1. The path to the assembled contigs fasta file 
+2. The ID to associate with the result products (e.g. sample ID)
 
 
-#### Environment                                                                                                                                                                                                                                                                
- - Linux (with sh/bash)
- - Python >= 3.6 (via conda)
- - Java >= 1.8 (via conda)
+#### Requirements for Execution (recommendations are in bold):                                                  
+- WDL-capable Workflow Execution Tool **(Cromwell)**
+- Container Runtime that can load Docker images **(Docker v2.1.0.3 or higher)**
+
 
 #### Third party software used (+ their licenses)
- - Conda (3-clause BSD)
- - tRNAscan-SE >= 2.0 (GNU GPL v3)
- - Infernal 1.1.2 (BSD)
- - CRT-CLI 1.8 (Public domain software, last official version is 1.2, I made changes to it based on Natalia's and David's suggestions)
- - Prodigal 2.6.3 (GNU GPL v3)
- - GeneMarkS-2 >= 1.07 ([Academic license for GeneMark family software](http://topaz.gatech.edu/GeneMark/license_download.cgi))
- - Last >= 983 (GNU GPL v3)
- - HMMER 3.1b2 (3-clause BSD, I am using [Bill's thread optimized hmmsearch](https://github.com/Larofeticus/hpc_hmmsearch))
- - SignalP 4.1 (Academic)
- - TMHMM 2.0 (Academic)
+   - Conda (3-clause BSD)
+   - tRNAscan-SE >= 2.0.12 (GNU GPL v3)
+   - Infernal 1.1.3 (BSD)
+   - CRT-CLI 1.8.4 (Public domain software, last official version is 1.2)
+   - Prodigal 2.6.3_patched (GNU GPL v3)
+   - GeneMarkS-2 >= 1.25 ([Academic license for GeneMark family software](http://topaz.gatech.edu/GeneMark/license_download.cgi))
+   - Last >= 1456 (GNU GPL v3)
+   - HMMER 3.1b2 (3-clause BSD, [thread optimized hmmsearch](https://github.com/Larofeticus/hpc_hmmsearch))
+ 
 
 #### Databases used (+ their licenses):
- - Rfam (public domain/CC0 1.0; [more info](http://reusabledata.org/rfam)
- - KEGG (paid subscription, getting KOs/ECs indirectly via IMG NR; [more info](http://reusabledata.org/kegg-ftp)
+ - Rfam (public domain/CC0 1.0; [more info](http://reusabledata.org/rfam))
+ - KEGG (paid subscription, getting KOs/ECs indirectly via IMG NR; [more info](http://reusabledata.org/kegg-ftp))
  - SMART (restrictive license/custom); [more info](http://reusabledata.org/smart)
  - COG (copyright/unlicensed); [more info](http://reusabledata.org/cogs)
  - TIGRFAM (copyleft/LGPL 2.0 or later); [more info](http://reusabledata.org/tigrfams)
