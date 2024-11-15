@@ -42,12 +42,14 @@ task run_genomad {
     set -euo pipefail
     if [[ "~{genomad_execute}" = true ]]
      then 
+     echo "starting genomad"
       ~{bin} \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
             --threads ~{threads} \
             ~{input_fasta}
     else
+      echo "skipping genomad"
       echo "NA" > ~{genomad_prefix}_virus_summary.tsv
       echo "NA" > ~{genomad_prefix}_plasmid_summary.tsv
       echo "NA" > ~{genomad_prefix}_aggregated_classification.tsv
