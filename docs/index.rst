@@ -82,7 +82,7 @@ An example JSON file is shown below:
 
 Output
 ------
-The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are *indicated* below but additional files are available.
+The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are *italicized* below but additional files are available.
 
 .. list-table:: 
    :header-rows: 1
