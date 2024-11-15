@@ -19,8 +19,8 @@ The workflow is available in GitHub: https://github.com/microbiomedata/mg_annota
 Requirements for Execution (recommendations are in bold):  
 ---------------------------------------------------------
 
-- WDL-capable Workflow Execution Tool **(Cromwell)**
-- Container Runtime that can load Docker images **(Docker v2.1.0.3 or higher)**
+- WDL-capable Workflow Execution Tool *(Cromwell)*
+- Container Runtime that can load Docker images *(Docker v2.1.0.3 or higher)*
 
 Hardware Requirements: 
 ----------------------
@@ -82,7 +82,7 @@ An example JSON file is shown below:
 
 Output
 ------
-The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are bolded below but additional files are available.
+The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are *indicated* below but additional files are available.
 
 .. list-table:: 
    :header-rows: 1
@@ -101,18 +101,18 @@ The final structural and functional annotation files are in GFF format and the s
      - xml file with CRISPR terms
    * - prefix_crt.gff
      - gff structural annotation generated with CRT
-   * - **prefix_ec.tsv**
-     - **tsv file for EC annotation**
-   * - **prefix_functional_annotation.gff**
-     - **gff with functional annotations**
+   * - *prefix_ec.tsv*
+     - *tsv file for EC annotation*
+   * - *prefix_functional_annotation.gff*
+     - *gff with functional annotations*
    * - prefix_genemark.gff
      - gff with structural annotation by GeneMark
-   * - **prefix_gene_phylogeny.tsv**
-     - **tsv of gene phylogeny**
+   * - *prefix_gene_phylogeny.tsv*
+     - *tsv of gene phylogeny*
    * - prefix_imgap.info
      - workflow information
-   * - **prefix_ko_ec.gff**
-     - **gff annotation with KO and EC terms**
+   * - *prefix_ko_ec.gff*
+     - *gff annotation with KO and EC terms*
    * - prefix_ko.tsv
      - tsv of only KO terms
    * - prefix_pfam.gff
@@ -133,8 +133,8 @@ The final structural and functional annotation files are in GFF format and the s
      - json of annotation statistics report
    * - prefix_stats.tsv
      - tsv of annotation statistics report
-   * - **prefix_structural_annotation.gff**
-     - **gff structural annotation**
+   * - *prefix_structural_annotation.gff*
+     - *gff structural annotation*
    * - prefix_supfam.gff
      - gff functional annotation from SUPERFAMILY database
    * - prefix_tigrfam.gff
