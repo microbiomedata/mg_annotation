@@ -82,38 +82,65 @@ An example JSON file is shown below:
 
 Output
 ------
- The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are bolded below but additional files are available.
+The final structural and functional annotation files are in GFF format and the summary files are in TSV format.  The key outputs are bolded below but additional files are available.
 
-==================================== ============================================================================
-FileName                              Description
-==================================== ============================================================================
-prefix_cath_funfam.gff                 gff functional annotation generated from Cath-FunFam (Functional Families) database
-prefix_cog.gff                         gff functional annotation generated from COG (Clusters of Orthologous Groups) database
-prefix_contig_names_mapping.tsv        tsv mapping assembly scaffold IDs to contig annotation IDs (to be uniform)
-prefix_contigs.fna                     fasta with contigs renamed to annotation IDs
-prefix_crt.crisprs                     xml file with CRISPR terms
-prefix_crt.gff                         gff structural annotation generated with CRT 
-**prefix_ec.tsv                        tsv file for EC annotation 
-prefix_functional_annotation.gff       gff with functional annotations**  
-prefix_genemark.gff                    gff with strunctural annotation by GeneMark
-**prefix_gene_phylogeny.tsv            tsv of gene phylogeny**
-prefix_imgap.info                      workflow information 
-**prefix_ko_ec.gff                     gff annotation with KO and EC terms**
-prefix_ko.tsv                          tsv of only KO terms 
-prefix_pfam.gff                        gff functional annotation from Pfam database 
-prefix_prodigal.gff                    gff structural annotation by Prodigal
-prefix_product_names.tsv               tsv of annotation products
-prefix_proteins.faa                    fasta of protein sequences 
-prefix_rfam.gff                        gff structural annotation by RFAM 
-prefix_scaffold_lineage.tsv            tsv of phylogeny at scaffold level
-prefix_smart.gff                       gff functional annotation from SMART database 
-prefix_stats.json                      json of annotation statistics report 
-prefix_stats.tsv                       tsv of annotation statistics report 
-**prefix_structural_annotation.gff     gff structural annotation**
-prefix_supfam.gff                      gff functional annotation from SUPERFAMILY database
-prefix_tigrfam.gff                     gff functional annotation from TIGRFAM database
-prefix_trna.gff                        gff structural annotation by tRNAscan-SE
-==================================== ============================================================================
+.. list-table:: 
+   :header-rows: 1
+
+   * - Directory/File Name
+     - Description
+   * - prefix_cath_funfam.gff
+     - gff functional annotation generated from Cath-FunFam (Functional Families) database
+   * - prefix_cog.gff
+     - gff functional annotation generated from COG (Clusters of Orthologous Groups) database
+   * - prefix_contig_names_mapping.tsv
+     - tsv mapping assembly scaffold IDs to contig annotation IDs (to be uniform)
+   * - prefix_contigs.fna
+     - fasta with contigs renamed to annotation IDs
+   * - prefix_crt.crisprs
+     - xml file with CRISPR terms
+   * - prefix_crt.gff
+     - gff structural annotation generated with CRT
+   * - **prefix_ec.tsv**
+     - **tsv file for EC annotation**
+   * - **prefix_functional_annotation.gff**
+     - **gff with functional annotations**
+   * - prefix_genemark.gff
+     - gff with structural annotation by GeneMark
+   * - **prefix_gene_phylogeny.tsv**
+     - **tsv of gene phylogeny**
+   * - prefix_imgap.info
+     - workflow information
+   * - **prefix_ko_ec.gff**
+     - **gff annotation with KO and EC terms**
+   * - prefix_ko.tsv
+     - tsv of only KO terms
+   * - prefix_pfam.gff
+     - gff functional annotation from Pfam database
+   * - prefix_prodigal.gff
+     - gff structural annotation by Prodigal
+   * - prefix_product_names.tsv
+     - tsv of annotation products
+   * - prefix_proteins.faa
+     - fasta of protein sequences
+   * - prefix_rfam.gff
+     - gff structural annotation by RFAM
+   * - prefix_scaffold_lineage.tsv
+     - tsv of phylogeny at scaffold level
+   * - prefix_smart.gff
+     - gff functional annotation from SMART database
+   * - prefix_stats.json
+     - json of annotation statistics report
+   * - prefix_stats.tsv
+     - tsv of annotation statistics report
+   * - **prefix_structural_annotation.gff**
+     - **gff structural annotation**
+   * - prefix_supfam.gff
+     - gff functional annotation from SUPERFAMILY database
+   * - prefix_tigrfam.gff
+     - gff functional annotation from TIGRFAM database
+   * - prefix_trna.gff
+     - gff structural annotation by tRNAscan-SE
 
 
 Version History
