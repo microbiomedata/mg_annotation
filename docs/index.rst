@@ -64,10 +64,10 @@ Inputs
 ------
 A JSON file containing the following: 
 
-1. The path to the assembled contigs fasta file 
-2.  output file prefix
-3.	(optional) parameters for memory 
-4.	(optional) number of threads requested
+#. The path to the assembled contigs fasta file 
+#.  output file prefix
+#.	(optional) parameters for memory 
+#.	(optional) number of threads requested
 
 An example JSON file is shown below:
 
