@@ -5,7 +5,7 @@ Metagenome Annotation Workflow (v1.1.4)
 
 Workflow Overview
 -----------------
-This workflow takes assembled metagenomes and generates structural and functional annotations. It is based on the JGI/IMG annotation pipeline (`details <https://github.com/kellyrowland/img-omics-wdl>`_) and uses a number of open-source tools and databases to generate the structural and functional annotations. 
+This workflow takes assembled metagenomes and generates structural and functional annotations. It is based on the `JGI/IMG annotation pipeline <https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/>`_ (`more details <https://journals.asm.org/doi/10.1128/msystems.00804-20>`_) and uses a number of open-source tools and databases to generate the structural and functional annotations. 
 
 The input assembly is first split into 10MB splits to be processed in parallel. Depending on the workflow engine configuration, the split can be processed in parallel. Each split is first structurally annotated, then those results are used for the functional annotation. The structural annotation uses tRNAscan_se, RFAM, CRT, Prodigal and GeneMarkS. These results are merged to create a consensus structural annotation. The resulting GFF is the input for functional annotation which uses multiple protein family databases (SMART, COG, TIGRFAM, SUPERFAMILY, Pfam and Cath-FunFam) along with custom HMM models. The functional predictions are created using Last and HMM. These annotations are also merged into a consensus GFF file. Finally, the respective split annotations are merged together to generate a single structural annotation file and single functional annotation file. In addition, several summary files are generated in TSV format.
 
@@ -32,6 +32,7 @@ Workflow Dependencies
 ---------------------
 
 - Third party software (This is included in the Docker image.)  
+
   - Conda (3-clause BSD)
   - tRNAscan-SE >= 2.0.12 (GNU GPL v3)
   - Infernal 1.1.3 (BSD)
@@ -40,21 +41,25 @@ Workflow Dependencies
   - GeneMarkS-2 >= 1.25 (`Academic license for GeneMark family software <http://topaz.gatech.edu/GeneMark/license_download.cgi>`_)
   - Last >= 1456 (GNU GPL v3)
   - HMMER 3.1b2 (3-clause BSD, `thread optimized <https://github.com/Larofeticus/hpc_hmmsearch>`_)
+
 - Requisite databases: 
-  - Rfam (public domain/CC0 1.0; [more info](http://reusabledata.org/rfam))
-  - KEGG (paid subscription, getting KOs/ECs indirectly via IMG NR; [more info](http://reusabledata.org/kegg-ftp))
-  - SMART (restrictive license/custom); [more info](http://reusabledata.org/smart)
-  - COG (copyright/unlicensed); [more info](http://reusabledata.org/cogs)
-  - TIGRFAM (copyleft/LGPL 2.0 or later); [more info](http://reusabledata.org/tigrfams)
-  - SUPERFAMILY (permissive/custom); [more info](http://reusabledata.org/supfam)
-  - Pfam (public domain/ CC0 1.0); [more info](http://reusabledata.org/pfam)
-  - Cath-FunFam (permissive/CC BY 4.0); [more info](http://reusabledata.org/cath)
+
+  - Rfam 13.0 (public domain/CC0 1.0; `more info <http://reusabledata.org/rfam>`_)
+  - KEGG (paid subscription, getting KOs/ECs indirectly via IMG-NR 20230629; `more info <http://reusabledata.org/kegg-ftp>`_)
+  - SMART 01_06_2016 (restrictive license/custom; `more info <http://reusabledata.org/smart>`_)
+  - COG 2003 (copyright/unlicensed; `more info <http://reusabledata.org/cogs>`_)
+  - TIGRFAM v15.0 (copyleft/LGPL 2.0 or later; `more info <http://reusabledata.org/tigrfams>`_)
+  - SUPERFAMILY v1.75 (permissive/custom; `more info <http://reusabledata.org/supfam>`_) 
+  - Pfam v34.0 (public domain/ CC0 1.0; `more info <http://reusabledata.org/pfam>`_) 
+  - Cath-FunFam v4.2.0 (permissive/CC BY 4.0; `more info <http://reusabledata.org/cath>`_) 
+
 The full list of databases is available by request. Please contact NMDC (support@microbiomedata.org) for access.
 
 
 Sample datasets
 ---------------
 - Processed Metatranscriptome of soil microbial communities from the East River watershed near Crested Butte, Colorado, United States - ER_RNA_119 (`SRR11678315 <https://www.ncbi.nlm.nih.gov/sra/SRX8239222>`_) with `metadata available in the NMDC Data Portal <https://data.microbiomedata.org/details/study/nmdc:sty-11-dcqce727>`_. 
+
   - The zipped raw fastq file is available `here <https://portal.nersc.gov/project/m3408//test_data/metaT/SRR11678315.fastq.gz>`_
   - The zipped, qc'ed fastq file is available `here <https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315/readsqc_output/SRR11678315-int-0.1_filtered.fastq.gz>`_
   - The assembled fasta file is available `here <https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315/assembly_output/SRR11678315-int-0.1_contigs.fna>`_
