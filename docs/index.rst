@@ -13,6 +13,7 @@ The input assembly is first split into 10MB splits to be processed in parallel. 
 Workflow Availability
 ---------------------
 The workflow is available in GitHub: https://github.com/microbiomedata/mg_annotation/ and the corresponding Docker image is available in DockerHub: 
+
 - `microbiomedata/img-omics:5.2.0 <https://hub.docker.com/r/microbiomedata/img-omics>`_
 
 
