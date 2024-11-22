@@ -27,7 +27,7 @@ input {
       input: container=container,
           input_file=input_file
     }
-  # confused whether to use assembly or annotation id
+
   call make_map_file {
        input: proj_id = proj,
               input_file = stage.imgap_input_fasta,
