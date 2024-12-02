@@ -38,6 +38,7 @@ A JSON file containing the following:
   - GeneMarkS-2 >= 1.25 ([Academic license for GeneMark family software](http://topaz.gatech.edu/GeneMark/license_download.cgi))
   - Last >= 1456 (GNU GPL v3)
   - HMMER 3.1b2 (3-clause BSD, [thread optimized hmmsearch](https://github.com/Larofeticus/hpc_hmmsearch))
+  - GeNomad 1.8.1 (GNU GPL v3, pulled from [IMG Annotation Pipeline repo](https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline))
  
 
 #### Databases used (+ their licenses):
@@ -49,3 +50,4 @@ A JSON file containing the following:
   - SUPERFAMILY (permissive/custom); [more info](http://reusabledata.org/supfam)
   - Pfam (public domain/ CC0 1.0); [more info](http://reusabledata.org/pfam)
   - Cath-FunFam (permissive/CC BY 4.0); [more info](http://reusabledata.org/cath)
+  - GeNomad DB v1.7 (permissive/CC BY 4.0; [more info](https://zenodo.org/records/10594875))

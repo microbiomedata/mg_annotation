@@ -54,7 +54,7 @@ Workflow Dependencies
   - SUPERFAMILY v1.75 (permissive/custom; `more info <http://reusabledata.org/supfam>`_) 
   - Pfam v34.0 (public domain/ CC0 1.0; `more info <http://reusabledata.org/pfam>`_) 
   - Cath-FunFam v4.2.0 (permissive/CC BY 4.0; `more info <http://reusabledata.org/cath>`_) 
-  - GeNomad v1.7 (permissive/CC BY 4.0; `more info <https://zenodo.org/records/10594875>`_) 
+  - GeNomad DB v1.7 (permissive/CC BY 4.0; `more info <https://zenodo.org/records/10594875>`_) 
 
 
 Sample datasets
