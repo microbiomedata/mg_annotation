@@ -15,7 +15,7 @@ workflow annotation {
     Int     additional_threads=16
     Int     additional_memory = 100
     String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
-    String  genomad_container="microbiomedata/img-genomad@sha256:08bd54e396163e88ad96b96099d23e0b55294ab166a6907bdbb4520ab28cafcc"
+    String  genomad_container="microbiomedata/img-genomad@sha256:85c75651918e84825c7b83cc3dc30f31f89228991d54ac7617f28f38349a14b8"
     String  genomad_db_dir = "/refdata/genomad_db/"
     # structural annotation
     Boolean sa_execute=true
