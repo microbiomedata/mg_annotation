@@ -42,6 +42,7 @@ Workflow Dependencies
   - GeneMarkS-2 >= 1.25 (`Academic license for GeneMark family software <http://topaz.gatech.edu/GeneMark/license_download.cgi>`_)
   - Last >= 1456 (GNU GPL v3)
   - HMMER 3.1b2 (3-clause BSD, `thread optimized <https://github.com/Larofeticus/hpc_hmmsearch>`_)
+  - GeNomad 1.8.1 (GNU GPL v3, pulled from `IMG Annotation Pipeline repo <https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline>`_)
 
 - Requisite databases: 
 
@@ -53,8 +54,7 @@ Workflow Dependencies
   - SUPERFAMILY v1.75 (permissive/custom; `more info <http://reusabledata.org/supfam>`_) 
   - Pfam v34.0 (public domain/ CC0 1.0; `more info <http://reusabledata.org/pfam>`_) 
   - Cath-FunFam v4.2.0 (permissive/CC BY 4.0; `more info <http://reusabledata.org/cath>`_) 
-
-The full list of databases is available by request. Please contact NMDC (support@microbiomedata.org) for access.
+  - GeNomad v1.7 (permissive/CC BY 4.0; `more info <https://zenodo.org/records/10594875>`_) 
 
 
 Sample datasets
@@ -71,7 +71,7 @@ Inputs
 A JSON file containing the following: 
 
 #. The path to the assembled contigs fasta file 
-#.  output file prefix
+#. output file prefix
 #.	(optional) parameters for memory 
 #.	(optional) number of threads requested
 
