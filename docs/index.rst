@@ -59,9 +59,10 @@ Workflow Dependencies
 
 Sample datasets
 ---------------
+
 - Processed Metatranscriptome of soil microbial communities from the East River watershed near Crested Butte, Colorado, United States - ER_RNA_119 (`SRR11678315 <https://www.ncbi.nlm.nih.gov/sra/SRX8239222>`_) with `metadata available in the NMDC Data Portal <https://data.microbiomedata.org/details/study/nmdc:sty-11-dcqce727>`_. 
 
-  - The zipped raw fastq file is available `here <https://portal.nersc.gov/project/m3408//test_data/metaT/SRR11678315.fastq.gz>`_
+  - The zipped raw fastq file is available `here <https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315.fastq.gz>`_
   - The zipped, qc'ed fastq file is available `here <https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315/readsqc_output/SRR11678315-int-0.1_filtered.fastq.gz>`_
   - The assembled fasta file is available `here <https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315/assembly_output/SRR11678315-int-0.1_contigs.fna>`_
   - the sample annotation outputs are available `here <https://portal.nersc.gov/cfs/m3408/test_data/metaT/SRR11678315/annotation_output/>`_
