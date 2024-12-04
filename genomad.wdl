@@ -39,11 +39,12 @@ task run_genomad {
         String genomad_prefix = basename(input_fasta) + ".filtered"
     }
   command <<<
-    set -euo pipefail
+    # set -euo pipefail
     if [[ "~{genomad_execute}" = true ]]
      then 
      echo "starting genomad"
-      ~{bin} \
+      # ~{bin} \
+      genomad.sh \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
             --threads ~{threads} \
@@ -62,7 +63,6 @@ task run_genomad {
     time: "1:00:00"
     memory: "86G"
     docker: container
-    cpu: threads
   }
 
   output {
