@@ -150,9 +150,10 @@ The final structural and functional annotation files are in GFF format and the s
 
 
 Structure of GFF and tab-delimited text files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------
 
 General GFFs
+~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -188,7 +189,9 @@ General GFFs
      - attributes
      - ID=<feature_id>;locus_tag=<gene_id>;product=<initial product>
 
+
 :code:`prefix_cog.gff` (From NCBI RPSBLAST or hmmsearch with COG HMMs)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -227,7 +230,9 @@ General GFFs
      - bit_score
      - Bit score of alignment
 
+
 :code:`prefix_pfam.gff` (From hmmsearch with Pfam HMMs)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -266,7 +271,9 @@ General GFFs
      - align_length
      - Alignment length
 
+
 :code:`prefix_tigrfam.gff` (TIGRFAM annotation)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -305,7 +312,9 @@ General GFFs
      - align_length
      - Alignment length
 
+
 :code:`prefix_cath_funfam.gff` (CATH FUNFAM annotation)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -344,7 +353,9 @@ General GFFs
      - align_length
      - Alignment length
 
+
 :code:`prefix_supfam.gff` (SUPERFAM annotation)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -383,7 +394,9 @@ General GFFs
      - align_length
      - Alignment length
 
+
 :code:`prefix_smart.gff` (SMART annotation)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -422,7 +435,9 @@ General GFFs
      - align_length
      - Alignment length
 
+
 :code:`prefix_gene_phylogeny.tsv` (from LAST on non-redundant database of IMG proteins extracted from high-quality genomes)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -446,7 +461,10 @@ General GFFs
      - lineage
      - Domain;phylum;class;order;family;genus;species;taxon_name of the genome in which LAST hit was found
 
+
 :code:`prefix_ko.tsv` (from LAST on IMG genes)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. list-table:: 
    :header-rows: 1
 
@@ -488,6 +506,7 @@ General GFFs
      - Alignment length
 
 :code:`prefix_ec.tsv` (from LAST on IMG genes)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -530,6 +549,7 @@ General GFFs
      - Alignment length
 
 :code:`prefix_product_names.tsv` (from COG, Pfam, TIGRfam)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -549,6 +569,7 @@ General GFFs
 
 
 :code:`prefix_contig_names_mapping.tsv` 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -565,6 +586,7 @@ General GFFs
 
 
 :code:`prefix_crt.crisprs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: 
    :header-rows: 1
@@ -590,7 +612,6 @@ General GFFs
    * - 6
      - tool_code
      - Single letter code for tool used
-
 
 
 
