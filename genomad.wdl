@@ -39,36 +39,47 @@ task run_genomad {
         String genomad_prefix = basename(input_fasta) + ".filtered"
     }
   command <<<
-    # set -euo pipefail
+    set -euo pipefail
     if [[ "~{genomad_execute}" = true ]]
      then 
      echo "starting genomad"
-      # ~{bin} \
+      PATH=$PATH:/opt/conda/bin
       genomad.sh \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
             --threads ~{threads} \
             ~{input_fasta}
+      # move and rename files output from genomad.sh script
+      mv ../../call-run_genomad_aggregated_classification.tsv ./genomad_aggregated_classification.tsv
+      mv ../../call-run_genomad_plasmid_summary.tsv ./genomad_plasmid_summary.tsv
+      mv ../../call-run_genomad_virus_summary.tsv ./genomad_virus_summary.tsv
+
     else
       echo "skipping genomad"
-      echo "NA" > ~{genomad_prefix}_virus_summary.tsv
-      echo "NA" > ~{genomad_prefix}_plasmid_summary.tsv
-      echo "NA" > ~{genomad_prefix}_aggregated_classification.tsv
+      echo "NA" > genomad_virus_summary.tsv
+      echo "NA" > genomad_plasmid_summary.tsv
+      echo "NA" > genomad_aggregated_classification.tsv
+      # echo "NA" > ~{genomad_prefix}_virus_summary.tsv
+      # echo "NA" > ~{genomad_prefix}_plasmid_summary.tsv
+      # echo "NA" > ~{genomad_prefix}_aggregated_classification.tsv
     fi
     echo "container: ~{container}"
 
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: "60"
     memory: "86G"
     docker: container
   }
 
   output {
-    File virus_summary = "~{genomad_prefix}_virus_summary.tsv"
-    File plasmid_summary = "~{genomad_prefix}_plasmid_summary.tsv"
-    File aggregated_class = "~{genomad_prefix}_aggregated_classification.tsv"
+    File virus_summary = "genomad_virus_summary.tsv"
+    File plasmid_summary = "genomad_plasmid_summary.tsv"
+    File aggregated_class = "genomad_aggregated_classification.tsv"
+    # File virus_summary = "~{genomad_prefix}_virus_summary.tsv"
+    # File plasmid_summary = "~{genomad_prefix}_plasmid_summary.tsv"
+    # File aggregated_class = "~{genomad_prefix}_aggregated_classification.tsv"
     File std_out = stdout()
   }
 }
