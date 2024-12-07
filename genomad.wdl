@@ -43,13 +43,14 @@ task run_genomad {
     if [[ "~{genomad_execute}" = true ]]
      then 
      echo "starting genomad"
-      PATH=$PATH:/opt/conda/bin
+      # PATH=$PATH:/opt/conda/bin
+      /usr/local/bin/_entrypoint.sh \
       genomad.sh \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
             --threads ~{threads} \
             ~{input_fasta}
-      # move and rename files output from genomad.sh script
+      # move and rename files output from genomad.sh script so that cromwell can find them
       mv ../../call-run_genomad_aggregated_classification.tsv ./genomad_aggregated_classification.tsv
       mv ../../call-run_genomad_plasmid_summary.tsv ./genomad_plasmid_summary.tsv
       mv ../../call-run_genomad_virus_summary.tsv ./genomad_virus_summary.tsv
