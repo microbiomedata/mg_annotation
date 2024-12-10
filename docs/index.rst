@@ -35,7 +35,7 @@ Workflow Dependencies
 - Third party software (This is included in the Docker image.)  
 
   - Conda (3-clause BSD)
-  - TRNAscan-SE >= 2.0.12 (GNU GPL v3)
+  - tRNAscan-SE >= 2.0.12 (GNU GPL v3)
   - Infernal 1.1.3 (BSD)
   - CRT-CLI 1.8.4 (Public domain software, last official version is 1.2)
   - Prodigal 2.6.3_patched (GNU GPL v3)
@@ -107,18 +107,18 @@ The final structural and functional annotation files are in GFF format and the s
      - Tab-delimited file for CRISPR array annotation details
    * - prefix_crt.gff
      - GFF / tab-delimited structural annotation generated with CRT
-   * - *prefix_ec.tsv*
-     - *Tab-delimited file file for EC annotation*
-   * - *prefix_functional_annotation.gff*
-     - *GFF / tab-delimited with functional annotations*
+   * - prefix_ec.tsv
+     - Tab-delimited file file for EC annotation
+   * - prefix_functional_annotation.gff
+     - GFF / tab-delimited with functional annotations
    * - prefix_genemark.gff
      - GFF / tab-delimited with structural annotation by GeneMark
-   * - *prefix_gene_phylogeny.tsv*
-     - *Tab-delimited file of gene phylogeny*
+   * - prefix_gene_phylogeny.tsv
+     - Tab-delimited file of gene phylogeny
    * - prefix_imgap.info
      - Workflow information
-   * - *prefix_ko_ec.gff*
-     - *GFF / tab-delimited annotation with KO and EC terms*
+   * - prefix_ko_ec.gff
+     - GFF / tab-delimited annotation with KO and EC terms
    * - prefix_ko.tsv
      - Tab-delimited file of only KO terms
    * - prefix_pfam.gff
@@ -130,7 +130,7 @@ The final structural and functional annotation files are in GFF format and the s
    * - prefix_proteins.faa
      - FASTA amino acid file for taxon
    * - prefix_rfam.gff
-     - GFF / tab-delimited structural annotation for non-coding RNA and regulatory RNA motif and binding site annotation by RFAM
+     - GFF / tab-delimited structural annotation for non-coding RNA and regulatory RNA motif and binding site annotation by Rfam
    * - prefix_scaffold_lineage.tsv
      - Tab-delimited file of phylogeny at scaffold level
    * - prefix_smart.gff
@@ -139,8 +139,8 @@ The final structural and functional annotation files are in GFF format and the s
      - JSON of annotation statistics report
    * - prefix_stats.tsv
      - Tab-delimited file of annotation statistics report
-   * - *prefix_structural_annotation.gff*
-     - *GFF / tab-delimited structural annotation*
+   * - prefix_structural_annotation.gff
+     - GFF / tab-delimited structural annotation
    * - prefix_supfam.gff
      - GFF / tab-delimited functional annotation from SUPERFAMILY database
    * - prefix_tigrfam.gff
@@ -248,7 +248,7 @@ General GFFs
      - Pfam identifier
    * - 3
      - percent_identity
-     - (Always "100%. Not valid for HMMs, retained for compatibility with legacy data)
+     - (Always "100%". Not valid for HMMs, retained for compatibility with legacy data)
    * - 4
      - query_start
      - Start coordinate of alignment on query gene
@@ -289,7 +289,7 @@ General GFFs
      - TIGRFAM identifier
    * - 3
      - percent_identity
-     - (Always "100%. Not valid for HMMs, retained for compatibility with legacy data)
+     - (Always "100%". Not valid for HMMs, retained for compatibility with legacy data)
    * - 4
      - query_start
      - Start coordinate of alignment on query gene
