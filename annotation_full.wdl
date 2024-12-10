@@ -15,7 +15,7 @@ workflow annotation {
     Int     additional_threads=16
     Int     additional_memory = 100
     String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
-    String  genomad_container="microbiomedata/img-genomad@sha256:85c75651918e84825c7b83cc3dc30f31f89228991d54ac7617f28f38349a14b8"
+    String  genomad_container="microbiomedata/img-genomad@sha256:6025d3943750dfe0caf961e58572c69cc6ce54ee74d8c118a2561d3a9ebf32d0"
     String  genomad_db_dir = "/refdata/genomad_db/"
     # structural annotation
     Boolean sa_execute=true
@@ -597,7 +597,7 @@ task make_info_file {
       g_con=`grep "container" ~{gen_info}`
       g_prog=`grep "Programs" -A1 ~{gen_info} | tail -n 1`
       g_db=`grep "DBs" -A1 ~{gen_info} | tail -n 1`
-      echo "$genomad_version $g_con; $g_db"  >> ~{prefix}_imgap.info
+      echo "$genomad_version $g_prog; $g_db; $g_con"  >> ~{prefix}_imgap.info
     fi
   >>>
 

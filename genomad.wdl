@@ -43,7 +43,6 @@ task run_genomad {
     if [[ "~{genomad_execute}" = true ]]
      then 
      echo "starting genomad"
-      # PATH=$PATH:/opt/conda/bin
       /usr/local/bin/_entrypoint.sh \
       genomad.sh \
             --len_cutoff ~{len_cutoff} \
@@ -69,7 +68,7 @@ task run_genomad {
   >>>
 
   runtime {
-    runtime_minutes: "60"
+    runtime_minutes: "90"
     memory: "86G"
     docker: container
   }
