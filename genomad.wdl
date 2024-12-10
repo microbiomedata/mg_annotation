@@ -59,9 +59,6 @@ task run_genomad {
       echo "NA" > genomad_virus_summary.tsv
       echo "NA" > genomad_plasmid_summary.tsv
       echo "NA" > genomad_aggregated_classification.tsv
-      # echo "NA" > ~{genomad_prefix}_virus_summary.tsv
-      # echo "NA" > ~{genomad_prefix}_plasmid_summary.tsv
-      # echo "NA" > ~{genomad_prefix}_aggregated_classification.tsv
     fi
     echo "container: ~{container}"
 
@@ -77,9 +74,6 @@ task run_genomad {
     File virus_summary = "genomad_virus_summary.tsv"
     File plasmid_summary = "genomad_plasmid_summary.tsv"
     File aggregated_class = "genomad_aggregated_classification.tsv"
-    # File virus_summary = "~{genomad_prefix}_virus_summary.tsv"
-    # File plasmid_summary = "~{genomad_prefix}_plasmid_summary.tsv"
-    # File aggregated_class = "~{genomad_prefix}_aggregated_classification.tsv"
     File std_out = stdout()
   }
 }
