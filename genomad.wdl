@@ -37,6 +37,9 @@ task run_genomad {
         Int    threads 
         String container
         String genomad_prefix = basename(input_fasta) + ".filtered"
+        String agg_class = "~{genomad_prefix}_aggregated_classification.tsv"
+        String plas_sum = "~{genomad_prefix}_plasmid_summary.tsv"
+        String vir_sum = "~{genomad_prefix}_virus_summary.tsv"
     }
   command <<<
     set -euo pipefail
@@ -50,9 +53,9 @@ task run_genomad {
             --threads ~{threads} \
             ~{input_fasta}
       # move and rename files output from genomad.sh script so that cromwell can find them
-      mv ../../call-run_genomad_aggregated_classification.tsv ./genomad_aggregated_classification.tsv
-      mv ../../call-run_genomad_plasmid_summary.tsv ./genomad_plasmid_summary.tsv
-      mv ../../call-run_genomad_virus_summary.tsv ./genomad_virus_summary.tsv
+      # mv ../inputs/~{agg_class} ./genomad_aggregated_classification.tsv
+      # mv ../inputs/~{plas_sum} ./genomad_plasmid_summary.tsv
+      # mv ../inputs/~{vir_sum} ./genomad_virus_summary.tsv
 
     else
       echo "skipping genomad"
