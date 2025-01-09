@@ -7,9 +7,9 @@ workflow f_annotate {
        # File    input_contigs_fasta
         File    input_fasta
         String  database_location="/refdata/img/"
-        String  ko_ec_img_nr_db="~{database_location}"+"/IMG-NR/20230629/img_nr"
-        String  ko_ec_md5_mapping="~{database_location}"+"/IMG-NR/20230629/md5Hash2Data.tsv"
-        String  ko_ec_taxon_to_phylo_mapping="~{database_location}"+"/IMG-NR/20230629/taxonOId2Taxonomy.tsv"
+        String  ko_ec_img_nr_db="~{database_location}"+"/IMG-NR/20240916/img_nr"
+        String  ko_ec_md5_mapping="~{database_location}"+"/IMG-NR/20240916/md5Hash2Data.tsv"
+        String  ko_ec_taxon_to_phylo_mapping="~{database_location}"+"/IMG-NR/20240916/taxonOId2Taxonomy.tsv"
         String  lastal_bin="/opt/omics/bin/lastal"
         String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
         Int?    par_hmm_inst
@@ -18,8 +18,8 @@ workflow f_annotate {
         String  cog_db="~{database_location}"+"/COG/HMMs/2003/COG.hmm"
         String  tigrfam_db="~{database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
         String  superfam_db="~{database_location}"+"/SuperFamily/v1.75/supfam.hmm"
-        String  pfam_db="~{database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.v34.0.hmm"
-        String  pfam_claninfo_tsv="~{database_location}"+"/Pfam/Pfam-A/v34.0/Pfam-A.clans.tsv"
+        String  pfam_db="~{database_location}"+"/Pfam/37.0/Pfam-A.hmm"
+        String  pfam_claninfo_tsv="~{database_location}"+"/Pfam/37.0/Pfam-A.clans.tsv"
         String  cath_funfam_db="~{database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
         #  Boolean signalp_execute=true
         #  String  signalp_gram_stain="GRAM_STAIN"
@@ -30,7 +30,7 @@ workflow f_annotate {
         #  String  tmhmm_decode_parser="/opt/omics/bin/functional_annotation/decodeanhmm_parser.py"
         File    sa_gff
         String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
-        String  product_names_mapping_dir="~{database_location}"+"/Product_Name_Mappings/20230814"
+        String  product_names_mapping_dir="~{database_location}"+"/Product_Name_Mappings/20241202"
         String  container
         String  hmm_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
         String  last_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
@@ -195,7 +195,7 @@ task ko_ec {
     }
   command <<<
     set -euo pipefail
-    ~{lastal} -f blasttab+ -P ~{threads} ~{nr_db} ~{input_fasta} 1> ~{prefix}_proteins.img_nr.last.blasttab
+    ~{lastal} -m -f blasttab+ -P ~{threads} ~{nr_db} ~{input_fasta} 1> ~{prefix}_proteins.img_nr.last.blasttab
     ~{selector} -l ~{aln_length_ratio} -m ~{min_ko_hits} -n ~{top_hits} \
                 ~{project_type} ~{md5} ~{phylo} \
                 ~{prefix}_ko.tsv ~{prefix}_ec.tsv \

@@ -46,12 +46,18 @@ task run_genomad {
     if [[ "~{genomad_execute}" = true ]]
      then 
      echo "starting genomad"
+     sed -i -e 's/mv/\# mv/g' genomad.sh
+     cat genomad.sh
       /usr/local/bin/_entrypoint.sh \
       genomad.sh \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
             --threads ~{threads} \
             ~{input_fasta}
+      
+      # mv ~{agg_class} .
+      # mv ~{plas_sum} .
+      # mv ~{vir_sum} .
       # move and rename files output from genomad.sh script so that cromwell can find them
       # mv ../inputs/~{agg_class} ./genomad_aggregated_classification.tsv
       # mv ../inputs/~{plas_sum} ./genomad_plasmid_summary.tsv
