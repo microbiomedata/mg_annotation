@@ -45,8 +45,10 @@ task run_genomad {
     set -euo pipefail
     if [[ "~{genomad_execute}" = true ]]
      then 
+     echo ~{genomad_prefix}
+     echo ~{agg_class}
      echo "starting genomad"
-     sed -i -e 's/mv/\# mv/g' genomad.sh
+     sed -i -e 's/mv/\# mv/g' /usr/local/bin/genomad.sh
      cat genomad.sh
       /usr/local/bin/_entrypoint.sh \
       genomad.sh \
@@ -65,9 +67,9 @@ task run_genomad {
 
     else
       echo "skipping genomad"
-      echo "NA" > genomad_virus_summary.tsv
-      echo "NA" > genomad_plasmid_summary.tsv
-      echo "NA" > genomad_aggregated_classification.tsv
+      echo "NA" > ~{agg_class}
+      echo "NA" > ~{plas_sum}
+      echo "NA" > ~{vir_sum}
     fi
     echo "container: ~{container}"
 
@@ -80,9 +82,9 @@ task run_genomad {
   }
 
   output {
-    File virus_summary = "genomad_virus_summary.tsv"
-    File plasmid_summary = "genomad_plasmid_summary.tsv"
-    File aggregated_class = "genomad_aggregated_classification.tsv"
+    File virus_summary = "~{agg_class}"
+    File plasmid_summary = " ~{plas_sum}"
+    File aggregated_class = "~{vir_sum}"
     File std_out = stdout()
   }
 }
