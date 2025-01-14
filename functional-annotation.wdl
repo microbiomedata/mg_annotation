@@ -195,7 +195,7 @@ task ko_ec {
     }
   command <<<
     set -euo pipefail
-    ~{lastal} -m -f blasttab+ -P ~{threads} ~{nr_db} ~{input_fasta} 1> ~{prefix}_proteins.img_nr.last.blasttab
+    ~{lastal} -m 180 -f blasttab+ -P ~{threads} ~{nr_db} ~{input_fasta} 1> ~{prefix}_proteins.img_nr.last.blasttab
     ~{selector} -l ~{aln_length_ratio} -m ~{min_ko_hits} -n ~{top_hits} \
                 ~{project_type} ~{md5} ~{phylo} \
                 ~{prefix}_ko.tsv ~{prefix}_ec.tsv \
@@ -212,7 +212,7 @@ task ko_ec {
 
   runtime {
     time: "1:00:00"
-    memory: "86G"
+    memory: "256G"
     docker: container
   }
 
