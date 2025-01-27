@@ -40,19 +40,19 @@ Workflow Dependencies
   - CRT-CLI 1.8.4 (Public domain software, last official version is 1.2)
   - Prodigal 2.6.3_patched (GNU GPL v3)
   - GeneMarkS-2 >= 1.25 (`Academic license for GeneMark family software <http://topaz.gatech.edu/GeneMark/license_download.cgi>`_)
-  - Last >= 1456 (GNU GPL v3)
+  - Last >= 1584 (GNU GPL v3)
   - HMMER 3.1b2 (3-clause BSD, `thread optimized <https://github.com/Larofeticus/hpc_hmmsearch>`_)
   - GeNomad 1.8.1 (GNU GPL v3, pulled from `IMG Annotation Pipeline repo <https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline>`_)
 
 - Requisite databases: 
 
   - Rfam 13.0 (public domain/CC0 1.0; `more info <http://reusabledata.org/rfam>`_)
-  - KEGG (paid subscription, getting KOs/ECs indirectly via IMG-NR 20230629; `more info <http://reusabledata.org/kegg-ftp>`_)
+  - KEGG (paid subscription, getting KOs/ECs indirectly via IMG-NR 20240916; `more info <http://reusabledata.org/kegg-ftp>`_)
   - SMART 01_06_2016 (restrictive license/custom; `more info <http://reusabledata.org/smart>`_)
   - COG 2003 (copyright/unlicensed; `more info <http://reusabledata.org/cogs>`_)
   - TIGRFAM v15.0 (copyleft/LGPL 2.0 or later; `more info <http://reusabledata.org/tigrfams>`_)
   - SUPERFAMILY v1.75 (permissive/custom; `more info <http://reusabledata.org/supfam>`_) 
-  - Pfam v34.0 (public domain/ CC0 1.0; `more info <http://reusabledata.org/pfam>`_) 
+  - Pfam v37.0 (public domain/ CC0 1.0; `more info <http://reusabledata.org/pfam>`_) 
   - Cath-FunFam v4.2.0 (permissive/CC BY 4.0; `more info <http://reusabledata.org/cath>`_) 
   - GeNomad DB v1.7 (permissive/CC BY 4.0; `more info <https://zenodo.org/records/10594875>`_) 
 
