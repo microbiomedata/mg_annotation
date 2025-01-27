@@ -48,22 +48,22 @@ task run_genomad {
      echo ~{genomad_prefix}
      echo ~{agg_class}
      echo "starting genomad"
-     sed -i -e 's/mv/\# mv/g' /usr/local/bin/genomad.sh
-     cat genomad.sh
+    #  sed -i -e 's/mv/\# mv/g' /usr/local/bin/genomad.sh
+    #  cat genomad.sh
       /usr/local/bin/_entrypoint.sh \
       genomad.sh \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
             --threads ~{threads} \
             ~{input_fasta}
-      
-      # mv ~{agg_class} .
-      # mv ~{plas_sum} .
-      # mv ~{vir_sum} .
+      pwd
+      ls -lah
+      ls -lah ../
+      ls -lah ../../
       # move and rename files output from genomad.sh script so that cromwell can find them
-      # mv ../inputs/~{agg_class} ./genomad_aggregated_classification.tsv
-      # mv ../inputs/~{plas_sum} ./genomad_plasmid_summary.tsv
-      # mv ../inputs/~{vir_sum} ./genomad_virus_summary.tsv
+      mv ../../**/*._aggregated_classification.tsv ./~{agg_class}
+      mv ../../**/*._plasmid_summary.tsv ./~{plas_sum}
+      mv ../../**/*._virus_summary.tsv ./~{vir_sum}
 
     else
       echo "skipping genomad"
