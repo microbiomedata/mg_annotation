@@ -48,14 +48,18 @@ task run_genomad {
      echo ~{genomad_prefix}
      echo ~{agg_class}
      echo "starting genomad"
-     sed -i -e 's/mv/\# mv/g' /usr/local/bin/genomad.sh
-     cat genomad.sh
+    #  sed -i -e 's/mv/\# mv/g' /usr/local/bin/genomad.sh
+    #  cat genomad.sh
       /usr/local/bin/_entrypoint.sh \
       genomad.sh \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
             --threads ~{threads} \
             ~{input_fasta}
+      
+      ls ../../
+      mv ../../**/*.tsv .
+      
       
       # mv ~{agg_class} .
       # mv ~{plas_sum} .
