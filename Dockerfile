@@ -1,6 +1,6 @@
 FROM debian:bullseye as buildbase
 
-RUN apt-get -y update && apt-get -y install git gcc make wget time autoconf unzip curl
+RUN apt-get -y update && apt-get -y install git gcc make wget time autoconf unzip curl ca-certificates
 
 RUN apt-get -y install libz-dev
 #
@@ -55,14 +55,14 @@ RUN \
     gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -fopenmp -fPIC -msse2 -DHAVE_CONFIG_H -L../easel -L./impl_sse -L../libdivsufsort -L. -o hpc_hmmsearch hpc_hmmsearch.o -lhmmer -leasel -ldivsufsort -lm  && \
    cp hpc_hmmsearch /opt/omics/programs/hmmer/bin/ && \
    /opt/omics/programs/hmmer/bin/hpc_hmmsearch -h
-# Build last 1456
+# Build last 1584
 #
 FROM buildbase as last
 
 RUN apt-get -y install  g++
 
 RUN \
-    git clone --depth 1 --branch 1456 https://gitlab.com/mcfrith/last && \
+    git clone --depth 1 --branch 1584 https://gitlab.com/mcfrith/last && \
     cd last && \
     make && \
     make prefix=/opt/omics/programs/last install
