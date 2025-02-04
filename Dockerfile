@@ -1,13 +1,28 @@
-FROM debian:bullseye as buildbase
+FROM debian:bullseye AS buildbase
 
-RUN apt-get -y update && apt-get -y install git gcc make wget time autoconf unzip curl ca-certificates
-
-RUN apt-get -y install libz-dev
+RUN apt-get -y update \
+    && apt-get -y upgrade \
+    && apt-get -y install \
+    git \
+    gcc \
+    make \
+    wget \
+    time \
+    autoconf \
+    unzip \
+    curl \
+    libz-dev \
+    g++ \
+    openjdk-11-jdk \
+    ca-certificates
 #
-# Build prodigal
+########## Build prodigal
 #
-FROM buildbase as prodigal
+FROM buildbase AS prodigal
 #4/20/23 Marcel is using a patched version, get from NERSC instead of offical repo
+# ADD http://portal.nersc.gov/dna/metagenome/assembly/prodigal_2.6.3_patched/prodigal /opt/prodigal
+# RUN chmod 755 /opt/prodigal
+
 RUN \
     cd /opt && \
     wget http://portal.nersc.gov/dna/metagenome/assembly/prodigal_2.6.3_patched/prodigal && \
@@ -20,9 +35,9 @@ RUN \
 #RUN cd Prodigal && make install
 
 
-# Build trnascan 2.0.08
+######### Build trnascan
 #
-FROM buildbase as trnascan
+FROM buildbase AS trnascan
 
 RUN wget http://trna.ucsc.edu/software/trnascan-se-2.0.12.tar.gz
 
@@ -33,9 +48,9 @@ RUN \
     make && make install
 
 #
-# Build HMMER 3.1b2 with HPC enhancements from Arndt
+########## Build HMMER 3.1b2 with HPC enhancements from Arndt
 #
-FROM buildbase as hmm
+FROM buildbase AS hmm
 
 ENV V=3.1b2
 RUN \
@@ -55,11 +70,12 @@ RUN \
     gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -fopenmp -fPIC -msse2 -DHAVE_CONFIG_H -L../easel -L./impl_sse -L../libdivsufsort -L. -o hpc_hmmsearch hpc_hmmsearch.o -lhmmer -leasel -ldivsufsort -lm  && \
    cp hpc_hmmsearch /opt/omics/programs/hmmer/bin/ && \
    /opt/omics/programs/hmmer/bin/hpc_hmmsearch -h
-# Build last 1584
+   
+########## Build last 1584
 #
-FROM buildbase as last
+FROM buildbase AS last
 
-RUN apt-get -y install  g++
+# RUN apt-get -y install  g++
 
 RUN \
     git clone --depth 1 --branch 1584 https://gitlab.com/mcfrith/last && \
@@ -67,9 +83,9 @@ RUN \
     make && \
     make prefix=/opt/omics/programs/last install
 
-# Build infernal 1.1.3
+########## Build infernal 1.1.3
 #
-FROM buildbase as infernal
+FROM buildbase AS infernal
 
 RUN \
     wget http://eddylab.org/infernal/infernal-1.1.3.tar.gz && \
@@ -81,20 +97,21 @@ RUN \
     make && make install
 
 #
-# IMG scripts and tools v 5.1.14, repo is public 4/2023. Add split.py from bfoster1/img-omics:0.1.12 (md5sum 21fb20bf430e61ce55430514029e7a83)
+########## IMG scripts and tools v 5.1.14, repo is public 4/2023. Add split.py from bfoster1/img-omics:0.1.12 (md5sum 21fb20bf430e61ce55430514029e7a83)
 #
-FROM buildbase as img
+FROM buildbase AS img
 
 RUN \
     cd /opt && \
     git clone -b scaffold-lineage https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline
+    # curl -v https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline
 
 RUN \
    cd /opt && \
    curl https://code.jgi.doe.gov/official-jgi-workflows/jgi-wdl-pipelines/img-omics/-/raw/83c5483f0fd8afc43a2956ed065bffc08d8574da/bin/split.py > split.py && \
    chmod 755 split.py
 
-# MetaGeneMark version was updated for img annotation pipeline 5.1.*
+########## MetaGeneMark version was updated for img annotation pipeline 5.1.*
 
 
 RUN \
@@ -104,8 +121,8 @@ RUN \
     #chmod -R 755 omics && \
     rm gms2_linux_64.v1.14_1.25_lic.tar.gz
 
-RUN apt-get update && apt-get install -y openjdk-11-jdk
-# get CRT version 1.8.4
+# RUN apt-get update && apt-get install -y openjdk-11-jdk
+########## get CRT version 1.8.4
 RUN \
     wget https://code.jgi.doe.gov/img/img-pipelines/crt-cli-imgap-version/-/archive/main/crt-cli-imgap-version-main.zip && \
     unzip crt-cli-imgap-version-main.zip && \
@@ -119,15 +136,16 @@ RUN \
 #
 # Build the final image
 #
-FROM buildbase as conda
+FROM buildbase AS conda
 
-# Install Miniconda
+########## Install Miniconda
 #
+ADD https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh .
 RUN \
-    wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    # wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
     bash ./Miniconda3-latest-Linux-x86_64.sh -b -p /miniconda3
 
-ENV PATH /miniconda3/bin:/miniconda3/condabin:$PATH
+ENV PATH=/miniconda3/bin:/miniconda3/condabin:$PATH
 
 RUN conda config --add channels conda-forge && conda config --add channels bioconda  && conda config --add channels anaconda
 
@@ -136,9 +154,9 @@ RUN conda install -y curl git wget jq parallel pyyaml openjdk perl-getopt-long b
 RUN conda clean -y -a
 
 #
-# Install Cromwell v49
+########## Install Cromwell v49
 #
-FROM buildbase as cromwell
+FROM buildbase AS cromwell
 
 RUN \
     mkdir -p /opt/omics/bin && \
@@ -148,16 +166,16 @@ RUN \
 
 FROM buildbase
 
-ENV PERL5LIB '/opt/omics/lib'
+ENV PERL5LIB='/opt/omics/lib'
 COPY --from=conda /miniconda3 /miniconda3
 
 # conda shell.posix activate
-ENV  PATH '/miniconda3/bin:/miniconda3/condabin:/opt/omics/bin:/opt/omics/bin/functional_annotation:/opt/omics/bin/qc/post-annotation:/opt/omics/bin/qc/pre-annotation:/opt/omics/bin/structural_annotation:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-ENV  CONDA_PREFIX '/miniconda3'
-ENV  CONDA_EXE '/miniconda3/bin/conda'
-ENV  _CE_M ''
-ENV  _CE_CONDA ''
-ENV  CONDA_PYTHON_EXE '/miniconda3/bin/python'
+ENV  PATH='/miniconda3/bin:/miniconda3/condabin:/opt/omics/bin:/opt/omics/bin/functional_annotation:/opt/omics/bin/qc/post-annotation:/opt/omics/bin/qc/pre-annotation:/opt/omics/bin/structural_annotation:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+ENV  CONDA_PREFIX='/miniconda3'
+ENV  CONDA_EXE='/miniconda3/bin/conda'
+ENV  _CE_M=''
+ENV  _CE_CONDA=''
+ENV  CONDA_PYTHON_EXE='/miniconda3/bin/python'
 
 COPY --from=cromwell /opt/omics/bin/ /opt/omics/bin/
 
