@@ -1,6 +1,7 @@
 FROM debian:bullseye AS buildbase
 
 RUN apt-get -y update \
+    && apt-get -y clean \
     && apt-get -y upgrade \
     && apt-get -y install \
     git \
@@ -14,7 +15,10 @@ RUN apt-get -y update \
     libz-dev \
     g++ \
     openjdk-11-jdk \
-    ca-certificates
+    ca-certificates 
+
+RUN update-ca-certificates
+
 #
 ########## Build prodigal
 #
@@ -75,10 +79,8 @@ RUN \
 #
 FROM buildbase AS last
 
-# RUN apt-get -y install  g++
-
 RUN \
-    git clone --depth 1 --branch 1584 https://gitlab.com/mcfrith/last && \
+    git clone --depth 1 --branch 1584 https://gitlab.com/mcfrith/last.git && \
     cd last && \
     make && \
     make prefix=/opt/omics/programs/last install
@@ -103,8 +105,7 @@ FROM buildbase AS img
 
 RUN \
     cd /opt && \
-    git clone -b scaffold-lineage https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline
-    # curl -v https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline
+    git clone --depth 1 --branch 5.3 https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline
 
 RUN \
    cd /opt && \
@@ -190,7 +191,6 @@ COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 COPY --from=last /opt/omics/programs/last /opt/omics/programs/last
 COPY --from=img /opt/CRT-CLI.jar /opt/omics/programs/CRT/CRT-CLI.jar
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
-#COPY --from=img /opt/omics/programs/tmhmm-2.0c /opt/omics/programs/tmhmm-2.0c
 
 COPY --from=infernal /opt/omics/programs/infernal /opt/omics/programs/infernal/
 COPY --from=img /opt/img-annotation-pipeline/bin/ /opt/omics/bin/
