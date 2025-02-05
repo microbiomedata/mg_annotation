@@ -36,34 +36,32 @@ task run_genomad {
         String db_dir 
         Int    threads 
         String container
-        String genomad_prefix = basename(input_fasta) + ".filtered"
-        String agg_class = "~{genomad_prefix}_aggregated_classification.tsv"
-        String plas_sum = "~{genomad_prefix}_plasmid_summary.tsv"
-        String vir_sum = "~{genomad_prefix}_virus_summary.tsv"
+        String agg_class = "aggregated_classification.tsv"
+        String plas_sum = "plasmid_summary.tsv"
+        String vir_sum = "virus_summary.tsv"
     }
   command <<<
     set -euo pipefail
     if [[ "~{genomad_execute}" = true ]]
      then 
-     echo ~{genomad_prefix}
-     echo ~{agg_class}
      echo "starting genomad"
-    #  sed -i -e 's/mv/\# mv/g' /usr/local/bin/genomad.sh
-    #  cat genomad.sh
       /usr/local/bin/_entrypoint.sh \
       genomad.sh \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
             --threads ~{threads} \
             ~{input_fasta}
-      pwd
-      ls -lah
-      ls -lah ../
-      ls -lah ../../
+      
+      # allow for glob / recursive search of files moved by genomad.sh
+      shopt -s globstar 
+      # file tree should be jgi_genomad/{execution_id}/call-run_genomad/execution/outputs.tsv 
+      # if running just genomad.wdl, files end up in call-run_genomad/ instead of in execution/
+      mv ../../**/*.tsv . 
+      
       # move and rename files output from genomad.sh script so that cromwell can find them
-      mv ../../**/*._aggregated_classification.tsv ./~{agg_class}
-      mv ../../**/*._plasmid_summary.tsv ./~{plas_sum}
-      mv ../../**/*._virus_summary.tsv ./~{vir_sum}
+      mv *classification.tsv ~{agg_class}
+      mv *plasmid_summary.tsv ~{plas_sum}
+      mv *virus_summary.tsv ~{vir_sum}
 
     else
       echo "skipping genomad"
@@ -72,7 +70,7 @@ task run_genomad {
       echo "NA" > ~{vir_sum}
     fi
     echo "container: ~{container}"
-
+    echo "finished run_genomad"
   >>>
 
   runtime {
@@ -82,9 +80,9 @@ task run_genomad {
   }
 
   output {
-    File virus_summary = "~{agg_class}"
+    File aggregated_class = "~{agg_class}"
     File plasmid_summary = " ~{plas_sum}"
-    File aggregated_class = "~{vir_sum}"
+    File virus_summary = "~{vir_sum}"
     File std_out = stdout()
   }
 }
