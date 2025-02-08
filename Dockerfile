@@ -1,9 +1,16 @@
 FROM debian:bullseye AS buildbase
 
 RUN apt-get -y update \
-    && apt-get -y clean \
     && apt-get -y upgrade \
-    && apt-get -y install \
+    && apt-get -y clean
+
+RUN apt-get -y install \
+    openjdk-11-jdk \
+    ca-certificates
+
+RUN update-ca-certificates
+
+RUN apt-get -y install \
     git \
     gcc \
     make \
@@ -13,11 +20,7 @@ RUN apt-get -y update \
     unzip \
     curl \
     libz-dev \
-    g++ \
-    openjdk-11-jdk \
-    ca-certificates 
-
-RUN update-ca-certificates
+    g++
 
 #
 ########## Build prodigal
@@ -43,11 +46,11 @@ RUN \
 #
 FROM buildbase AS trnascan
 
-RUN wget http://trna.ucsc.edu/software/trnascan-se-2.0.12.tar.gz
+RUN wget https://github.com/UCSC-LoweLab/tRNAscan-SE/archive/refs/tags/v2.0.12.tar.gz
 
 RUN \
-    tar xzvf trnascan-se-2.0.12.tar.gz && \
-    cd tRNAscan-SE-2.0 && \
+    tar xzvf v2.0.12.tar.gz && \
+    cd tRNAscan-SE-2.0.12 && \
     ./configure --prefix=/opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.12/ && \
     make && make install
 
@@ -127,7 +130,7 @@ RUN \
 RUN \
     wget https://code.jgi.doe.gov/img/img-pipelines/crt-cli-imgap-version/-/archive/main/crt-cli-imgap-version-main.zip && \
     unzip crt-cli-imgap-version-main.zip && \
-    cd crt-cli-imgap-version-main && \
+    cd crt-cli-imgap-version-main/src && \
     javac *.java && \
     jar cfe CRT-CLI.jar crt *.class && \
     cp CRT-CLI.jar /opt/.
@@ -221,4 +224,3 @@ RUN \
     ln -s /opt/omics/programs/infernal/infernal-1.1.3/bin/cmscan
 
 #COPY --from=img /opt/omics /opt/omics3/
-
