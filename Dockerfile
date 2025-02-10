@@ -1,21 +1,19 @@
 FROM debian:bullseye AS buildbase
 
-RUN apt-get -y update \
-    && apt-get -y clean \
-    && apt-get -y upgrade \
-    && apt-get -y install \
-    git \
-    gcc \
-    make \
-    wget \
-    time \
-    autoconf \
-    unzip \
-    curl \
-    libz-dev \
-    g++ \
-    openjdk-11-jdk \
-    ca-certificates 
+# Update and clean package lists
+RUN apt-get -y update && apt-get -y clean
+
+# Upgrade system packages
+RUN apt-get -y upgrade
+
+# Install essential packages
+RUN apt-get -y install git gcc make wget time autoconf unzip curl libz-dev g++
+
+# Install OpenJDK
+RUN apt-get -y install openjdk-11-jdk
+
+# Install CA certificates
+RUN apt-get -y install ca-certificates
 
 RUN update-ca-certificates
 
