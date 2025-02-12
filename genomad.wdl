@@ -30,7 +30,6 @@ workflow jgi_genomad {
 task run_genomad {
     input {
         Boolean genomad_execute
-        String bin="/usr/local/bin/genomad.sh"
         File   input_fasta
         Int    len_cutoff 
         String db_dir 

@@ -4,7 +4,6 @@ workflow f_annotate {
         String  imgap_project_id
         String  imgap_project_type
         Int     additional_threads
-       # File    input_contigs_fasta
         File    input_fasta
         String  database_location="/refdata/img/"
         String  ko_ec_img_nr_db="~{database_location}"+"/IMG-NR/20240916/img_nr"
@@ -21,20 +20,12 @@ workflow f_annotate {
         String  pfam_db="~{database_location}"+"/Pfam/37.0/Pfam-A.hmm"
         String  pfam_claninfo_tsv="~{database_location}"+"/Pfam/37.0/Pfam-A.clans.tsv"
         String  cath_funfam_db="~{database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
-        #  Boolean signalp_execute=true
-        #  String  signalp_gram_stain="GRAM_STAIN"
-        #  String  signalp_bin="/opt/omics/bin/signalp"
-        #  Boolean tmhmm_execute=true
-        #  String  tmhmm_model="/opt/omics/programs/tmhmm-2.0c/lib/TMHMM2.0.model"
-        #  String  tmhmm_decode="/opt/omics/bin/decodeanhmm"
-        #  String  tmhmm_decode_parser="/opt/omics/bin/functional_annotation/decodeanhmm_parser.py"
         File    sa_gff
         String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
         String  product_names_mapping_dir="~{database_location}"+"/Product_Name_Mappings/20250123"
         String  container
-        String  hmm_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
-        String  last_container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
     }
+
     call ko_ec {
       input:
         project_id = imgap_project_id,
@@ -46,7 +37,7 @@ workflow f_annotate {
         phylo = ko_ec_taxon_to_phylo_mapping,
         lastal = lastal_bin,
         selector = selector_bin,
-        container=last_container
+        container=container
     }
 
     call smart {
@@ -57,7 +48,7 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         smart_db = smart_db,
-        container=hmm_container
+        container=container
     }
 
     call cog {
@@ -68,7 +59,7 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         cog_db = cog_db,
-        container=hmm_container
+        container=container
     }
 
     call tigrfam {
@@ -79,7 +70,7 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         tigrfam_db = tigrfam_db,
-        container=hmm_container
+        container=container
     }
 
     call superfam {
@@ -90,7 +81,7 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         superfam_db = superfam_db,
-        container=hmm_container
+        container=container
     }
 
     call pfam {
@@ -102,7 +93,7 @@ workflow f_annotate {
         approx_num_proteins = approx_num_proteins,
         pfam_db = pfam_db,
         pfam_claninfo_tsv = pfam_claninfo_tsv,
-        container=hmm_container
+        container=container
     }
 
     call cath_funfam {
@@ -113,7 +104,7 @@ workflow f_annotate {
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
         cath_funfam_db = cath_funfam_db,
-        container=hmm_container
+        container=container
     }
 
 
