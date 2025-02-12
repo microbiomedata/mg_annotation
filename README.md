@@ -36,7 +36,7 @@ A JSON file containing the following:
   - CRT-CLI 1.8.4 (Public domain software, last official version is 1.2)
   - Prodigal 2.6.3_patched (GNU GPL v3)
   - GeneMarkS-2 >= 1.25 ([Academic license for GeneMark family software](http://topaz.gatech.edu/GeneMark/license_download.cgi))
-  - Last >= 1456 (GNU GPL v3)
+  - Last >= 1584 (GNU GPL v3)
   - HMMER 3.1b2 (3-clause BSD, [thread optimized hmmsearch](https://github.com/Larofeticus/hpc_hmmsearch))
   - GeNomad 1.8.1 (GNU GPL v3, pulled from [IMG Annotation Pipeline repo](https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline))
  
