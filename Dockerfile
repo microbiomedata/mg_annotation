@@ -107,17 +107,19 @@ RUN \
 #     make && \
 #     make prefix=/opt/omics/programs/last install
 
-########## Build infernal 1.1.3
+########## Build infernal 1.1.4
 #
 FROM buildbase AS infernal
 
-RUN \
-    wget http://eddylab.org/infernal/infernal-1.1.4.tar.gz && \
-    tar -zxf infernal-1.1.4.tar.gz
+ENV infernal_ver=1.1.4
 
 RUN \
-    cd infernal-1.1.4 && \
-    ./configure --prefix=/opt/omics/programs/infernal/infernal-1.1.4 && \
+    wget http://eddylab.org/infernal/infernal-${infernal_ver}.tar.gz && \
+    tar -zxf infernal-${infernal_ver}.tar.gz
+
+RUN \
+    cd infernal-${infernal_ver} && \
+    ./configure --prefix=/opt/omics/programs/infernal/infernal-${infernal_ver} && \
     make && make install
 
 #
@@ -129,14 +131,16 @@ FROM buildbase AS img
 #     cd /opt && \
 #     git clone --depth 1 --branch 5.3 https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline
 
-ADD https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/archive/5.3.0/img-annotation-pipeline-5.3.0.tar.gz /opt/
+ENV IMG_annoation_pipeline_ver=5.3.0
+
+ADD https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/archive/$IMG_annoation_pipeline_ver/img-annotation-pipeline-${IMG_annoation_pipeline_ver}.tar.gz /opt/
 
 RUN \
     cd /opt && \
-    tar -zxvf img-annotation-pipeline-5.3.0.tar.gz 
+    tar -zxvf img-annotation-pipeline-${IMG_annoation_pipeline_ver}.tar.gz 
     # && \
     # mkdir img-annotation-pipeline && \
-    # mv img-annotation-pipeline-5.3.0/* img-annotation-pipeline/ && \
+    # mv img-annotation-pipeline-${IMG_annoation_pipeline_ver}/* img-annotation-pipeline/ && \
     # ls img-annotation-pipeline
 
 ADD --chmod=755 https://code.jgi.doe.gov/official-jgi-workflows/jgi-wdl-pipelines/img-omics/-/raw/83c5483f0fd8afc43a2956ed065bffc08d8574da/bin/split.py /opt/
@@ -221,6 +225,8 @@ ENV  CONDA_EXE='/miniconda3/bin/conda'
 ENV  _CE_M=''
 ENV  _CE_CONDA=''
 ENV  CONDA_PYTHON_EXE='/miniconda3/bin/python'
+ENV  IMG_annoation_pipeline_ver=5.3.0
+ENV  infernal_ver=1.1.4
 
 COPY --from=cromwell /opt/omics/bin/ /opt/omics/bin/
 
@@ -237,9 +243,9 @@ COPY --from=img /opt/CRT-CLI.jar /opt/omics/programs/CRT/CRT-CLI.jar
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
 
 COPY --from=infernal /opt/omics/programs/infernal /opt/omics/programs/infernal/
-COPY --from=img /opt/img-annotation-pipeline-5.3.0/bin/ /opt/omics/bin/
+COPY --from=img /opt/img-annotation-pipeline-${IMG_annoation_pipeline_ver}/bin/ /opt/omics/bin/
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
-COPY --from=img /opt/img-annotation-pipeline-5.3.0/VERSION /opt/omics/VERSION
+COPY --from=img /opt/img-annotation-pipeline-${IMG_annoation_pipeline_ver}/VERSION /opt/omics/VERSION
 RUN \
     mkdir /opt/omics/lib && cd /opt/omics/lib && \
     ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.12/lib/tRNAscan-SE/* . 
@@ -250,7 +256,7 @@ RUN \
     cd /opt/omics/bin &&\ 
     ln -s ../programs/gms2_linux_64/gms2.pl &&\
     ln -s ../programs/gms2_linux_64/gmhmmp2 &&\
-    ln -s ../programs/infernal/infernal-1.1.4/bin/cmsearch && \
+    ln -s ../programs/infernal/infernal-${infernal_ver}/bin/cmsearch && \
     ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.12/bin/tRNAscan-SE && \
     ln -s ../programs/last/bin/lastal && \
     ln -s ../programs/CRT/CRT-CLI.jar CRT-CLI.jar && \
@@ -261,7 +267,7 @@ RUN \
 
 RUN \ 
     cd /opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.12/bin/ &&\
-    ln -s /opt/omics/programs/infernal/infernal-1.1.4/bin/cmsearch && \
-    ln -s /opt/omics/programs/infernal/infernal-1.1.4/bin/cmscan
+    ln -s /opt/omics/programs/infernal/infernal-${infernal_ver}/bin/cmsearch && \
+    ln -s /opt/omics/programs/infernal/infernal-${infernal_ver}/bin/cmscan
 
 #COPY --from=img /opt/omics /opt/omics3/

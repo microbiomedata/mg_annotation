@@ -36,12 +36,12 @@ Workflow Dependencies
 
   - Conda (3-clause BSD)
   - tRNAscan-SE >= 2.0.12 (GNU GPL v3)
-  - Infernal 1.1.3 (BSD)
+  - Infernal 1.1.4 (BSD)
   - CRT-CLI 1.8.4 (Public domain software, last official version is 1.2)
   - Prodigal 2.6.3_patched (GNU GPL v3)
   - GeneMarkS-2 >= 1.25 (`Academic license for GeneMark family software <http://topaz.gatech.edu/GeneMark/license_download.cgi>`_)
   - Last >= 1584 (GNU GPL v3)
-  - HMMER 3.1b2 (3-clause BSD, `thread optimized <https://github.com/Larofeticus/hpc_hmmsearch>`_)
+  - HMMER 3.3.2 (3-clause BSD, `thread optimized <https://github.com/Larofeticus/hpc_hmmsearch>`_)
   - GeNomad 1.8.1 (GNU GPL v3, pulled from `IMG Annotation Pipeline repo <https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline>`_)
 
 - Requisite databases: 
