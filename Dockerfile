@@ -13,7 +13,7 @@ RUN update-ca-certificates --fresh
 # original: RUN apt-get -y install openjdk-11-jdk
 # for building on arm / mac machine for amd
 # RUN apt-get -y update && apt-get install -y openjdk-11-jdk:amd64
-RUN apt-get -y update && apt-get install -y 
+RUN apt-get -y update && apt-get install -y openjdk-11-jdk
 # potential fix with openjdk:19-alpine following this comment, if we want
 # to use wget instead of ADD (which is better practice)
 # https://forums.docker.com/t/how-to-make-wget-run-in-docker/140555/6
@@ -131,16 +131,16 @@ FROM buildbase AS img
 #     cd /opt && \
 #     git clone --depth 1 --branch 5.3 https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline
 
-ENV IMG_annoation_pipeline_ver=5.3.0
+ENV IMG_annotation_pipeline_ver=5.3.0
 
-ADD https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/archive/$IMG_annoation_pipeline_ver/img-annotation-pipeline-${IMG_annoation_pipeline_ver}.tar.gz /opt/
+ADD https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/archive/$IMG_annotation_pipeline_ver/img-annotation-pipeline-${IMG_annotation_pipeline_ver}.tar.gz /opt/
 
 RUN \
     cd /opt && \
-    tar -zxvf img-annotation-pipeline-${IMG_annoation_pipeline_ver}.tar.gz 
+    tar -zxvf img-annotation-pipeline-${IMG_annotation_pipeline_ver}.tar.gz 
     # && \
     # mkdir img-annotation-pipeline && \
-    # mv img-annotation-pipeline-${IMG_annoation_pipeline_ver}/* img-annotation-pipeline/ && \
+    # mv img-annotation-pipeline-${IMG_annotation_pipeline_ver}/* img-annotation-pipeline/ && \
     # ls img-annotation-pipeline
 
 ADD --chmod=755 https://code.jgi.doe.gov/official-jgi-workflows/jgi-wdl-pipelines/img-omics/-/raw/83c5483f0fd8afc43a2956ed065bffc08d8574da/bin/split.py /opt/
@@ -225,7 +225,7 @@ ENV  CONDA_EXE='/miniconda3/bin/conda'
 ENV  _CE_M=''
 ENV  _CE_CONDA=''
 ENV  CONDA_PYTHON_EXE='/miniconda3/bin/python'
-ENV  IMG_annoation_pipeline_ver=5.3.0
+ENV  IMG_annotation_pipeline_ver=5.3.0
 ENV  infernal_ver=1.1.4
 
 COPY --from=cromwell /opt/omics/bin/ /opt/omics/bin/
@@ -243,9 +243,9 @@ COPY --from=img /opt/CRT-CLI.jar /opt/omics/programs/CRT/CRT-CLI.jar
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
 
 COPY --from=infernal /opt/omics/programs/infernal /opt/omics/programs/infernal/
-COPY --from=img /opt/img-annotation-pipeline-${IMG_annoation_pipeline_ver}/bin/ /opt/omics/bin/
+COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/bin/ /opt/omics/bin/
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
-COPY --from=img /opt/img-annotation-pipeline-${IMG_annoation_pipeline_ver}/VERSION /opt/omics/VERSION
+COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/VERSION /opt/omics/VERSION
 RUN \
     mkdir /opt/omics/lib && cd /opt/omics/lib && \
     ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.12/lib/tRNAscan-SE/* . 
