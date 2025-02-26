@@ -75,9 +75,10 @@ RUN \
     make && make install
 
 # get and extract commit sha a8d641046729328fdda97331d527edb2ce81510a  of master branch of modification file, copy into hmmer source code
+## for hmmer version 3.3.2 the hpc_hmmsearch should use the code in master branch
 RUN \
-    wget https://github.com/Larofeticus/hpc_hmmsearch/archive/a8d641046729328fdda97331d527edb2ce81510a.zip && \
-    unzip a8d641046729328fdda97331d527edb2ce81510a.zip && \
+    wget https://github.com/Larofeticus/hpc_hmmsearch/archive/master.zip && \
+    unzip master.zip && \
     cp /hpc_hmmsearch-*/hpc_hmmsearch.c /opt/hmmer-$V/src && \
     cd /opt/hmmer-$V/src && \
     gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -fopenmp -fPIC -msse2 -DHAVE_CONFIG_H -I../easel -I../libdivsufsort -I../easel -I. -I. -o hpc_hmmsearch.o -c hpc_hmmsearch.c && \
