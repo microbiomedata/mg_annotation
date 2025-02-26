@@ -68,7 +68,6 @@ task run_genomad {
       echo "NA" > ~{plas_sum}
       echo "NA" > ~{vir_sum}
     fi
-    echo "container: ~{container}"
     echo "finished run_genomad"
   >>>
 

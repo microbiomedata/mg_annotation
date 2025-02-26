@@ -7,13 +7,13 @@ RUN apt-get -y update \
 
 # Install CA certificates
 RUN apt-get -y update && apt-get -y install ca-certificates
-# RUN apt-get -y install ca-certificates
 RUN update-ca-certificates --fresh
 
 # Install OpenJDK
 # original: RUN apt-get -y install openjdk-11-jdk
 # for building on arm / mac machine for amd
-RUN apt-get -y update && apt-get install -y openjdk-11-jdk:amd64
+# RUN apt-get -y update && apt-get install -y openjdk-11-jdk:amd64
+RUN apt-get -y update && apt-get install -y 
 # potential fix with openjdk:19-alpine following this comment, if we want
 # to use wget instead of ADD (which is better practice)
 # https://forums.docker.com/t/how-to-make-wget-run-in-docker/140555/6
@@ -61,11 +61,11 @@ RUN \
     make && make install
 
 #
-########## Build HMMER 3.1b2 with HPC enhancements from Arndt
+########## Build HMMER 3.3.2
 #
 FROM buildbase AS hmm
 
-ENV V=3.1b2
+ENV V=3.3.2
 ADD http://eddylab.org/software/hmmer/hmmer-$V.tar.gz /opt/
 RUN \
     cd /opt && \
@@ -112,12 +112,12 @@ RUN \
 FROM buildbase AS infernal
 
 RUN \
-    wget http://eddylab.org/infernal/infernal-1.1.3.tar.gz && \
-    tar -zxf infernal-1.1.3.tar.gz
+    wget http://eddylab.org/infernal/infernal-1.1.4.tar.gz && \
+    tar -zxf infernal-1.1.4.tar.gz
 
 RUN \
-    cd infernal-1.1.3 && \
-    ./configure --prefix=/opt/omics/programs/infernal/infernal-1.1.3 && \
+    cd infernal-1.1.4 && \
+    ./configure --prefix=/opt/omics/programs/infernal/infernal-1.1.4 && \
     make && make install
 
 #
@@ -250,7 +250,7 @@ RUN \
     cd /opt/omics/bin &&\ 
     ln -s ../programs/gms2_linux_64/gms2.pl &&\
     ln -s ../programs/gms2_linux_64/gmhmmp2 &&\
-    ln -s ../programs/infernal/infernal-1.1.3/bin/cmsearch && \
+    ln -s ../programs/infernal/infernal-1.1.4/bin/cmsearch && \
     ln -s ../programs/tRNAscan-SE/tRNAscan-SE-2.0.12/bin/tRNAscan-SE && \
     ln -s ../programs/last/bin/lastal && \
     ln -s ../programs/CRT/CRT-CLI.jar CRT-CLI.jar && \
@@ -261,7 +261,7 @@ RUN \
 
 RUN \ 
     cd /opt/omics/programs/tRNAscan-SE/tRNAscan-SE-2.0.12/bin/ &&\
-    ln -s /opt/omics/programs/infernal/infernal-1.1.3/bin/cmsearch && \
-    ln -s /opt/omics/programs/infernal/infernal-1.1.3/bin/cmscan
+    ln -s /opt/omics/programs/infernal/infernal-1.1.4/bin/cmsearch && \
+    ln -s /opt/omics/programs/infernal/infernal-1.1.4/bin/cmscan
 
 #COPY --from=img /opt/omics /opt/omics3/

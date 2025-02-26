@@ -596,11 +596,10 @@ task make_info_file {
     fi
     if [[ "~{genomad_execute}" = true ]]
       then
-      genomad_version="GeNomad run information:"
-      g_con=`grep "container" ~{gen_info}`
-      g_prog=`grep "Programs" -A1 ~{gen_info} | tail -n 1`
-      g_db=`grep "DBs" -A1 ~{gen_info} | tail -n 1`
-      echo "$genomad_version $g_prog; $g_db; $g_con"  >> ~{prefix}_imgap.info
+      g_prog=`grep "Programs Used" -A1 ~{gen_info} | tail -n 1`
+      g_db=`grep "DBs Used" -A1 ~{gen_info} | tail -n 1`
+      echo "geNomad Programs Used: $g_prog"  >> ~{prefix}_imgap.info
+      echo "geNomad DBs Used: $g_db"  >> ~{prefix}_imgap.info
     fi
   >>>
 

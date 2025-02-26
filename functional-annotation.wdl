@@ -14,7 +14,7 @@ workflow f_annotate {
         Int?    par_hmm_inst
         Int?    approx_num_proteins
         String  smart_db="~{database_location}"+"/SMART/01_06_2016/SMART.hmm"
-        String  cog_db="~{database_location}"+"/COG/HMMs/2003/COG.hmm"
+        String  cog_db="~{database_location}"+"/COG/2014/COG.hmm"
         String  tigrfam_db="~{database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
         String  superfam_db="~{database_location}"+"/SuperFamily/v1.75/supfam.hmm"
         String  pfam_db="~{database_location}"+"/Pfam/37.0/Pfam-A.hmm"
