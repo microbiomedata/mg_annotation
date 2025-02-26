@@ -5,7 +5,7 @@ on:
     workflow_dispatch:
     push:
         branches:
-            - master
+            - 36-annotation-update-to-53-genomad
         paths:
             - 'Dockerfile'
 
