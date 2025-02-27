@@ -1,4 +1,4 @@
-name: Build and push img-omics container image to GHCR
+name: Test Build and push img-omics container image to GHCR
 
 # Run this workflow whenever a Dockerfile is updated.
 on:
