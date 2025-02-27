@@ -15,8 +15,6 @@ jobs:
         steps:
             - name: Checkout branch
               uses: actions/checkout@v4
-              with:
-                  ref: '36-annotation-update-to-53-genomad'
             - name: Get Version
               id: get_version
               run: |
