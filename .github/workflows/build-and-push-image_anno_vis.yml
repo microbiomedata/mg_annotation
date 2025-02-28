@@ -20,7 +20,7 @@ jobs:
             - name: Get Version
               id: get_version
               run: |
-                  VERSION=$(grep "version=" Docker/Docker_vis.txt  | cut -d"=" -f 2 | seq -e 's/\"//g' )
+                  VERSION=$(grep "version=" Docker/Docker_vis.txt  | cut -d"=" -f 2 | sed -e 's/\"//g' )
                   echo "version=${VERSION}" >> $GITHUB_OUTPUT
             - name: Authenticate with container registry
               uses: docker/login-action@v3
