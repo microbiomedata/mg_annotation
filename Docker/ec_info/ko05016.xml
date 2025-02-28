@@ -1,0 +1,441 @@
+<?xml version="1.0"?>
+<!DOCTYPE pathway SYSTEM "http://www.kegg.jp/kegg/xml/KGML_v0.7.2_.dtd">
+<!-- Creation date: Jul 10, 2018 11:12:18 +0900 (GMT+9) -->
+<pathway name="path:ko05016" org="ko" number="05016"
+         title="Huntington disease"
+         image="http://www.kegg.jp/kegg/pathway/ko/ko05016.png"
+         link="http://www.kegg.jp/kegg-bin/show_pathway?ko05016">
+    <entry id="1" name="path:ko05016" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ko05016">
+        <graphics name="TITLE:Huntington disease" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="136" y="58" width="192" height="25"/>
+    </entry>
+    <entry id="2" name="ko:K03942 ko:K03943 ko:K03944 ko:K03945 ko:K03946 ko:K03947 ko:K03948 ko:K03949 ko:K03950 ko:K03951 ko:K03952 ko:K03953 ko:K03954 ko:K03955 ko:K03956 ko:K11352 ko:K11353 ko:K03957 ko:K03958 ko:K03959 ko:K03960 ko:K03961 ko:K03962 ko:K03963 ko:K03964 ko:K03965 ko:K03966 ko:K11351 ko:K03934 ko:K03935 ko:K03936 ko:K03937 ko:K03938 ko:K03939 ko:K03940 ko:K03941 ko:K03967 ko:K03968" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K03942+K03943+K03944+K03945+K03946+K03947+K03948+K03949+K03950+K03951+K03952+K03953+K03954+K03955+K03956+K11352+K11353+K03957+K03958+K03959+K03960+K03961+K03962+K03963+K03964+K03965+K03966+K11351+K03934+K03935+K03936+K03937+K03938+K03939+K03940+K03941+K03967+K03968">
+        <graphics name="K03942..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="600" y="665" width="46" height="17"/>
+    </entry>
+    <entry id="3" name="ko:K00234 ko:K00235 ko:K00236 ko:K00237" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K00234+K00235+K00236+K00237">
+        <graphics name="K00234..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="600" y="695" width="46" height="17"/>
+    </entry>
+    <entry id="4" name="ko:K00411 ko:K00412 ko:K00413 ko:K00414 ko:K00415 ko:K00416 ko:K00417 ko:K00418 ko:K00419 ko:K00420" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K00411+K00412+K00413+K00414+K00415+K00416+K00417+K00418+K00419+K00420">
+        <graphics name="K00411..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="600" y="725" width="46" height="17"/>
+    </entry>
+    <entry id="5" name="ko:K02262 ko:K02256 ko:K02261 ko:K02263 ko:K02264 ko:K02265 ko:K02266 ko:K02267 ko:K02268 ko:K02270 ko:K02271 ko:K02272 ko:K02273" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K02262+K02256+K02261+K02263+K02264+K02265+K02266+K02267+K02268+K02270+K02271+K02272+K02273">
+        <graphics name="K02262..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="600" y="755" width="46" height="17"/>
+    </entry>
+    <entry id="6" name="ko:K02132 ko:K02133 ko:K02136 ko:K02134 ko:K02135 ko:K02126 ko:K02127 ko:K02128 ko:K02138 ko:K02137 ko:K02131 ko:K02125" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K02132+K02133+K02136+K02134+K02135+K02126+K02127+K02128+K02138+K02137+K02131+K02125">
+        <graphics name="K02132..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="600" y="785" width="46" height="17"/>
+    </entry>
+    <entry id="7" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="792" y="203" width="46" height="17"/>
+    </entry>
+    <entry id="8" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="620" y="219" width="46" height="17"/>
+    </entry>
+    <entry id="9" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="225" y="635" width="46" height="17"/>
+    </entry>
+    <entry id="10" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="511" y="694" width="46" height="17"/>
+    </entry>
+    <entry id="11" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="610" y="74" width="46" height="17"/>
+    </entry>
+    <entry id="12" name="ko:K09222" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K09222">
+        <graphics name="K09222" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="640" y="117" width="46" height="17"/>
+    </entry>
+    <entry id="13" name="ko:K09222" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K09222">
+        <graphics name="K09222" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="768" y="120" width="46" height="17"/>
+    </entry>
+    <entry id="14" name="ko:K11829" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K11829">
+        <graphics name="K11829" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="814" y="103" width="46" height="17"/>
+    </entry>
+    <entry id="15" name="ko:K11644" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K11644">
+        <graphics name="K11644" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="768" y="103" width="46" height="17"/>
+    </entry>
+    <entry id="16" name="ko:K06067" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K06067">
+        <graphics name="K06067" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="814" y="120" width="46" height="17"/>
+    </entry>
+    <entry id="17" name="ko:K04355" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04355">
+        <graphics name="K04355" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="572" y="163" width="46" height="17"/>
+    </entry>
+    <entry id="18" name="ko:K04647" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04647">
+        <graphics name="K04647" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="574" y="219" width="46" height="17"/>
+    </entry>
+    <entry id="19" name="ko:K04498" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04498">
+        <graphics name="K04498" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="812" y="186" width="46" height="17"/>
+    </entry>
+    <entry id="20" name="ko:K03006 ko:K03010 ko:K03011 ko:K03012 ko:K03013 ko:K03014 ko:K03015 ko:K03016 ko:K03017 ko:K03007 ko:K03008 ko:K03009" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K03006+K03010+K03011+K03012+K03013+K03014+K03015+K03016+K03017+K03007+K03008+K03009">
+        <graphics name="K03006..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="873" y="148" width="46" height="17"/>
+    </entry>
+    <entry id="21" name="ko:K05208 ko:K05210" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K05208+K05210">
+        <graphics name="K05208..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="164" y="570" width="46" height="17"/>
+    </entry>
+    <entry id="22" name="ko:K11828" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K11828">
+        <graphics name="K11828" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="215" y="618" width="46" height="17"/>
+    </entry>
+    <entry id="23" name="ko:K04634" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04634">
+        <graphics name="K04634" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="245" y="486" width="46" height="17"/>
+    </entry>
+    <entry id="24" name="ko:K04604" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04604">
+        <graphics name="K04604" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="164" y="486" width="46" height="17"/>
+    </entry>
+    <entry id="25" name="ko:K05858" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K05858">
+        <graphics name="K05858" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="326" y="486" width="46" height="17"/>
+    </entry>
+    <entry id="26" name="ko:K04958" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04958">
+        <graphics name="K04958" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="419" y="570" width="46" height="17"/>
+    </entry>
+    <entry id="27" name="cpd:C00025" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00025">
+        <graphics name="C00025" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="93" y="523" width="8" height="8"/>
+    </entry>
+    <entry id="28" name="cpd:C01245" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C01245">
+        <graphics name="C01245" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="380" y="521" width="8" height="8"/>
+    </entry>
+    <entry id="29" name="cpd:C00076" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00076">
+        <graphics name="C00076" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="273" y="570" width="8" height="8"/>
+    </entry>
+    <entry id="30" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="368" y="604" width="46" height="17"/>
+    </entry>
+    <entry id="31" name="ko:K05862 ko:K05863 ko:K09565 ko:K15040 ko:K15041" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K05862+K05863+K09565+K15040+K15041">
+        <graphics name="K05862..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="781" y="828" width="46" height="17"/>
+    </entry>
+    <entry id="32" name="ko:K08738" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K08738">
+        <graphics name="K08738" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="781" y="863" width="46" height="17"/>
+    </entry>
+    <entry id="33" name="ko:K03129" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K03129">
+        <graphics name="K03129" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="871" y="237" width="46" height="17"/>
+    </entry>
+    <entry id="34" name="ko:K11830" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K11830">
+        <graphics name="K11830" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="499" y="449" width="46" height="17"/>
+    </entry>
+    <entry id="35" name="ko:K11831" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K11831">
+        <graphics name="K11831" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="552" y="449" width="46" height="17"/>
+    </entry>
+    <entry id="36" name="ko:K04564" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04564">
+        <graphics name="K04564" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="552" y="485" width="46" height="17"/>
+    </entry>
+    <entry id="38" name="ko:K08769" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K08769">
+        <graphics name="K08769" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="499" y="524" width="46" height="17"/>
+    </entry>
+    <entry id="39" name="ko:K04565" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04565">
+        <graphics name="K04565" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="499" y="485" width="46" height="17"/>
+    </entry>
+    <entry id="40" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="748" y="530" width="46" height="17"/>
+    </entry>
+    <entry id="41" name="ko:K03120" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K03120">
+        <graphics name="K03120" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="806" y="260" width="46" height="17"/>
+    </entry>
+    <entry id="42" name="ko:K04451" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04451">
+        <graphics name="K04451" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="768" y="513" width="46" height="17"/>
+    </entry>
+    <entry id="43" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="787" y="277" width="46" height="17"/>
+    </entry>
+    <entry id="44" name="ko:K04644 ko:K04645 ko:K04646" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04644+K04645+K04646">
+        <graphics name="K04644..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="260" y="178" width="46" height="17"/>
+    </entry>
+    <entry id="45" name="ko:K11824 ko:K11825 ko:K11826 ko:K11827" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K11824+K11825+K11826+K11827">
+        <graphics name="K11824..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="306" y="186" width="46" height="17"/>
+    </entry>
+    <entry id="46" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="377" y="178" width="46" height="17"/>
+    </entry>
+    <entry id="47" name="ko:K04559" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04559">
+        <graphics name="K04559" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="306" y="169" width="46" height="17"/>
+    </entry>
+    <entry id="48" name="ko:K04559" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04559">
+        <graphics name="K04559" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="325" y="360" width="46" height="17"/>
+    </entry>
+    <entry id="49" name="ko:K04638" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04638">
+        <graphics name="K04638" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="325" y="377" width="46" height="17"/>
+    </entry>
+    <entry id="50" name="ko:K04398" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04398">
+        <graphics name="K04398" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="325" y="394" width="46" height="17"/>
+    </entry>
+    <entry id="51" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="272" y="328" width="46" height="17"/>
+    </entry>
+    <entry id="52" name="ko:K02187" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K02187">
+        <graphics name="K02187" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="404" y="394" width="46" height="17"/>
+    </entry>
+    <entry id="53" name="ko:K04648 ko:K10424 ko:K10426" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04648+K10424+K10426">
+        <graphics name="K04648..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="574" y="202" width="46" height="17"/>
+    </entry>
+    <entry id="54" name="ko:K10408 ko:K10410 ko:K10409 ko:K11143 ko:K10411 ko:K10412" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K10408+K10410+K10409+K11143+K10411+K10412">
+        <graphics name="K10408..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="554" y="236" width="46" height="17"/>
+    </entry>
+    <entry id="55" name="ko:K05625" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K05625">
+        <graphics name="K05625" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="373" y="690" width="46" height="17"/>
+    </entry>
+    <entry id="56" name="path:ko04020" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ko04020">
+        <graphics name="Calcium signaling pathway" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="282" y="451" width="116" height="34"/>
+    </entry>
+    <entry id="57" name="path:ko00190" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ko00190">
+        <graphics name="Oxidative phosphorylation" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="482" y="661" width="120" height="34"/>
+    </entry>
+    <entry id="58" name="ko:K02084" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K02084">
+        <graphics name="K02084" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="781" y="897" width="46" height="17"/>
+    </entry>
+    <entry id="59" name="ko:K04399" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04399">
+        <graphics name="K04399" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="871" y="882" width="46" height="17"/>
+    </entry>
+    <entry id="60" name="ko:K02187" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K02187">
+        <graphics name="K02187" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="943" y="882" width="46" height="17"/>
+    </entry>
+    <entry id="61" name="path:ko04210" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ko04210">
+        <graphics name="Apoptosis" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="988" y="844" width="116" height="25"/>
+    </entry>
+    <entry id="62" name="ko:K05870 ko:K09048 ko:K09047" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K05870+K09048+K09047">
+        <graphics name="K05870..." fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="809" y="358" width="46" height="17"/>
+    </entry>
+    <entry id="63" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="791" y="375" width="46" height="17"/>
+    </entry>
+    <entry id="64" name="ko:K03129" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K03129">
+        <graphics name="K03129" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="836" y="375" width="46" height="17"/>
+    </entry>
+    <entry id="65" name="ko:K07202" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K07202">
+        <graphics name="K07202" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="634" y="402" width="46" height="17"/>
+    </entry>
+    <entry id="66" name="ko:K08530" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K08530">
+        <graphics name="K08530" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="767" y="461" width="46" height="17"/>
+    </entry>
+    <entry id="67" name="path:ko04115" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ko04115">
+        <graphics name="p53 signaling pathway" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="861" y="536" width="120" height="34"/>
+    </entry>
+    <entry id="68" name="ko:K02159" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K02159">
+        <graphics name="K02159" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="638" y="557" width="46" height="17"/>
+    </entry>
+    <entry id="69" name="ko:K10132" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K10132">
+        <graphics name="K10132" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="638" y="580" width="46" height="17"/>
+    </entry>
+    <entry id="70" name="ko:K04684" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04684">
+        <graphics name="K04684" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="854" y="308" width="46" height="17"/>
+    </entry>
+    <entry id="71" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="836" y="325" width="46" height="17"/>
+    </entry>
+    <entry id="72" name="ko:K04533" type="ortholog"
+        link="http://www.kegg.jp/dbget-bin/www_bget?K04533">
+        <graphics name="K04533" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="353" y="313" width="46" height="17"/>
+    </entry>
+    <entry id="73" name="path:ko03050" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ko03050">
+        <graphics name="Proteasome" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="546" y="361" width="116" height="25"/>
+    </entry>
+    <entry id="74" name="path:ko03022" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ko03022">
+        <graphics name="Basal transcription factors" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="820" y="63" width="116" height="34"/>
+    </entry>
+    <entry id="75" name="path:ko03020" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ko03020">
+        <graphics name="RNA polymerase" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="951" y="63" width="116" height="34"/>
+    </entry>
+    <entry id="76" name="path:ko04724" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ko04724">
+        <graphics name="Glutamatergic synapse" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="89" y="602" width="92" height="34"/>
+    </entry>
+    <entry id="77" name="undefined" type="group">
+        <graphics fgcolor="#000000" bgcolor="#FFFFFF"
+             type="rectangle" x="283" y="177" width="92" height="34"/>
+        <component id="44"/>
+        <component id="45"/>
+        <component id="47"/>
+    </entry>
+    <entry id="78" name="undefined" type="group">
+        <graphics fgcolor="#000000" bgcolor="#FFFFFF"
+             type="rectangle" x="220" y="626" width="56" height="34"/>
+        <component id="22"/>
+        <component id="9"/>
+    </entry>
+    <relation entry1="77" entry2="46" type="PPrel">
+        <subtype name="missing interaction" value="-/-"/>
+    </relation>
+    <relation entry1="11" entry2="12" type="PPrel">
+        <subtype name="missing interaction" value="-/-"/>
+    </relation>
+    <relation entry1="51" entry2="48" type="PPrel">
+        <subtype name="missing interaction" value="-/-"/>
+    </relation>
+    <relation entry1="21" entry2="78" type="PPrel">
+        <subtype name="missing interaction" value="-/-"/>
+    </relation>
+    <relation entry1="50" entry2="52" type="PPrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="27" entry2="24" type="PCrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="24" entry2="23" type="PPrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="23" entry2="25" type="PPrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="25" entry2="28" type="PCrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="28" entry2="26" type="PCrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="30" entry2="26" type="PPrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="29" entry2="55" type="PCrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="32" entry2="59" type="PPrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="58" entry2="59" type="PPrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+    <relation entry1="59" entry2="60" type="PPrel">
+        <subtype name="activation" value="--&gt;"/>
+    </relation>
+</pathway>
