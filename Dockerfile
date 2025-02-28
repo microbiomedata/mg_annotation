@@ -13,7 +13,7 @@ RUN update-ca-certificates --fresh
 # for building on arm / mac machine for amd, use `openjdk-11-jdk:amd64`
 RUN apt-get -y update && apt-get install -y openjdk-11-jdk
 # potential fix with openjdk:19-alpine following this comment, if we want
-# to use wget instead of ADD (which is better practice)
+# to use wget instead of ADD (which is better practice) for building on MacOS
 # https://forums.docker.com/t/how-to-make-wget-run-in-docker/140555/6
 
 # Install essential packages
@@ -218,8 +218,6 @@ ENV  CONDA_EXE='/miniconda3/bin/conda'
 ENV  _CE_M=''
 ENV  _CE_CONDA=''
 ENV  CONDA_PYTHON_EXE='/miniconda3/bin/python'
-ENV  IMG_annotation_pipeline_ver=5.3.0
-ENV  infernal_ver=1.1.4
 
 COPY --from=cromwell /opt/omics/bin/ /opt/omics/bin/
 
@@ -236,9 +234,9 @@ COPY --from=img /opt/CRT-CLI.jar /opt/omics/programs/CRT/CRT-CLI.jar
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
 
 COPY --from=infernal /opt/omics/programs/infernal /opt/omics/programs/infernal/
-COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/bin/ /opt/omics/bin/
+COPY --from=img /opt/img-annotation-pipeline/bin/ /opt/omics/bin/
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
-COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/VERSION /opt/omics/VERSION
+COPY --from=img /opt/img-annotation-pipeline/VERSION /opt/omics/VERSION
 RUN \
     mkdir /opt/omics/lib && cd /opt/omics/lib && \
     ln -s ../programs/tRNAscan-SE/tRNAscan-SE-${trnascan_ver}/lib/tRNAscan-SE/* . 
