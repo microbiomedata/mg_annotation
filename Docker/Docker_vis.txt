@@ -28,7 +28,7 @@ RUN \
 
 ADD *.py /opt/conda/envs/$conda_env/bin/
 ADD *.pl /opt/conda/envs/$conda_env/bin/
-ADD ec_info /opt/conda/envs/$conda_env/bin/ec_info
+ADD Docker/ec_info /opt/conda/envs/$conda_env/bin/ec_info
 
 ENV PATH="/opt/conda/envs/$conda_env/bin:${PATH}"
 
