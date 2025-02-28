@@ -26,8 +26,8 @@ RUN \
     ln -s /opt/conda/envs/$conda_env/lib/python3.7/site-packages/microbeannotator/data /opt/conda/envs/$conda_env/data && \
     micromamba clean -y -a && pip cache purge
 
-ADD *.py /opt/conda/envs/$conda_env/bin/
-ADD *.pl /opt/conda/envs/$conda_env/bin/
+ADD Docker/*.py /opt/conda/envs/$conda_env/bin/
+ADD Docker/*.pl /opt/conda/envs/$conda_env/bin/
 ADD Docker/ec_info /opt/conda/envs/$conda_env/bin/ec_info
 
 ENV PATH="/opt/conda/envs/$conda_env/bin:${PATH}"
