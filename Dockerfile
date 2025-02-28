@@ -48,12 +48,14 @@ FROM buildbase AS trnascan
 ENV trnascan_ver=2.0.12
 # ADD https://github.com/UCSC-LoweLab/tRNAscan-SE/archive/refs/tags/v${trnascan_ver}.tar.gz .
 
-RUN wget https://github.com/UCSC-LoweLab/tRNAscan-SE/archive/refs/tags/v${trnascan_ver}.tar.gz
+RUN git clone --depth 1 --branch ${trnascan_ver} https://github.com/UCSC-LoweLab/tRNAscan-SE
+# RUN wget https://github.com/UCSC-LoweLab/tRNAscan-SE/archive/refs/tags/v${trnascan_ver}.tar.gz
 
 RUN \
-    tar -xzf v${trnascan_ver}.tar.gz && \
-    cd tRNAscan-SE-${trnascan_ver} && \
-    ./configure --prefix=/opt/omics/programs/tRNAscan-SE/tRNAscan-SE-${trnascan_ver}/ && \
+    # tar -xzf v${trnascan_ver}.tar.gz && \
+    # cd tRNAscan-SE-${trnascan_ver} && \
+    cd tRNAscan-SE && \
+    ./configure --prefix=/opt/omics/programs/tRNAscan-SE/ && \
     make && make install
 
 #
@@ -107,13 +109,15 @@ FROM buildbase AS infernal
 
 ENV infernal_ver=1.1.4
 
-RUN \
-    wget http://eddylab.org/infernal/infernal-${infernal_ver}.tar.gz && \
-    tar -zxf infernal-${infernal_ver}.tar.gz
+# RUN \
+#     wget http://eddylab.org/infernal/infernal-${infernal_ver}.tar.gz && \
+#     tar -zxf infernal-${infernal_ver}.tar.gz
+
+RUN git clone --depth 1 --branch ${infernal_ver} https://github.com/EddyRivasLab/infernal
 
 RUN \
-    cd infernal-${infernal_ver} && \
-    ./configure --prefix=/opt/omics/programs/infernal/infernal-${infernal_ver} && \
+    cd infernal && \
+    ./configure --prefix=/opt/omics/programs/infernal/ && \
     make && make install
 
 #
@@ -239,7 +243,7 @@ COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
 COPY --from=img /opt/img-annotation-pipeline/VERSION /opt/omics/VERSION
 RUN \
     mkdir /opt/omics/lib && cd /opt/omics/lib && \
-    ln -s ../programs/tRNAscan-SE/tRNAscan-SE-${trnascan_ver}/lib/tRNAscan-SE/* . 
+    ln -s ../programs/tRNAscan-SE/lib/tRNAscan-SE/* . 
 
 #link things to the bin directory
 
@@ -247,8 +251,8 @@ RUN \
     cd /opt/omics/bin &&\ 
     ln -s ../programs/gms2_linux_64/gms2.pl &&\
     ln -s ../programs/gms2_linux_64/gmhmmp2 &&\
-    ln -s ../programs/infernal/infernal-${infernal_ver}/bin/cmsearch && \
-    ln -s ../programs/tRNAscan-SE/tRNAscan-SE-${trnascan_ver}/bin/tRNAscan-SE && \
+    ln -s ../programs/infernal/bin/cmsearch && \
+    ln -s ../programs/tRNAscan-SE/bin/tRNAscan-SE && \
     ln -s ../programs/last/bin/lastal && \
     ln -s ../programs/CRT/CRT-CLI.jar CRT-CLI.jar && \
     ln -s ../programs/prodigal &&\
@@ -257,7 +261,7 @@ RUN \
 #make sure tRNAscan can see cmsearch and cmscan
 
 RUN \ 
-    cd /opt/omics/programs/tRNAscan-SE/tRNAscan-SE-${trnascan_ver}/bin/ &&\
-    ln -s /opt/omics/programs/infernal/infernal-${infernal_ver}/bin/cmsearch && \
-    ln -s /opt/omics/programs/infernal/infernal-${infernal_ver}/bin/cmscan
+    cd /opt/omics/programs/tRNAscan-SE/bin/ &&\
+    ln -s /opt/omics/programs/infernal/bin/cmsearch && \
+    ln -s /opt/omics/programs/infernal/bin/cmscan
 
