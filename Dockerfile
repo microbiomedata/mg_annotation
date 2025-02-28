@@ -48,7 +48,7 @@ FROM buildbase AS trnascan
 ENV trnascan_ver=2.0.12
 # ADD https://github.com/UCSC-LoweLab/tRNAscan-SE/archive/refs/tags/v${trnascan_ver}.tar.gz .
 
-RUN git clone --depth 1 --branch ${trnascan_ver} https://github.com/UCSC-LoweLab/tRNAscan-SE
+RUN git clone --depth 1 --branch v${trnascan_ver} https://github.com/UCSC-LoweLab/tRNAscan-SE
 # RUN wget https://github.com/UCSC-LoweLab/tRNAscan-SE/archive/refs/tags/v${trnascan_ver}.tar.gz
 
 RUN \
