@@ -113,7 +113,7 @@ ENV infernal_ver=1.1.4
 #     wget http://eddylab.org/infernal/infernal-${infernal_ver}.tar.gz && \
 #     tar -zxf infernal-${infernal_ver}.tar.gz
 
-RUN git clone --depth 1 --branch ${infernal_ver} https://github.com/EddyRivasLab/infernal
+RUN git clone --depth 1 --branch infernal-${infernal_ver} https://github.com/EddyRivasLab/infernal
 
 RUN \
     cd infernal && \
