@@ -6,11 +6,11 @@ import "./functional-annotation.wdl" as fa
 workflow annotation {
 input {
   String  proj
-  String  input_file
+  File    input_file
   String  imgap_project_id
   String  database_location="/refdata/img/"
   String  imgap_project_type="metagenome"
-  String  gm_license="/refdata/licenses/.gmhmmp2_key"
+  File    gm_license="/refdata/licenses/.gmhmmp2_key"
   Int     additional_threads=16
   Int     additional_memory = 100
   String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
@@ -235,7 +235,7 @@ task stage {
     input {
         String container
         String target="input.fasta"
-        String   input_file
+        File   input_file
     }
 
    command <<<
@@ -266,7 +266,7 @@ task make_map_file {
   input{
     String proj_id
     String prefix=sub(proj_id, ":", "_")
-    File input_file
+    File   input_file
     String container
     Int min_seq_length = 150      # default value
     Int unknown_gap_length = 100  # default value
