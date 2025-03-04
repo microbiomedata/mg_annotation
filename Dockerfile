@@ -55,8 +55,9 @@ RUN \
     # tar -xzf v${trnascan_ver}.tar.gz && \
     # cd tRNAscan-SE-${trnascan_ver} && \
     cd tRNAscan-SE && \
-    ./configure --prefix=/opt/omics/programs/tRNAscan-SE/ && \
-    make && make install
+    # ./configure --prefix=/opt/omics/programs/tRNAscan-SE/ && \
+    make && \
+    make prefix=/opt/omics/programs/tRNAscan-SE/ install
 
 #
 ########## Build HMMER 3.3.2
@@ -69,8 +70,10 @@ RUN \
     cd /opt && \
     wget http://eddylab.org/software/hmmer/hmmer-${hmm_ver}.tar.gz && \
     tar -zxf hmmer-${hmm_ver}.tar.gz && \
-    cd hmmer-${hmm_ver} && ./configure --prefix /opt/omics/programs/hmmer/ && \
-    make && make install
+    cd hmmer-${hmm_ver} && \
+    # ./configure --prefix /opt/omics/programs/hmmer/ && \
+    make && \
+    make prefix=/opt/omics/programs/hmmer/ install
 
 # get and extract commit sha a8d641046729328fdda97331d527edb2ce81510a  of master branch of modification file, copy into hmmer source code
 ## for hmmer version 3.3.2 the hpc_hmmsearch should use the code in master branch
@@ -117,8 +120,9 @@ RUN git clone --depth 1 --branch infernal-${infernal_ver} https://github.com/Edd
 
 RUN \
     cd infernal && \
-    ./configure --prefix=/opt/omics/programs/infernal/ && \
-    make && make install
+    # ./configure --prefix=/opt/omics/programs/infernal/ && \
+    make && \
+    make prefix=/opt/omics/programs/infernal/ install
 
 #
 ########## IMG scripts and tools v 5.1.14, repo is public 4/2023. Add split.py from bfoster1/img-omics:0.1.12 (md5sum 21fb20bf430e61ce55430514029e7a83)
