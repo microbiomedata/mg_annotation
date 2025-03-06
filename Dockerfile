@@ -77,7 +77,8 @@ ENV hmm_ver=3.3.2
 
 RUN \
     cd /opt && \
-    git clone --depth 1 --branch hmmer-${hmm_ver} https://github.com/EddyRivasLab/hmmer && \
+    git clone --depth 1 --branch hmmer-${hmm_ver} https://github.com/EddyRivasLab/hmmer
+RUN \
     cd hmmer && \
     make && \
     make prefix=/opt/omics/programs/hmmer/ install
@@ -110,8 +111,8 @@ ENV last_ver=1584
 #     make && \
 #     make prefix=/opt/omics/programs/last install
 
+RUN git clone --depth 1 --branch ${last_ver} https://gitlab.com/mcfrith/last
 RUN \
-    git clone --depth 1 --branch ${last_ver} https://gitlab.com/mcfrith/last && \
     cd last && \
     make && \
     make prefix=/opt/omics/programs/last install
@@ -182,8 +183,8 @@ RUN \
 
 ENV CRT_ver=1.8.4
 
+RUN git clone --depth 1 --branch ${CRT_ver} https://code.jgi.doe.gov/img/img-pipelines/crt-cli-imgap-version
 RUN \
-    git clone --depth 1 --branch ${CRT_ver} https://code.jgi.doe.gov/img/img-pipelines/crt-cli-imgap-version && \
     cd crt-cli-imgap-version/src && \
     javac *.java && \
     jar cfe CRT-CLI.jar crt *.class && \
