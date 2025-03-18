@@ -54,7 +54,7 @@ Workflow Dependencies
 - Requisite databases: 
 
   - Rfam 13.0 (public domain/CC0 1.0; `more info <http://reusabledata.org/rfam>`_)
-  - KEGG (paid subscription, getting KOs/ECs indirectly via IMG-NR 20230629; `more info <http://reusabledata.org/kegg-ftp>`, `IMG-NR downloads <https://genome.jgi.doe.gov/portal/IMG_NR/IMG_NR.download.html>`_)
+  - KEGG (paid subscription, getting KOs/ECs indirectly via IMG-NR 20230629; `more info <http://reusabledata.org/kegg-ftp>`_, `IMG-NR downloads <https://genome.jgi.doe.gov/portal/IMG_NR/IMG_NR.download.html>`_)
   - SMART 01_06_2016 (restrictive license/custom; `more info <http://reusabledata.org/smart>`_)
   - COG 2003 (copyright/unlicensed; `more info <http://reusabledata.org/cogs>`_)
   - TIGRFAM v15.0 (copyleft/LGPL 2.0 or later; `more info <http://reusabledata.org/tigrfams>`_)
