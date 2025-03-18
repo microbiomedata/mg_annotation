@@ -255,10 +255,11 @@ task stage {
       String start = read_string("start.txt")
    }
    runtime {
-     memory: "1G"
-     cpu:  2
-     maxRetries: 1
-     docker: container
+      runtime_minutes: 10
+      memory: "1G"
+      cpu:  2
+      maxRetries: 1
+      docker: container
    }
 }
 
@@ -290,10 +291,11 @@ task make_map_file {
     File  out_log = stdout()
  }
   runtime {
+    runtime_minutes: 60
     memory: "120G"
-     cpu:  16
-     maxRetries: 1
-     docker: container
+    cpu:  16
+    maxRetries: 1
+    docker: container
   }
 }
 
@@ -323,6 +325,7 @@ task split {
    }
 
    runtime {
+     runtime_minutes: 90
      memory: "120G"
      cpu:  16
      maxRetries: 1
@@ -467,6 +470,7 @@ task merge_outputs {
     File crt_out = "~{prefix}_crt.out"
   }
   runtime {
+    runtime_minutes: 30
     memory: "2G"
     cpu:  4
     maxRetries: 1
@@ -574,6 +578,7 @@ task make_info_file {
     File imgap_info = "~{prefix}_imgap.info"
   }
   runtime {
+    runtime_minutes: 20
     memory: "2G"
     cpu:  4
     maxRetries: 1
@@ -605,8 +610,9 @@ task final_stats {
   }
 
   runtime {
-    time: "0:10:00"
+    runtime_minutes: 10
     memory: "86G"
+    cpu: 4
     docker: container
   }
 }
@@ -719,6 +725,7 @@ task finish_ano {
  
     }
     runtime {
+       runtime_minutes: 50
         memory: "10G"
         cpu:  4
         maxRetries: 1

@@ -40,7 +40,7 @@ task trnascan_ba {
   >>>
 
   runtime {
-    time: "9:00:00"
+    runtime_minutes: 540
     docker: container
     cpu: threads
     memory: "115G"

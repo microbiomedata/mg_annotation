@@ -180,8 +180,9 @@ task pre_qc {
   >>>
 
   runtime {
-    time: "1:00:00"
-    memory: "86G"
+    runtime_minutes: 60
+    memory: "64G"
+    cpu: 8
     docker: container
   }
 
@@ -220,8 +221,9 @@ task gff_merge {
   >>>
 
   runtime {
-    time: "1:00:00"
-    memory: "86G"
+    runtime_minutes: 60
+    memory: "64G"
+    cpu: 8
     docker: container
   }
 
@@ -251,8 +253,9 @@ task fasta_merge {
   >>>
 
   runtime {
-    time: "2:00:00"
+    runtime_minutes: 60
     memory: "40G"
+    cpu: 8
     docker: container
   }
  
@@ -275,8 +278,9 @@ task gff_and_fasta_stats {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu: 8
     docker: container
   }
 
@@ -296,8 +300,9 @@ task post_qc {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu: 8
     docker: container
   }
  

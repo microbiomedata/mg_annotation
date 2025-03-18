@@ -58,8 +58,9 @@ task gm_isolate {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu: 8
     docker: container
   }
 
@@ -88,8 +89,9 @@ task gm_meta {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu: 8
     docker: container
   }
 
@@ -128,8 +130,9 @@ task clean_and_unify {
   >>>
 
   runtime {
-    time: "1:00:00"
-    memory: "86G"
+    runtime_minutes: 60
+    memory: "64G"
+    cpu: 4
     docker: container
   }
 
