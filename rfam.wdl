@@ -69,7 +69,7 @@ task run {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     docker: container
     cpu: threads
     memory: "~{memory} GiB"

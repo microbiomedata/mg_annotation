@@ -211,8 +211,9 @@ task ko_ec {
   >>>
 
   runtime {
-    time: "1:00:00"
-    memory: "86G"
+    runtime_minutes: 60
+    memory: "128G"
+    cpu: 16
     docker: container
   }
 
@@ -261,8 +262,9 @@ task smart {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu: 16
     docker: container
   }
 
@@ -307,8 +309,9 @@ task cog {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu: 16
     docker: container
   }
 
@@ -352,8 +355,9 @@ task tigrfam {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu:16
     docker: container
   }
 
@@ -400,8 +404,9 @@ task superfam {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu: 16
     docker: container
   }
 
@@ -444,8 +449,9 @@ task pfam {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu: 16
     docker: container
   }
 
@@ -488,8 +494,9 @@ task cath_funfam {
   >>>
 
   runtime {
-    time: "1:00:00"
+    runtime_minutes: 60
     memory: "86G"
+    cpu: 16
     docker: container
   }
   
@@ -521,8 +528,9 @@ task run_signalp {
   >>>
 
   runtime {
-    time: "1:00:00"
-    memory: "86G"
+    runtime_minutes: 60
+    memory: "64G"
+    cpu: 8
     docker: container
   }
 
@@ -553,8 +561,9 @@ task tmhmm {
   >>>
 
   runtime {
-    time: "1:00:00"
-    memory: "86G"
+    runtime_minutes: 60
+    memory: "64G"
+    cpu: 8
     docker: container
   }
 
@@ -592,8 +601,9 @@ task product_name {
   >>>
 
   runtime {
-    time: "1:00:00"
-    memory: "86G"
+    runtime_minutes: 60
+    memory: "64G"
+    cpu: 8
     docker: container
   }
 
