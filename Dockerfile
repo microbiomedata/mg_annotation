@@ -134,7 +134,7 @@ RUN git clone --depth 1 --branch infernal-${infernal_ver} https://github.com/Edd
 
 RUN \
     cd infernal && \
-    ./configure --prefix=/opt/omics/programs/infernal/ && \
+    ./configure --prefix=/opt/omics/programs/infernal/infernal-${infernal_ver} && \
     make && \
     make install 
     # make prefix=/opt/omics/programs/infernal/ install
@@ -232,6 +232,7 @@ RUN \
 FROM buildbase
 
 ENV PERL5LIB='/opt/omics/lib'
+ENV infernal_ver=1.1.4
 COPY --from=conda /miniconda3 /miniconda3
 
 # conda shell.posix activate
@@ -270,7 +271,7 @@ RUN \
     cd /opt/omics/bin &&\ 
     ln -s ../programs/gms2_linux_64/gms2.pl &&\
     ln -s ../programs/gms2_linux_64/gmhmmp2 &&\
-    ln -s ../programs/infernal/bin/cmsearch && \
+    ln -s ../programs/infernal/infernal-${infernal_ver}/bin/cmsearch && \
     ln -s ../programs/tRNAscan-SE/bin/tRNAscan-SE && \
     ln -s ../programs/last/bin/lastal && \
     ln -s ../programs/CRT/CRT-CLI.jar CRT-CLI.jar && \
