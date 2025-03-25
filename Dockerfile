@@ -66,25 +66,22 @@ RUN \
 FROM buildbase AS hmm
 
 ENV hmm_ver=3.3.2
-# ADD http://eddylab.org/software/hmmer/hmmer-${hmm_ver}.tar.gz /opt/
-# RUN \
-#     cd /opt && \
-#     # wget http://eddylab.org/software/hmmer/hmmer-${hmm_ver}.tar.gz && \
-#     # tar -zxf hmmer-${hmm_ver}.tar.gz && \
-#     cd hmmer-${hmm_ver} && \
-#     # ./configure --prefix /opt/omics/programs/hmmer/ && \
-#     make && \
-#     make prefix=/opt/omics/programs/hmmer/ install
-
 RUN \
     cd /opt && \
-    git clone --depth 1 --branch hmmer-${hmm_ver} https://github.com/EddyRivasLab/hmmer
-RUN \
-    cd /opt/hmmer && \
-    ./configure --prefix /opt/omics/programs/hmmer/ && \
-    make && \
-    make install 
-    # make prefix=/opt/omics/programs/hmmer/ install
+    wget http://eddylab.org/software/hmmer/hmmer-${hmm_ver}.tar.gz && \
+    tar -zxvf hmmer-${hmm_ver}.tar.gz && \
+    cd hmmer-${hmm_ver} && ./configure --prefix /opt/omics/programs/hmmer/ && \
+    make && make install
+
+# RUN \
+#     cd /opt && \
+#     git clone --depth 1 --branch hmmer-${hmm_ver} https://github.com/EddyRivasLab/hmmer
+# RUN \
+#     cd /opt/hmmer && \
+#     ./configure --prefix /opt/omics/programs/hmmer/ && \
+#     make && \
+#     make install 
+#     # make prefix=/opt/omics/programs/hmmer/ install
 
 
 # get and extract commit sha a8d641046729328fdda97331d527edb2ce81510a  of master branch of modification file, copy into hmmer source code
@@ -94,8 +91,8 @@ ENV hpc_hmm_sha=66a2b4a7a01dab5111163d8372f581de381e8cb1
 RUN \
     wget https://github.com/Larofeticus/hpc_hmmsearch/archive/${hpc_hmm_sha}.zip && \
     unzip ${hpc_hmm_sha}.zip && \
-    cp /hpc_hmmsearch-*/hpc_hmmsearch.c /opt/hmmer/src && \
-    cd /opt/hmmer/src && \
+    cp /hpc_hmmsearch-*/hpc_hmmsearch.c /opt/hmmer-${hmm_ver}/src && \
+    cd /opt/hmmer-${hmm_ver}/src && \
     gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -fopenmp -fPIC -msse2 -DHAVE_CONFIG_H -I../easel -I../libdivsufsort -I../easel -I. -I. -o hpc_hmmsearch.o -c hpc_hmmsearch.c && \
     gcc -std=gnu99 -O3 -fomit-frame-pointer -fstrict-aliasing -march=core2 -fopenmp -fPIC -msse2 -DHAVE_CONFIG_H -L../easel -L./impl_sse -L../libdivsufsort -L. -o hpc_hmmsearch hpc_hmmsearch.o -lhmmer -leasel -ldivsufsort -lm  && \
     cp hpc_hmmsearch /opt/omics/programs/hmmer/bin/ && \

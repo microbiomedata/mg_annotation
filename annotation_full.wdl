@@ -2,7 +2,7 @@ version 1.0
 
 import "./structural-annotation.wdl" as sa
 import "./functional-annotation.wdl" as fa
-import "./genomad.wdl" as gen
+import "./genomad.wdl" as ge
 
 workflow annotation {
   input {
@@ -73,16 +73,16 @@ workflow annotation {
           sa_gff = s_annotate.gff,
           container=container
       }
-
+      call ge.jgi_genomad {
+        input:
+        genomad_execute = genomad_execute,
+        input_fasta = make_map_file.out_fasta,
+        db_dir = genomad_db_dir,
+        container = genomad_container
+      }
   }
 
-    call gen.jgi_genomad as genomad {
-    input:
-    genomad_execute = genomad_execute,
-    input_fasta = make_map_file.out_fasta,
-    db_dir = genomad_db_dir,
-    container = genomad_container
-  }
+
 
   call merge_outputs {
     input:
@@ -127,6 +127,9 @@ workflow annotation {
        trna_archaeal_outs = s_annotate.trna_archaeal_out,
        rfam_gffs = s_annotate.rfam_gff,
        rfam_tbls = s_annotate.rfam_tbl,
+       virus_summary = genomad.virus_summary,
+       plasmid_summary = genomad.plasmid_summary,
+       aggregated_class = genomad.aggregated_class,
        container=container
   }
   call make_info_file {
@@ -194,10 +197,7 @@ workflow annotation {
       product_names_tsv = merge_outputs.product_names_tsv,
       crt_crisprs = merge_outputs.crt_crisprs,
       map_file = make_map_file.map_file,
-      renamed_fasta = make_map_file.out_fasta,
-      virus_summary = genomad.virus_summary,
-      plasmid_summary = genomad.plasmid_summary,
-      aggregated_class = genomad.aggregated_class
+      renamed_fasta = make_map_file.out_fasta
   }
 
   output{
