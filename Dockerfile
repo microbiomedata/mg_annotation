@@ -4,15 +4,14 @@
 FROM debian:bullseye AS buildbase
 # docker buildx build --progress=plain --no-cache  --platform linux/amd64 -t microbiomedata/img-omics:5.3.0 .
 
-LABEL version="5.3.0"
 # version variables
+ENV IMG_annotation_pipeline_ver=5.3.0
 ENV prodigal_ver=2.6.3
 ENV trnascan_ver=2.0.12
 ENV hmm_ver=3.3.2
 ENV hpc_hmm_sha=66a2b4a7a01dab5111163d8372f581de381e8cb1
 ENV last_ver=1584
 ENV infernal_ver=1.1.4
-ENV IMG_anno_ver=5.3.0
 ENV gms2_ver=1.14_1.25
 ENV CRT_ver=1.8.4
 ENV cromwell_ver=49
@@ -143,9 +142,9 @@ FROM buildbase AS img
 
 RUN \
     cd /opt && \
-    wget https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/archive/${IMG_anno_ver}/img-annotation-pipeline-${IMG_anno_ver}.tar.gz && \
-    tar -xzf img-annotation-pipeline-${IMG_anno_ver}.tar.gz && \
-    rm img-annotation-pipeline-${IMG_anno_ver}.tar.gz
+    wget https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/archive/${IMG_annotation_pipeline_ver    }/img-annotation-pipeline-${IMG_annotation_pipeline_ver    }.tar.gz && \
+    tar -xzf img-annotation-pipeline-${IMG_annotation_pipeline_ver    }.tar.gz && \
+    rm img-annotation-pipeline-${IMG_annotation_pipeline_ver    }.tar.gz
 
 RUN \
     cd /opt && \
@@ -224,7 +223,7 @@ COPY --from=trnascan /opt/omics/programs/tRNAscan-SE /opt/omics/programs/tRNAsca
 COPY --from=hmm /opt/omics/programs/hmmer/ /opt/omics/programs/hmmer
 COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 COPY --from=infernal /opt/omics/programs/infernal/ /opt/omics/programs/infernal/
-COPY --from=img /opt/img-annotation-pipeline-${IMG_anno_ver}/bin/ /opt/omics/bin/
+COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver    }/bin/ /opt/omics/bin/
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
 COPY --from=img /opt/CRT-CLI.jar /opt/omics/programs/CRT/CRT-CLI.jar
