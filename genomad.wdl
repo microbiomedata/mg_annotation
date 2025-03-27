@@ -41,6 +41,7 @@ task run_genomad {
     }
   command <<<
     set -euo pipefail
+    echo ~{len_cutoff}
     if [[ "~{genomad_execute}" = true ]]
      then 
      echo "starting genomad"
