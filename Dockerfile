@@ -17,23 +17,24 @@ ENV seqkit_ver=2.10.0
 
 
 # Update and clean package lists
-RUN apt-get update && \
-    apt-get upgrade && \
+RUN apt-get -y update && \
+    apt-get -y upgrade && \
     apt-get clean -y 
 
 # Install CA certificates
-RUN apt-get update && apt-get install -y ca-certificates
+RUN apt-get -y update && \
+    apt-get install -y ca-certificates
 RUN update-ca-certificates --fresh
 
 # Install OpenJDK
 # for building on arm / mac machine for amd, use `openjdk-11-jdk:amd64`
-RUN apt-get update && apt-get install -y openjdk-11-jdk
+RUN apt-get -y update && apt-get install -y openjdk-11-jdk
 # potential fix with openjdk:19-alpine following this comment, if we want
 # to use wget instead of ADD (which is better practice) for building on MacOS
 # https://forums.docker.com/t/how-to-make-wget-run-in-docker/140555/6
 
 # Install essential packages
-RUN apt-get update && apt-get install -y \
+RUN apt-get -y update && apt-get install -y \
     git \
     gcc \
     make \
@@ -43,9 +44,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     curl \
     libz-dev \
-    g++ \
-    && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
+    g++ 
+RUN apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/*
 
 
 #
@@ -201,7 +202,12 @@ RUN \
 ## seqkit_ver=2.10.0
 FROM mambaorg/micromamba:2.0.3 as genomad 
 
-RUN micromamba install -y -n base -c conda-forge -c bioconda genomad==1.8.1 seqkit==2.10.0  && \
+RUN \
+    micromamba install -y -n base \
+        -c conda-forge \
+        -c bioconda \
+        genomad==${genomad_ver} \
+        seqkit==${seqkit_ver}  && \
     micromamba clean --all --yes
     
 RUN wget --directory-prefix=/usr/local/bin https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh
