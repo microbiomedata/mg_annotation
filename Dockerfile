@@ -1,6 +1,3 @@
-# syntax=docker/dockerfile:1
-# check=error=true
-
 FROM debian:bullseye AS buildbase
 # docker buildx build --progress=plain --no-cache  --platform linux/amd64 -t microbiomedata/img-omics:5.3.0 .
 
