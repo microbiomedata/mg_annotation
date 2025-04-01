@@ -165,6 +165,38 @@ RUN \
     jar cfe CRT-CLI.jar crt *.class && \
     cp CRT-CLI.jar /opt/.
 
+########## get genomad script from jgi
+RUN \
+    cd /opt && \
+    wget --directory-prefix=/usr/local/bin https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh
+
+
+########## Build genomad from img with micromamba
+## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
+## genomad_ver=1.8.1
+## seqkit_ver=2.10.0
+FROM mambaorg/micromamba:2.0.3 as genomad 
+
+# RUN \
+#     wget https://github.com/mamba-org/micromamba-releases/archive/refs/tags/2.0.3-0.tar.gz && \
+#     tar -xzf 2.0.3-0.tar.gz && \
+#     rm 2.0.3-0.tar.gz && \
+#     cd micromamba-releases-2.0.3-0 && \
+#     bash install.sh -b -p /micromamba
+# RUN apt-get -y update && \
+#     apt-get -y upgrade && \
+#     apt-get clean -y 
+
+
+RUN \
+    micromamba install -y -n base \
+        -c conda-forge \
+        -c bioconda \
+        genomad==${genomad_ver} \
+        seqkit==${seqkit_ver}  && \
+    micromamba clean --all --yes
+    
+
 
 #
 ########### Install miniconda
@@ -196,22 +228,6 @@ RUN \
     ln -sf cromwell-${cromwell_ver}.jar cromwell.jar
 
 #
-########## Build genomad from img 
-## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
-## genomad_ver=1.8.1
-## seqkit_ver=2.10.0
-FROM mambaorg/micromamba:2.0.3 as genomad 
-
-RUN \
-    micromamba install -y -n base \
-        -c conda-forge \
-        -c bioconda \
-        genomad==${genomad_ver} \
-        seqkit==${seqkit_ver}  && \
-    micromamba clean --all --yes
-    
-RUN wget --directory-prefix=/usr/local/bin https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh
-
 #
 ########## build final image
 #
@@ -250,7 +266,7 @@ RUN mkdir -p /usr/local/bin/ /opt/conda/bin/
 COPY --from=genomad /opt/conda/bin/seqkit /opt/conda/bin/seqkit
 COPY --from=genomad /opt/conda/bin/genomad /opt/conda/bin/genomad
 COPY --from=genomad /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
-COPY --from=genomad /usr/local/bin/genomad.sh /usr/local/bin/genomad.sh
+COPY --from=img /opt/genomad.sh /usr/local/bin/genomad.sh
 
 #link things to the bin directory
 RUN \
