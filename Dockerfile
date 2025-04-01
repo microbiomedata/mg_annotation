@@ -16,12 +16,13 @@ ENV gms2_ver=1.14_1.25
 ENV CRT_ver=1.8.4
 ENV cromwell_ver=49
 ENV genomad_ver=1.8.1
+ENV seqkit_ver=2.10.0
 
 
 # Update and clean package lists
 RUN apt-get update && \
     apt-get upgrade && \
-    apt-get clean
+    apt-get clean -y 
 
 # Install CA certificates
 RUN apt-get update && apt-get install -y ca-certificates
@@ -29,7 +30,7 @@ RUN update-ca-certificates --fresh
 
 # Install OpenJDK
 # for building on arm / mac machine for amd, use `openjdk-11-jdk:amd64`
-RUN apt-get update && apt-get install -y openjdk-11-jdk:amd64
+RUN apt-get update && apt-get install -y openjdk-11-jdk
 # potential fix with openjdk:19-alpine following this comment, if we want
 # to use wget instead of ADD (which is better practice) for building on MacOS
 # https://forums.docker.com/t/how-to-make-wget-run-in-docker/140555/6
@@ -46,10 +47,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     libz-dev \
     g++ \
-    && apt-get clean \
+    && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
-
-
 
 
 #
@@ -142,9 +141,9 @@ FROM buildbase AS img
 
 RUN \
     cd /opt && \
-    wget https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/archive/${IMG_annotation_pipeline_ver    }/img-annotation-pipeline-${IMG_annotation_pipeline_ver    }.tar.gz && \
-    tar -xzf img-annotation-pipeline-${IMG_annotation_pipeline_ver    }.tar.gz && \
-    rm img-annotation-pipeline-${IMG_annotation_pipeline_ver    }.tar.gz
+    wget https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/archive/${IMG_annotation_pipeline_ver}/img-annotation-pipeline-${IMG_annotation_pipeline_ver}.tar.gz && \
+    tar -xzf img-annotation-pipeline-${IMG_annotation_pipeline_ver}.tar.gz && \
+    rm img-annotation-pipeline-${IMG_annotation_pipeline_ver}.tar.gz
 
 RUN \
     cd /opt && \
@@ -170,12 +169,9 @@ RUN \
 
 
 #
-########### Build the final image
+########### Install miniconda
 #
 FROM buildbase AS conda
-
-########## Install Miniconda
-
 RUN \
     wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \ 
     bash ./Miniconda3-latest-Linux-x86_64.sh -b -p /miniconda3
@@ -202,7 +198,19 @@ RUN \
     ln -sf cromwell-${cromwell_ver}.jar cromwell.jar
 
 #
-##########
+########## Build genomad from img 
+## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
+## genomad_ver=1.8.1
+## seqkit_ver=2.10.0
+FROM mambaorg/micromamba:2.0.3 as genomad 
+
+RUN conda install -y -n base -c conda-forge -c bioconda genomad==1.8.1 seqkit==2.10.0  && \
+    conda clean --all --yes
+    
+RUN wget --directory-prefix=/usr/local/bin https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh
+
+#
+########## build final image
 #
 FROM buildbase
 
@@ -223,7 +231,8 @@ COPY --from=trnascan /opt/omics/programs/tRNAscan-SE /opt/omics/programs/tRNAsca
 COPY --from=hmm /opt/omics/programs/hmmer/ /opt/omics/programs/hmmer
 COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 COPY --from=infernal /opt/omics/programs/infernal/ /opt/omics/programs/infernal/
-COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver    }/bin/ /opt/omics/bin/
+
+COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/bin/ /opt/omics/bin/
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
 COPY --from=img /opt/CRT-CLI.jar /opt/omics/programs/CRT/CRT-CLI.jar
@@ -232,6 +241,13 @@ RUN \
     mkdir /opt/omics/lib && \
     cd /opt/omics/lib && \
     ln -s ../programs/tRNAscan-SE/lib/tRNAscan-SE/* . 
+
+# copy from existing genomad container
+RUN mkdir -p /usr/local/bin/ /opt/conda/bin/
+COPY --from=genomad /opt/conda/bin/seqkit /opt/conda/bin/seqkit
+COPY --from=genomad /opt/conda/bin/genomad /opt/conda/bin/genomad
+COPY --from=genomad /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
+COPY --from=genomad /usr/local/bin/genomad.sh /usr/local/bin/genomad.sh
 
 #link things to the bin directory
 RUN \
@@ -251,9 +267,5 @@ RUN \
     ln -s /opt/omics/programs/infernal/bin/cmsearch && \
     ln -s /opt/omics/programs/infernal/bin/cmscan
 
-# copy from existing genomad container
-COPY --from=microbiomedata/img-genomad:1.0.0_g1.8.1 /opt/conda/bin/seqkit /opt/conda/bin/seqkit
-COPY --from=microbiomedata/img-genomad:1.0.0_g1.8.1 /opt/conda/bin/genomad /opt/conda/bin/genomad
-COPY --from=microbiomedata/img-genomad:1.0.0_g1.8.1 /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
-COPY --from=microbiomedata/img-genomad:1.0.0_g1.8.1 /usr/local/bin/genomad.sh /usr/local/bin/genomad.sh
+
 
