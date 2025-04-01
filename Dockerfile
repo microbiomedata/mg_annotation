@@ -245,7 +245,7 @@ COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/bin/
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
 COPY --from=img /opt/CRT-CLI.jar /opt/omics/programs/CRT/CRT-CLI.jar
-COPY --from=img /opt/img-annotation-pipeline/VERSION /opt/omics/VERSION
+COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/VERSION /opt/omics/VERSION
 RUN \
     mkdir /opt/omics/lib && \
     cd /opt/omics/lib && \
