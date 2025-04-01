@@ -168,7 +168,8 @@ RUN \
 ########## get genomad script from jgi
 RUN \
     cd /opt && \
-    wget https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh
+    wget https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh && \
+    chmod 755 genomad.sh
 
 
 ########## Build micromamba for genomad from img 
@@ -261,11 +262,7 @@ RUN \
     ln -s ../programs/last/bin/lastal && \
     ln -s ../programs/CRT/CRT-CLI.jar CRT-CLI.jar && \
     ln -s ../programs/prodigal && \
-    ln -s ../programs/hmmer/bin/hpc_hmmsearch /opt/omics/bin/hmmsearch && \
-    ln -s /opt/conda/bin/genomad . && \
-    ln -s /opt/conda/bin/seqkit . && \
-    ln -s /usr/local/bin/genomad.sh . && \
-    ln -s /usr/local/bin/_entrypoint.sh
+    ln -s ../programs/hmmer/bin/hpc_hmmsearch /opt/omics/bin/hmmsearch 
 
 
 #make sure tRNAscan can see cmsearch and cmscan
