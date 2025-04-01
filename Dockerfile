@@ -168,26 +168,12 @@ RUN \
 ########## get genomad script from jgi
 RUN \
     cd /opt && \
-    wget --directory-prefix=/usr/local/bin https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh
+    wget https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh
 
 
-########## Build genomad from img with micromamba
+########## Build micromamba for genomad from img 
 ## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
-## genomad_ver=1.8.1
-## seqkit_ver=2.10.0
 FROM mambaorg/micromamba:2.0.3 as genomad 
-
-# RUN \
-#     wget https://github.com/mamba-org/micromamba-releases/archive/refs/tags/2.0.3-0.tar.gz && \
-#     tar -xzf 2.0.3-0.tar.gz && \
-#     rm 2.0.3-0.tar.gz && \
-#     cd micromamba-releases-2.0.3-0 && \
-#     bash install.sh -b -p /micromamba
-# RUN apt-get -y update && \
-#     apt-get -y upgrade && \
-#     apt-get clean -y 
-
-
 RUN \
     micromamba install -y -n base \
         -c conda-forge \
@@ -196,8 +182,6 @@ RUN \
         seqkit==${seqkit_ver}  && \
     micromamba clean --all --yes
     
-
-
 #
 ########### Install miniconda
 #
@@ -251,6 +235,12 @@ COPY --from=hmm /opt/omics/programs/hmmer/ /opt/omics/programs/hmmer
 COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 COPY --from=infernal /opt/omics/programs/infernal/ /opt/omics/programs/infernal/
 
+RUN mkdir -p /usr/local/bin/ /opt/conda/bin/
+COPY --from=genomad /opt/conda/bin/seqkit /opt/conda/bin/seqkit
+COPY --from=genomad /opt/conda/bin/genomad /opt/conda/bin/genomad
+COPY --from=genomad /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
+COPY --from=img /opt/genomad.sh /usr/local/bin/genomad.sh
+
 COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/bin/ /opt/omics/bin/
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
@@ -260,13 +250,6 @@ RUN \
     mkdir /opt/omics/lib && \
     cd /opt/omics/lib && \
     ln -s ../programs/tRNAscan-SE/lib/tRNAscan-SE/* . 
-
-# copy from existing genomad container
-RUN mkdir -p /usr/local/bin/ /opt/conda/bin/
-COPY --from=genomad /opt/conda/bin/seqkit /opt/conda/bin/seqkit
-COPY --from=genomad /opt/conda/bin/genomad /opt/conda/bin/genomad
-COPY --from=genomad /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
-COPY --from=img /opt/genomad.sh /usr/local/bin/genomad.sh
 
 #link things to the bin directory
 RUN \
@@ -278,7 +261,12 @@ RUN \
     ln -s ../programs/last/bin/lastal && \
     ln -s ../programs/CRT/CRT-CLI.jar CRT-CLI.jar && \
     ln -s ../programs/prodigal && \
-    ln -s ../programs/hmmer/bin/hpc_hmmsearch /opt/omics/bin/hmmsearch 
+    ln -s ../programs/hmmer/bin/hpc_hmmsearch /opt/omics/bin/hmmsearch && \
+    ln -s /opt/conda/bin/genomad . && \
+    ln -s /opt/conda/bin/seqkit . && \
+    ln -s /usr/local/bin/genomad.sh . && \
+    ln -s /usr/local/bin/_entrypoint.sh
+
 
 #make sure tRNAscan can see cmsearch and cmscan
 RUN \ 
