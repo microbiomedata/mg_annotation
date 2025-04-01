@@ -201,8 +201,8 @@ RUN \
 ## seqkit_ver=2.10.0
 FROM mambaorg/micromamba:2.0.3 as genomad 
 
-RUN conda install -y -n base -c conda-forge -c bioconda genomad==1.8.1 seqkit==2.10.0  && \
-    conda clean --all --yes
+RUN micromamba install -y -n base -c conda-forge -c bioconda genomad==1.8.1 seqkit==2.10.0  && \
+    micromamba clean --all --yes
     
 RUN wget --directory-prefix=/usr/local/bin https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh
 
