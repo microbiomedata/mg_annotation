@@ -12,6 +12,7 @@ ENV infernal_ver=1.1.4
 ENV gms2_ver=1.14_1.25
 ENV CRT_ver=1.8.4
 ENV cromwell_ver=49
+ENV jgi_genomad_branch=1.0.0_g1.8.1
 
 # Update and clean package lists
 RUN apt-get -y update && \
@@ -163,38 +164,56 @@ RUN \
 ########## get genomad script from jgi
 RUN \
     cd /opt && \
-    wget https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/raw/1.0.0_g1.8.1/genomad.sh && \
+    wget https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/raw/${jgi_genomad_branch}/genomad.sh && \
     chmod 755 genomad.sh
 
 
 ########## Build micromamba for genomad from img 
 ## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
 # version variables declared separately because image not built from base
-FROM mambaorg/micromamba:2.0.3 as genomad 
+FROM mambaorg/micromamba:2.0.3 as micromamba 
 ENV genomad_ver=1.8.1
 ENV seqkit_ver=2.10.0
-RUN \
-    micromamba install -y -n base -c conda-forge -c bioconda genomad==${genomad_ver} seqkit==${seqkit_ver}  && \
+
+# Set up micromamba and install dependencies
+RUN micromamba install -y -n base -c conda-forge -c bioconda -c anaconda \
+    ca-certificates \
+    curl \
+    git \
+    wget \
+    jq \
+    parallel \
+    pyyaml \
+    openjdk \
+    perl-getopt-long \
+    bc \
+    procps-ng \
+    genomad=${GENOMAD_VER} \
+    seqkit=${SEQKIT_VER} && \
     micromamba clean --all --yes
+
+
+ENV PATH=/opt/conda/bin:$PATH
+    
     
 #
 ########### Install miniconda
 #
-FROM buildbase AS conda
-RUN \
-    wget -q https://repo.anaconda.com/miniconda/Miniconda3-py312_25.1.1-2-Linux-x86_64.sh && \ 
-    bash ./Miniconda3-py312_25.1.1-2-Linux-x86_64.sh -b -p /miniconda3
+# FROM buildbase AS conda
+# RUN \
+#     wget -q https://repo.anaconda.com/miniconda/Miniconda3-py312_25.1.1-2-Linux-x86_64.sh && \ 
+#     bash ./Miniconda3-py312_25.1.1-2-Linux-x86_64.sh -b -p /miniconda3
 
-ENV PATH=/miniconda3/bin:/miniconda3/condabin:$PATH
+# ENV PATH=/miniconda3/bin:/miniconda3/condabin:$PATH
 
-RUN \
-    conda config --add channels conda-forge && \
-    conda config --add channels bioconda && \
-    conda config --add channels anaconda
-RUN conda install -y conda-forge::ca-certificates
-RUN conda install -y curl git wget jq parallel pyyaml openjdk perl-getopt-long bc procps-ng
+# RUN \
+#     conda config --add channels conda-forge && \
+#     conda config --add channels bioconda && \
+#     conda config --add channels anaconda
+# RUN conda install -y conda-forge::ca-certificates
+# RUN conda install -y curl git wget jq parallel pyyaml openjdk perl-getopt-long bc procps-ng
 
-RUN conda clean -y -a
+# RUN conda clean -y -a
 
 #
 ########## Install Cromwell v49
@@ -212,15 +231,15 @@ RUN \
 #
 FROM buildbase
 
-COPY --from=conda /miniconda3 /miniconda3
+COPY --from=micromamba /opt/conda /opt/conda
 
 # conda shell.posix activate
-ENV  PATH='/miniconda3/bin:/miniconda3/condabin:/opt/omics/bin:/opt/omics/bin/functional_annotation:/opt/omics/bin/qc/post-annotation:/opt/omics/bin/qc/pre-annotation:/opt/omics/bin/structural_annotation:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-ENV  CONDA_PREFIX='/miniconda3'
-ENV  CONDA_EXE='/miniconda3/bin/conda'
-ENV  _CE_M=''
-ENV  _CE_CONDA=''
-ENV  CONDA_PYTHON_EXE='/miniconda3/bin/python'
+ENV PATH="/opt/conda/bin:/opt/omics/bin:/opt/omics/bin/functional_annotation:/opt/omics/bin/qc/post-annotation:/opt/omics/bin/qc/pre-annotation:/opt/omics/bin/structural_annotation:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ENV CONDA_PREFIX="/opt/conda"
+ENV MAMBA_EXE="/opt/conda/bin/micromamba"
+ENV MAMBA_ROOT_PREFIX="/opt/conda"
+ENV CONDA_EXE="/opt/conda/bin/conda"
+ENV CONDA_PYTHON_EXE="/opt/conda/bin/python"
 
 # move everything to /opt
 COPY --from=cromwell /opt/omics/bin/ /opt/omics/bin/
@@ -231,9 +250,9 @@ COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 COPY --from=infernal /opt/omics/programs/infernal/ /opt/omics/programs/infernal/
 
 RUN mkdir -p /usr/local/bin/ /opt/conda/bin/
-COPY --from=genomad /opt/conda/bin/seqkit /opt/conda/bin/seqkit
-COPY --from=genomad /opt/conda/bin/genomad /opt/conda/bin/genomad
-COPY --from=genomad /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
+COPY --from=micromamba /opt/conda/bin/seqkit /opt/conda/bin/seqkit
+COPY --from=micromamba /opt/conda/bin/genomad /opt/conda/bin/genomad
+COPY --from=micromamba /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
 COPY --from=img /opt/genomad.sh /usr/local/bin/genomad.sh
 
 COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/bin/ /opt/omics/bin/

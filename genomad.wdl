@@ -45,7 +45,7 @@ task run_genomad {
     if [[ "~{genomad_execute}" = true ]]
      then 
      echo "starting genomad"
-      /usr/local/bin/_entrypoint.sh \
+      # /usr/local/bin/_entrypoint.sh \
       genomad.sh \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
