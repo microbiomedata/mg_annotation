@@ -172,8 +172,6 @@ RUN \
 ## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
 # version variables declared separately because image not built from base
 FROM mambaorg/micromamba:2.0.3 as micromamba 
-ENV genomad_ver=1.8.1
-ENV seqkit_ver=2.10.0
 
 # Set up micromamba and install dependencies
 RUN micromamba install -y -n base -c conda-forge -c bioconda -c anaconda \
@@ -188,8 +186,8 @@ RUN micromamba install -y -n base -c conda-forge -c bioconda -c anaconda \
     perl-getopt-long \
     bc \
     procps-ng \
-    genomad=${GENOMAD_VER} \
-    seqkit=${SEQKIT_VER} && \
+    genomad=1.8.1 \
+    seqkit=2.10.0 && \
     micromamba clean --all --yes
 
 
@@ -252,7 +250,7 @@ COPY --from=infernal /opt/omics/programs/infernal/ /opt/omics/programs/infernal/
 RUN mkdir -p /usr/local/bin/ /opt/conda/bin/
 COPY --from=micromamba /opt/conda/bin/seqkit /opt/conda/bin/seqkit
 COPY --from=micromamba /opt/conda/bin/genomad /opt/conda/bin/genomad
-COPY --from=micromamba /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
+COPY --from=micromamba /usr/local/bin/ /usr/local/bin/
 COPY --from=img /opt/genomad.sh /usr/local/bin/genomad.sh
 
 COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/bin/ /opt/omics/bin/

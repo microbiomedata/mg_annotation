@@ -41,11 +41,11 @@ task run_genomad {
     }
   command <<<
     set -euo pipefail
-    echo ~{len_cutoff}
+    # echo ~{len_cutoff}
     if [[ "~{genomad_execute}" = true ]]
      then 
      echo "starting genomad"
-      # /usr/local/bin/_entrypoint.sh \
+      /usr/local/bin/_entrypoint.sh \
       genomad.sh \
             --len_cutoff ~{len_cutoff} \
             --database_dir ~{db_dir} \
