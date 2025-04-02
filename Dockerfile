@@ -255,21 +255,18 @@ RUN \
 #link things to the bin directory
 RUN \
     cd /opt/omics/bin && \ 
-    ln -s ../programs/gms2_linux_64/gms2.pl && \
-    ln -s ../programs/gms2_linux_64/gmhmmp2 && \
-    ln -s ../programs/infernal/infernal-${infernal_ver}/bin/cmsearch && \
-    ln -s ../programs/tRNAscan-SE/bin/tRNAscan-SE && \
-    ln -s ../programs/last/bin/lastal && \
+    ln -s ../programs/gms2_linux_64/gms2.pl gms2.pl && \
+    ln -s ../programs/gms2_linux_64/gmhmmp2 gmhmmp2 && \
+    ln -s ../programs/infernal/infernal-${infernal_ver}/bin/cmsearch cmsearch && \
+    ln -s ../programs/tRNAscan-SE/bin/tRNAscan-SE tRNAscan-SE && \
+    ln -s ../programs/last/bin/lastal lastal && \
     ln -s ../programs/CRT/CRT-CLI.jar CRT-CLI.jar && \
-    ln -s ../programs/prodigal && \
+    ln -s ../programs/prodigal prodigal && \
     ln -s ../programs/hmmer/bin/hpc_hmmsearch /opt/omics/bin/hmmsearch 
 
 
 #make sure tRNAscan can see cmsearch and cmscan
 RUN \ 
     cd /opt/omics/programs/tRNAscan-SE/bin/ && \
-    ln -s /opt/omics/programs/infernal/bin/cmsearch && \
-    ln -s /opt/omics/programs/infernal/bin/cmscan
-
-
-
+    ln -s /opt/omics/programs/infernal/bin/cmsearch cmsearch && \
+    ln -s /opt/omics/programs/infernal/bin/cmscan cmscan
