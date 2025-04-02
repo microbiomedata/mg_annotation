@@ -15,8 +15,9 @@ workflow annotation {
     Int     additional_threads=16
     Int     additional_memory = 100
     Int     split_blocksize = 100
-    String  container="microbiomedata/img-omics@sha256:762e455d24df92907daea0fd3ccdf18479bf04c74dde75fce21b1c81d78f3541"
-    String  genomad_container="microbiomedata/img-genomad@sha256:7a6b46ab0a5adc6d1c393a5a96143c2ce33f63a6e23830debac73aedf60e8931"
+    String container = "ghcr.io/microbiomedata/nmdc-img-annotation-pipeline:5.3.0"
+    # String  container="microbiomedata/img-omics@sha256:762e455d24df92907daea0fd3ccdf18479bf04c74dde75fce21b1c81d78f3541"
+    # String  genomad_container="microbiomedata/img-genomad@sha256:7a6b46ab0a5adc6d1c393a5a96143c2ce33f63a6e23830debac73aedf60e8931"
     String  genomad_db_dir = "/refdata/genomad_db/"
     # structural annotation
     Boolean sa_execute=true
@@ -78,8 +79,8 @@ workflow annotation {
         genomad_execute = genomad_execute,
         input_fasta = pathname,
         db_dir = genomad_db_dir,
-        len_cutoff = split_blocksize,
-        container = genomad_container
+        container = container
+        # len_cutoff = split_blocksize,
       }
   }
 
