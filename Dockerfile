@@ -12,9 +12,6 @@ ENV infernal_ver=1.1.4
 ENV gms2_ver=1.14_1.25
 ENV CRT_ver=1.8.4
 ENV cromwell_ver=49
-ENV genomad_ver=1.8.1
-ENV seqkit_ver=2.10.0
-
 
 # Update and clean package lists
 RUN apt-get -y update && \
@@ -121,7 +118,6 @@ RUN \
 ########## Build infernal 1.1.4
 #
 FROM buildbase AS infernal
-
 RUN \
     wget http://eddylab.org/infernal/infernal-${infernal_ver}.tar.gz  && \
     tar -zxf infernal-${infernal_ver}.tar.gz && \
@@ -136,7 +132,6 @@ RUN \
 ########## IMG scripts and tools v 5.1.14, repo is public 4/2023. Add split.py from bfoster1/img-omics:0.1.12 (md5sum 21fb20bf430e61ce55430514029e7a83)
 #
 FROM buildbase AS img
-
 RUN \
     cd /opt && \
     wget https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/-/archive/${IMG_annotation_pipeline_ver}/img-annotation-pipeline-${IMG_annotation_pipeline_ver}.tar.gz && \
@@ -174,13 +169,12 @@ RUN \
 
 ########## Build micromamba for genomad from img 
 ## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
+# version variables declared separately because image not built from base
 FROM mambaorg/micromamba:2.0.3 as genomad 
+ENV genomad_ver=1.8.1
+ENV seqkit_ver=2.10.0
 RUN \
-    micromamba install -y -n base \
-        -c conda-forge \
-        -c bioconda \
-        genomad==${genomad_ver} \
-        seqkit==${seqkit_ver}  && \
+    micromamba install -y -n base -c conda-forge -c bioconda genomad==${genomad_ver} seqkit==${seqkit_ver}  && \
     micromamba clean --all --yes
     
 #
@@ -188,8 +182,8 @@ RUN \
 #
 FROM buildbase AS conda
 RUN \
-    wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \ 
-    bash ./Miniconda3-latest-Linux-x86_64.sh -b -p /miniconda3
+    wget -q https://repo.anaconda.com/miniconda/Miniconda3-py312_25.1.1-2-Linux-x86_64.sh && \ 
+    bash ./Miniconda3-py312_25.1.1-2-Linux-x86_64.sh -b -p /miniconda3
 
 ENV PATH=/miniconda3/bin:/miniconda3/condabin:$PATH
 
