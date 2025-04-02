@@ -163,7 +163,7 @@ RUN \
 ########## get genomad script from jgi
 RUN \
     cd /opt && \
-    wget https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/blob/1.0.0_g1.8.1/genomad.sh && \
+    wget https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/raw/1.0.0_g1.8.1/genomad.sh && \
     chmod 755 genomad.sh
 
 
