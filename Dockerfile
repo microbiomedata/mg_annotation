@@ -162,16 +162,15 @@ RUN \
     cp CRT-CLI.jar /opt/.
 
 ########## get genomad script from jgi
+## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
 RUN \
     cd /opt && \
     wget https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/raw/${jgi_genomad_branch}/genomad.sh && \
     chmod 755 genomad.sh
 
-
-########## Build micromamba for genomad from img 
-## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
-# version variables declared separately because image not built from base
-FROM mambaorg/micromamba:2.0.3 as micromamba 
+#
+########## Build micromamba for genomad from img and replace miniconda3
+FROM mambaorg/micromamba:2.0.3 as micromamba
 
 # Set up micromamba and install dependencies
 RUN micromamba install -y -n base -c conda-forge -c bioconda -c anaconda \
@@ -190,28 +189,11 @@ RUN micromamba install -y -n base -c conda-forge -c bioconda -c anaconda \
     seqkit=2.10.0 && \
     micromamba clean --all --yes
 
-
-ENV PATH=/opt/conda/bin:$PATH
+# Ensure micromamba is the only package manager used
+ENV PATH="/opt/conda/bin:$PATH"
+ENV MAMBA_ROOT_PREFIX="/opt/conda"
+ENV MAMBA_EXE="/usr/bin/micromamba"
     
-    
-#
-########### Install miniconda
-#
-# FROM buildbase AS conda
-# RUN \
-#     wget -q https://repo.anaconda.com/miniconda/Miniconda3-py312_25.1.1-2-Linux-x86_64.sh && \ 
-#     bash ./Miniconda3-py312_25.1.1-2-Linux-x86_64.sh -b -p /miniconda3
-
-# ENV PATH=/miniconda3/bin:/miniconda3/condabin:$PATH
-
-# RUN \
-#     conda config --add channels conda-forge && \
-#     conda config --add channels bioconda && \
-#     conda config --add channels anaconda
-# RUN conda install -y conda-forge::ca-certificates
-# RUN conda install -y curl git wget jq parallel pyyaml openjdk perl-getopt-long bc procps-ng
-
-# RUN conda clean -y -a
 
 #
 ########## Install Cromwell v49
@@ -230,14 +212,13 @@ RUN \
 FROM buildbase
 
 COPY --from=micromamba /opt/conda /opt/conda
+COPY --from=micromamba /usr/bin/micromamba /usr/bin/micromamba
+COPY --from=micromamba /usr/local/bin/ /usr/local/bin/
 
 # conda shell.posix activate
-ENV PATH="/opt/conda/bin:/opt/omics/bin:/opt/omics/bin/functional_annotation:/opt/omics/bin/qc/post-annotation:/opt/omics/bin/qc/pre-annotation:/opt/omics/bin/structural_annotation:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-ENV CONDA_PREFIX="/opt/conda"
-ENV MAMBA_EXE="/opt/conda/bin/micromamba"
+ENV PATH="/opt/conda/bin:/opt/conda/envs/base/bin:/opt/omics/bin:/opt/omics/bin/functional_annotation:/opt/omics/bin/qc/post-annotation:/opt/omics/bin/qc/pre-annotation:/opt/omics/bin/structural_annotation:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 ENV MAMBA_ROOT_PREFIX="/opt/conda"
-ENV CONDA_EXE="/opt/conda/bin/conda"
-ENV CONDA_PYTHON_EXE="/opt/conda/bin/python"
+ENV MAMBA_EXE="/usr/bin/micromamba"
 
 # move everything to /opt
 COPY --from=cromwell /opt/omics/bin/ /opt/omics/bin/
@@ -247,17 +228,12 @@ COPY --from=hmm /opt/omics/programs/hmmer/ /opt/omics/programs/hmmer
 COPY --from=last /opt/omics/programs/last/ /opt/omics/programs/last
 COPY --from=infernal /opt/omics/programs/infernal/ /opt/omics/programs/infernal/
 
-RUN mkdir -p /usr/local/bin/ /opt/conda/bin/
-COPY --from=micromamba /opt/conda/bin/seqkit /opt/conda/bin/seqkit
-COPY --from=micromamba /opt/conda/bin/genomad /opt/conda/bin/genomad
-COPY --from=micromamba /usr/local/bin/ /usr/local/bin/
-COPY --from=img /opt/genomad.sh /usr/local/bin/genomad.sh
-
 COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/bin/ /opt/omics/bin/
 COPY --from=img /opt/split.py /opt/omics/bin/split.py
 COPY --from=img /opt/gms2_linux_64 /opt/omics/programs/gms2_linux_64
 COPY --from=img /opt/CRT-CLI.jar /opt/omics/programs/CRT/CRT-CLI.jar
 COPY --from=img /opt/img-annotation-pipeline-${IMG_annotation_pipeline_ver}/VERSION /opt/omics/VERSION
+COPY --from=img /opt/genomad.sh /usr/local/bin/genomad.sh
 RUN \
     mkdir /opt/omics/lib && \
     cd /opt/omics/lib && \
@@ -265,7 +241,7 @@ RUN \
 
 #link things to the bin directory
 RUN \
-    cd /opt/omics/bin && \ 
+    cd /opt/omics/bin && \
     ln -s ../programs/gms2_linux_64/gms2.pl gms2.pl && \
     ln -s ../programs/gms2_linux_64/gmhmmp2 gmhmmp2 && \
     ln -s ../programs/infernal/infernal-${infernal_ver}/bin/cmsearch cmsearch && \
@@ -273,7 +249,10 @@ RUN \
     ln -s ../programs/last/bin/lastal lastal && \
     ln -s ../programs/CRT/CRT-CLI.jar CRT-CLI.jar && \
     ln -s ../programs/prodigal prodigal && \
-    ln -s ../programs/hmmer/bin/hpc_hmmsearch /opt/omics/bin/hmmsearch 
+    ln -s ../programs/hmmer/bin/hpc_hmmsearch hmmsearch && \
+    ln -s /opt/conda/bin/seqkit seqkit && \
+    ln -s /opt/conda/bin/genomad genomad && \
+    ln -s /usr/bin/micromamba micromamba
 
 
 #make sure tRNAscan can see cmsearch and cmscan
