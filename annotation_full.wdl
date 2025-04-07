@@ -15,9 +15,7 @@ workflow annotation {
     Int     additional_threads=16
     Int     additional_memory = 100
     Int     split_blocksize = 100
-    String container = "ghcr.io/microbiomedata/nmdc-img-annotation-pipeline@sha256:08565e728307aa52ca45efc4949eb3bc6d23d8f17b6ec1dcb47a0e11fa4357f7"
-    # String  container="microbiomedata/img-omics@sha256:762e455d24df92907daea0fd3ccdf18479bf04c74dde75fce21b1c81d78f3541"
-    # String  genomad_container="microbiomedata/img-genomad@sha256:7a6b46ab0a5adc6d1c393a5a96143c2ce33f63a6e23830debac73aedf60e8931"
+    String container = "ghcr.io/microbiomedata/nmdc-img-annotation-pipeline@sha256:437016d25f65398912493a5cb837de332b7382cf5ad066694e5acf9ca3111da5"
     String  genomad_db_dir = "/refdata/genomad_db/"
     # structural annotation
     Boolean sa_execute=true
@@ -612,8 +610,8 @@ task make_info_file {
     fi
     if [[ "~{genomad_execute}" = true ]]
       then
-      g_prog=`grep "Programs Used" -A1 ~{gen_info} | tail -n 1`
-      g_db=`grep "DBs Used" -A1 ~{gen_info} | tail -n 1`
+      g_prog=`grep "Programs" -A1 ~{gen_info} | tail -n 1`
+      g_db=`grep "DBs" -A1 ~{gen_info} | tail -n 1`
       echo "geNomad Programs Used: $g_prog"  >> ~{prefix}_imgap.info
       echo "geNomad DBs Used: $g_db"  >> ~{prefix}_imgap.info
     fi
