@@ -43,7 +43,6 @@ workflow annotation {
            blocksize = split_blocksize,
            container=container
   }
-  #confused for assembly or annotation id replacement
   scatter(pathname in split.files) {
 
       call sa.s_annotate {
@@ -78,7 +77,6 @@ workflow annotation {
         input_fasta = pathname,
         db_dir = genomad_db_dir,
         container = container
-        # len_cutoff = split_blocksize,
       }
   }
 
