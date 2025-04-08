@@ -15,7 +15,7 @@ workflow annotation {
     Int     additional_threads=16
     Int     additional_memory = 100
     Int     split_blocksize = 100
-    String container = "ghcr.io/microbiomedata/nmdc-img-annotation-pipeline@sha256:437016d25f65398912493a5cb837de332b7382cf5ad066694e5acf9ca3111da5"
+    String  container = "ghcr.io/microbiomedata/nmdc-img-annotation-pipeline@sha256:437016d25f65398912493a5cb837de332b7382cf5ad066694e5acf9ca3111da5"
     String  genomad_db_dir = "/refdata/genomad_db/"
     # structural annotation
     Boolean sa_execute=true
@@ -263,7 +263,7 @@ task stage {
     input {
         String container
         String target="input.fasta"
-        String   input_file
+        File   input_file
     }
 
    command <<<
@@ -294,7 +294,7 @@ task make_map_file {
   input{
     String proj_id
     String prefix=sub(proj_id, ":", "_")
-    File input_file
+    File   input_file
     String container
     Int min_seq_length = 150      # default value
     Int unknown_gap_length = 100  # default value

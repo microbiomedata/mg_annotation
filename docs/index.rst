@@ -1,3 +1,11 @@
+:github_url: https://github.com/microbiomedata/mg_annotation/blob/master/docs/index.rst
+
+..
+   Note: The above `github_url` field is used to force the target of the "Edit on GitHub" link
+         to be the specified URL. That makes it so the link will work, regardless of the Sphinx
+         site the file is incorporated into. You can learn more about the `github_url` field at:
+         https://sphinx-rtd-theme.readthedocs.io/en/stable/configuring.html#confval-github_url
+
 Metagenome Annotation Workflow (v1.1.4)
 =======================================
 
@@ -5,7 +13,7 @@ Metagenome Annotation Workflow (v1.1.4)
 
 Workflow Overview
 -----------------
-This workflow takes assembled metagenomes and generates structural and functional annotations. It is based on the `JGI/IMG annotation pipeline <https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/>`_ (`more details <https://journals.asm.org/doi/10.1128/msystems.00804-20>`_) and uses a number of open-source tools and databases to generate the structural and functional annotations. 
+This workflow takes assembled metagenomes and generates structural and functional annotations. It is based on the `JGI/IMG annotation pipeline <https://code.jgi.doe.gov/img/img-pipelines/img-annotation-pipeline/>`_ (`more details <https://doi.org/10.1128/msystems.00804-20>`_) and uses a number of open-source tools and databases to generate the structural and functional annotations. 
 
 The input assembly is first split into 10MB splits to be processed in parallel. Depending on the workflow engine configuration, the split can be processed in parallel. Each split is first structurally annotated, then those results are used for the functional annotation. The structural annotation uses :code:`tRNAscan-SE`, :code:`Rfam`, :code:`CRT`, :code:`Prodigal` and :code:`GeneMarkS`. These results are merged to create a consensus structural annotation. The resulting GFF is the input for functional annotation which uses multiple protein family databases (:code:`SMART`, :code:`COG`, :code:`TIGRFAM`, :code:`SUPERFAMILY`, :code:`Pfam` and :code:`Cath-FunFam`) along with custom :code:`HMM` models. The functional predictions are created using :code:`Last` and :code:`HMM`. These annotations are also merged into a consensus GFF file. Finally, the respective split annotations are merged together to generate a single structural annotation file and single functional annotation file. In addition, several summary files are generated in TSV format.
 

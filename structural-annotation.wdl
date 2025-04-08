@@ -13,10 +13,10 @@ workflow s_annotate {
       String  imgap_project_type
       Int     additional_threads
       Int     additional_memory
-      Int? imgap_structural_annotation_translation_table
+      Int?    imgap_structural_annotation_translation_table
       String  database_location
       String  container
-      String gm_license="/refdata/licenses/.gmhmmp2_key"
+      String  gm_license="/refdata/licenses/.gmhmmp2_key"
     }
 
     # call pre_qc {
