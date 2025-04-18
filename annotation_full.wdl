@@ -451,9 +451,9 @@ task merge_outputs {
      cat ~{sep=" " crt_crisprs_s} > "~{prefix}_crt.crisprs"
      cat ~{sep=" " crt_gffs} > "~{prefix}_crt.gff"
      cat ~{sep=" " crt_outs} > "~{prefix}_crt.out"
-     cat ~{sep=" " virus_summary} > "~{prefix}_virus_summary.tsv"
-     cat ~{sep=" " plasmid_summary} > "~{prefix}_plasmid_summary.tsv"
-     cat ~{sep=" " aggregated_class} > "~{prefix}_aggregated_classification.tsv"
+     cat ~{sep=" " virus_summary} > "~{prefix}_genomad_virus_summary.tsv"
+     cat ~{sep=" " plasmid_summary} > "~{prefix}_genomad_plasmid_summary.tsv"
+     cat ~{sep=" " aggregated_class} > "~{prefix}_genomad_aggregated_classification.tsv"
 
  >>>
 
@@ -498,9 +498,9 @@ task merge_outputs {
     File product_names_tsv = "~{prefix}_product_names.tsv"
     File crt_crisprs = "~{prefix}_crt.crisprs"
     File crt_out = "~{prefix}_crt.out"
-    File virus_tsv = "~{prefix}_virus_summary.tsv"
-    File plasmid_tsv = "~{prefix}_plasmid_summary.tsv"
-    File agg_class_tsv = "~{prefix}_aggregated_classification.tsv"
+    File virus_tsv = "~{prefix}_genomad_virus_summary.tsv"
+    File plasmid_tsv = "~{prefix}_genomad_plasmid_summary.tsv"
+    File agg_class_tsv = "~{prefix}_genomad_aggregated_classification.tsv"
   }
   runtime {
     memory: "2G"

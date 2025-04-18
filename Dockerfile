@@ -186,7 +186,7 @@ RUN micromamba install -y -n base -c conda-forge -c bioconda -c anaconda \
     bc \
     procps-ng \
     genomad=1.8.1 \
-    seqkit=2.10.0 && \
+    seqkit=2.9.0 && \
     micromamba clean --all --yes
 
 # Ensure micromamba is the only package manager used
