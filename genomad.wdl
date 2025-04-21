@@ -35,9 +35,9 @@ task run_genomad {
         String db_dir 
         Int    threads 
         String container
-        String agg_class = "aggregated_classification.tsv"
-        String plas_sum = "plasmid_summary.tsv"
-        String vir_sum = "virus_summary.tsv"
+        String agg_class = "genomad_aggregated_classification.tsv"
+        String plas_sum = "genomad_plasmid_summary.tsv"
+        String vir_sum = "genomad_virus_summary.tsv"
     }
   command <<<
     set -euo pipefail
