@@ -729,9 +729,9 @@ task finish_ano {
        ln ~{map_file} ~{prefix}_contig_names_mapping.tsv || ln -s ~{map_file} ~{prefix}_contig_names_mapping.tsv
        ln ~{renamed_fasta} ~{prefix}_contigs.fna || ln -s ~{renamed_fasta} ~{prefix}_contigs.fna
 
-       ln ~{virus_summary} ~{prefix}_virus_summary.tsv || ln -s ~{virus_summary} ~{prefix}_virus_summary.tsv
-       ln ~{plasmid_summary} ~{prefix}_plasmid_summary.tsv || ln -s ~{plasmid_summary} ~{prefix}_plasmid_summary.tsv
-       ln ~{aggregated_class} ~{prefix}_aggregated_classification.tsv || ln -s ~{aggregated_class} ~{prefix}_aggregated_classification.tsv
+       ln ~{virus_summary} ~{prefix}_genomad_virus_summary.tsv || ln -s ~{virus_summary} ~{prefix}_genomad_virus_summary.tsv
+       ln ~{plasmid_summary} ~{prefix}_genomad_plasmid_summary.tsv || ln -s ~{plasmid_summary} ~{prefix}_genomad_plasmid_summary.tsv
+       ln ~{aggregated_class} ~{prefix}_genomad_aggregated_classification.tsv || ln -s ~{aggregated_class} ~{prefix}_genomad_aggregated_classification.tsv
 
   >>>
 
@@ -767,9 +767,9 @@ task finish_ano {
         File final_map_file = "~{prefix}_contig_names_mapping.tsv"
         File final_tsv = "~{prefix}_stats.tsv"
         File final_json = "~{prefix}_stats.json"
-        File final_virus_summary = "~{prefix}_virus_summary.tsv"
-        File final_plasmid_summary = "~{prefix}_plasmid_summary.tsv"
-        File final_aggregated_class = "~{prefix}_aggregated_classification.tsv"
+        File final_virus_summary = "~{prefix}_genomad_virus_summary.tsv"
+        File final_plasmid_summary = "~{prefix}_genomad_plasmid_summary.tsv"
+        File final_aggregated_class = "~{prefix}_genomad_aggregated_classification.tsv"
         File final_version = "~{prefix}_imgap.info"
  
     }
