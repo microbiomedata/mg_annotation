@@ -2,28 +2,32 @@ version 1.0
 
 import "./structural-annotation.wdl" as sa
 import "./functional-annotation.wdl" as fa
+import "./genomad.wdl" as ge
 
 workflow annotation {
-input {
-  String  proj
-  File    input_file
-  String  imgap_project_id
-  String  database_location="/refdata/img/"
-  String  imgap_project_type="metagenome"
-  File    gm_license="/refdata/licenses/.gmhmmp2_key"
-  Int     additional_threads=16
-  Int     additional_memory = 100
-  String  container="microbiomedata/img-omics@sha256:d5f4306bf36a97d55a3710280b940b89d7d4aca76a343e75b0e250734bc82b71"
+  input {
+    String  proj
+    String  input_file
+    String  imgap_project_id
+    String  database_location="/refdata/img/"
+    String  imgap_project_type="metagenome"
+    String  gm_license="/refdata/licenses/.gmhmmp2_key"
+    Int     additional_threads=16
+    Int     additional_memory = 100
+    Int     split_blocksize = 100
+    String  container = "ghcr.io/microbiomedata/nmdc-img-annotation-pipeline@sha256:16fb1aab91eb490276e7dd4c453f30dea46cfc3d1a94932364f434f3fd8b6333"
+    String  genomad_db_dir = "/refdata/genomad_db/"
+    # structural annotation
+    Boolean sa_execute=true
 
-  # structural annotation
-  Boolean sa_execute=true
+    # functional annotation
+    Boolean fa_execute=true
 
-  # functional annotation
-  Boolean fa_execute=true
+    Boolean genomad_execute = false
         }
 
 
- call stage {
+  call stage {
       input: container=container,
           input_file=input_file
     }
@@ -36,9 +40,9 @@ input {
 
   call split {
     input: infile=make_map_file.out_fasta,
+           blocksize = split_blocksize,
            container=container
   }
-  #confused for assembly or annotation id replacement
   scatter(pathname in split.files) {
 
       call sa.s_annotate {
@@ -67,8 +71,17 @@ input {
           sa_gff = s_annotate.gff,
           container=container
       }
-
+      call ge.jgi_genomad {
+        input:
+        genomad_execute = genomad_execute,
+        input_fasta = pathname,
+        db_dir = genomad_db_dir,
+        container = container
+      }
   }
+
+
+
   call merge_outputs {
     input:
        project_id = imgap_project_id,
@@ -112,6 +125,9 @@ input {
        trna_archaeal_outs = s_annotate.trna_archaeal_out,
        rfam_gffs = s_annotate.rfam_gff,
        rfam_tbls = s_annotate.rfam_tbl,
+       virus_summary = jgi_genomad.virus_summary,
+       plasmid_summary = jgi_genomad.plasmid_summary,
+       aggregated_class = jgi_genomad.aggregated_class,
        container=container
   }
   call make_info_file {
@@ -120,6 +136,8 @@ input {
        sa_execute = sa_execute,
        fa_execute = fa_execute,
        map_info = make_map_file.out_log,
+       gen_info = jgi_genomad.info[0],
+       genomad_execute = genomad_execute,
        structural_gff  = merge_outputs.structural_gff,
        imgap_version = split.imgap_version,
        rfam_version = s_annotate.rfam_version,
@@ -146,7 +164,8 @@ input {
        input_fasta = make_map_file.out_fasta,
        container=container
   }
-# confused what to use for orig prefix
+
+
   call finish_ano {
     input:
       container=container,
@@ -176,8 +195,12 @@ input {
       product_names_tsv = merge_outputs.product_names_tsv,
       crt_crisprs = merge_outputs.crt_crisprs,
       map_file = make_map_file.map_file,
-      renamed_fasta = make_map_file.out_fasta
+      renamed_fasta = make_map_file.out_fasta,
+      virus_summary = merge_outputs.virus_tsv,
+      plasmid_summary = merge_outputs.plasmid_tsv,
+      aggregated_class = merge_outputs.agg_class_tsv
   }
+
 
   output{
     File proteins_faa = finish_ano.final_proteins_faa
@@ -212,6 +235,9 @@ input {
     File imgap_version = finish_ano.final_version
     File renamed_fasta = finish_ano.final_renamed_fasta
     File map_file = finish_ano.final_map_file
+    File virus_summary = finish_ano.final_virus_summary
+    File plasmid_summary = finish_ano.final_plasmid_summary
+    File aggregated_class = finish_ano.final_aggregated_class
   }
 
   parameter_meta {
@@ -375,6 +401,9 @@ task merge_outputs {
       Array[File] trna_archaeal_outs
       Array[File] rfam_gffs
       Array[File] rfam_tbls
+      Array[File] virus_summary
+      Array[File] plasmid_summary
+      Array[File] aggregated_class
       String container
   }
  
@@ -422,8 +451,12 @@ task merge_outputs {
      cat ~{sep=" " crt_crisprs_s} > "~{prefix}_crt.crisprs"
      cat ~{sep=" " crt_gffs} > "~{prefix}_crt.gff"
      cat ~{sep=" " crt_outs} > "~{prefix}_crt.out"
+     cat ~{sep=" " virus_summary} > "~{prefix}_genomad_virus_summary.tsv"
+     cat ~{sep=" " plasmid_summary} > "~{prefix}_genomad_plasmid_summary.tsv"
+     cat ~{sep=" " aggregated_class} > "~{prefix}_genomad_aggregated_classification.tsv"
 
  >>>
+
   output {
     File functional_gff = "~{prefix}_functional_annotation.gff"
     File structural_gff = "~{prefix}_structural_annotation.gff"
@@ -465,6 +498,9 @@ task merge_outputs {
     File product_names_tsv = "~{prefix}_product_names.tsv"
     File crt_crisprs = "~{prefix}_crt.crisprs"
     File crt_out = "~{prefix}_crt.out"
+    File virus_tsv = "~{prefix}_genomad_virus_summary.tsv"
+    File plasmid_tsv = "~{prefix}_genomad_plasmid_summary.tsv"
+    File agg_class_tsv = "~{prefix}_genomad_aggregated_classification.tsv"
   }
   runtime {
     memory: "2G"
@@ -480,8 +516,10 @@ task make_info_file {
         String container
         String imgap_version
         File map_info
+        File gen_info
         Boolean fa_execute
         Boolean sa_execute
+        Boolean genomad_execute
         String project_id
         String prefix=sub(project_id, ":", "_")
         Array[String] rfam_version
@@ -568,6 +606,13 @@ task make_info_file {
        fa_db_version=`echo $fa_db_version | sed -E 's/(.*)\;/\1/'`
        echo $fa_db_version >> ~{prefix}_imgap.info
     fi
+    if [[ "~{genomad_execute}" = true ]]
+      then
+      g_prog=`grep "Programs" -A1 ~{gen_info} | tail -n 1`
+      g_db=`grep "DBs" -A1 ~{gen_info} | tail -n 1`
+      echo "geNomad Programs Used: $g_prog"  >> ~{prefix}_imgap.info
+      echo "geNomad DBs Used: $g_db"  >> ~{prefix}_imgap.info
+    fi
   >>>
 
   output {
@@ -642,6 +687,9 @@ task finish_ano {
        File crt_crisprs
        File map_file
        File renamed_fasta
+       File virus_summary 
+       File plasmid_summary 
+       File aggregated_class 
        String orig_prefix="scaffold"
        String sed="s/~{orig_prefix}_/~{proj}_/g"
     }
@@ -681,6 +729,10 @@ task finish_ano {
        ln ~{map_file} ~{prefix}_contig_names_mapping.tsv || ln -s ~{map_file} ~{prefix}_contig_names_mapping.tsv
        ln ~{renamed_fasta} ~{prefix}_contigs.fna || ln -s ~{renamed_fasta} ~{prefix}_contigs.fna
 
+       ln ~{virus_summary} ~{prefix}_genomad_virus_summary.tsv || ln -s ~{virus_summary} ~{prefix}_genomad_virus_summary.tsv
+       ln ~{plasmid_summary} ~{prefix}_genomad_plasmid_summary.tsv || ln -s ~{plasmid_summary} ~{prefix}_genomad_plasmid_summary.tsv
+       ln ~{aggregated_class} ~{prefix}_genomad_aggregated_classification.tsv || ln -s ~{aggregated_class} ~{prefix}_genomad_aggregated_classification.tsv
+
   >>>
 
    output {
@@ -715,6 +767,9 @@ task finish_ano {
         File final_map_file = "~{prefix}_contig_names_mapping.tsv"
         File final_tsv = "~{prefix}_stats.tsv"
         File final_json = "~{prefix}_stats.json"
+        File final_virus_summary = "~{prefix}_genomad_virus_summary.tsv"
+        File final_plasmid_summary = "~{prefix}_genomad_plasmid_summary.tsv"
+        File final_aggregated_class = "~{prefix}_genomad_aggregated_classification.tsv"
         File final_version = "~{prefix}_imgap.info"
  
     }

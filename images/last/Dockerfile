@@ -7,7 +7,7 @@ RUN apt-get -y install libz-dev
 # Build last 1066
 #
 FROM buildbase as last
-ENV LAST_VER 1066
+ENV LAST_VER 1584
 RUN apt-get -y install unzip g++
 
 RUN \
