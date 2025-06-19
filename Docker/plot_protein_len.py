@@ -36,8 +36,12 @@ with open(args.input, 'r') as gff3:
             all_aa_len.append(aa_len)
             a_temp = temp[8].split(';')
             for attr in a_temp:
-                tag, val = attr.split('=')
-                tag = tag.upper()
+                if '=' in attr:
+                    tag, val = attr.split('=')
+                    tag = tag.upper()
+                else:
+                    print(f"Skipping malformed attribute: {attr}")
+            
 
 fig = px.histogram(all_aa_len,title='Distribution of Protein size')
 fig.update_traces(xbins_size=50)
