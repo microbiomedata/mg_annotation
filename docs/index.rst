@@ -631,8 +631,7 @@ Version History
 Point of contact
 ----------------
 
-- Author: Shane Canon <scanon@lbl.gov>
-- Maintainer: Kaitlyn Li <kli@lanl.gov>
+- Maintainer: Samantha Obermiller samantha.obermiller@pnnl.gov
 
 
 
