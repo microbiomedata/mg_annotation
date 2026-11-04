@@ -1,4 +1,4 @@
-FROM debian:bullseye AS buildbase
+FROM debian:bookworm AS buildbase
 # docker buildx build --progress=plain --no-cache  --platform linux/amd64 -t microbiomedata/img-omics:5.3.0 .
 
 # version variables
@@ -26,7 +26,7 @@ RUN update-ca-certificates --fresh
 
 # Install OpenJDK
 # for building on arm / mac machine for amd, use `openjdk-11-jdk:amd64`
-RUN apt-get -y update && apt-get install -y openjdk-11-jdk
+RUN apt-get -y update && apt-get install -y openjdk-17-jdk
 # potential fix with openjdk:19-alpine following this comment, if we want
 # to use wget instead of ADD (which is better practice) for building on MacOS
 # https://forums.docker.com/t/how-to-make-wget-run-in-docker/140555/6
