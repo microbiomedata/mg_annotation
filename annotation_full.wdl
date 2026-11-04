@@ -23,7 +23,7 @@ workflow annotation {
     # functional annotation
     Boolean fa_execute=true
 
-    Boolean genomad_execute = false
+    Boolean genomad_execute = true
         }
 
 
