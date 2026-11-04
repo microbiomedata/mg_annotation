@@ -1,7 +1,7 @@
 version 1.0
 workflow jgi_genomad {
     input {
-        Boolean genomad_execute = false
+        Boolean genomad_execute = true
         File input_fasta
         String container
         Int len_cutoff = 2000
