@@ -1,4 +1,4 @@
-FROM debian:bullseye AS buildbase
+FROM debian:bookworm AS buildbase
 # docker buildx build --progress=plain --no-cache  --platform linux/amd64 -t microbiomedata/img-omics:5.3.0 .
 
 # version variables
@@ -12,7 +12,6 @@ ENV infernal_ver=1.1.4
 ENV gms2_ver=1.14_1.25
 ENV CRT_ver=1.8.4
 ENV cromwell_ver=49
-ENV jgi_genomad_branch=1.0.0_g1.8.1
 
 # Update and clean package lists
 RUN apt-get -y update && \
@@ -26,7 +25,7 @@ RUN update-ca-certificates --fresh
 
 # Install OpenJDK
 # for building on arm / mac machine for amd, use `openjdk-11-jdk:amd64`
-RUN apt-get -y update && apt-get install -y openjdk-11-jdk
+RUN apt-get -y update && apt-get install -y openjdk-17-jdk
 # potential fix with openjdk:19-alpine following this comment, if we want
 # to use wget instead of ADD (which is better practice) for building on MacOS
 # https://forums.docker.com/t/how-to-make-wget-run-in-docker/140555/6
@@ -162,11 +161,9 @@ RUN \
     cp CRT-CLI.jar /opt/.
 
 ########## get genomad script from jgi
-## https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad
-RUN \
-    cd /opt && \
-    wget https://code.jgi.doe.gov/img/img-pipelines/containerized-imgap-modules/misc/img-genomad/-/raw/${jgi_genomad_branch}/genomad.sh && \
-    chmod 755 genomad.sh
+#manual copy b/c of permission issues
+#from https://code.jgi.doe.gov/dsi/img/img-pipelines/containerized-imgap-modules/additional-annotations/imgap-genomad/-/blob/8d6f96efcc56fbd84ffb18359e964551a5e4b158/genomad.sh which is release 11.0.0_g1.8.1
+COPY --chmod=755 genomad.sh /opt
 
 #
 ########## Build micromamba for genomad from img and replace miniconda3
