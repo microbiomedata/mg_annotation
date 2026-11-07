@@ -15,7 +15,7 @@ workflow annotation {
     Int     additional_threads=16
     Int     additional_memory = 100
     Int     split_blocksize = 100
-    String  container = "ghcr.io/microbiomedata/nmdc-img-annotation-pipeline@sha256:810a9efb898c25d5a3fbcecb19487a37a109b691e2e15cd89d931be9265f99da"
+    String  container = "ghcr.io/microbiomedata/nmdc-img-annotation-pipeline@sha:256e556be56945e1d406823f085c084513ebdc6da1dd42d671c14673034430a133a"
     String  genomad_db_dir = "/refdata/genomad_db/"
     # structural annotation
     Boolean sa_execute=true
