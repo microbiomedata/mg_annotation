@@ -1,4 +1,14 @@
 version 1.0
+
+import "ko_ec.wdl" as ko_ec
+import "smart.wdl" as smart
+import "cog.wdl" as cog
+import "tigrfam.wdl" as tigrfam
+import "superfam.wdl" as superfam
+import "pfam.wdl" as pfam
+import "cath_funfam.wdl" as cath_funfam
+import "product_name.wdl" as product_name
+
 workflow f_annotate {
     input {
         String  imgap_project_id
@@ -6,591 +16,137 @@ workflow f_annotate {
         Int     additional_threads
         File    input_fasta
         String  database_location="/refdata/img/"
-        String  ko_ec_img_nr_db="~{database_location}"+"/IMG-NR/20240916/img_nr"
-        String  ko_ec_md5_mapping="~{database_location}"+"/IMG-NR/20240916/md5Hash2Data.tsv"
-        String  ko_ec_taxon_to_phylo_mapping="~{database_location}"+"/IMG-NR/20240916/taxonOId2Taxonomy.tsv"
-        String  lastal_bin="/opt/omics/bin/lastal"
-        String  selector_bin="/opt/omics/bin/functional_annotation/lastal_img_nr_ko_ec_gene_phylo_hit_selector.py"
         Int?    par_hmm_inst
         Int?    approx_num_proteins
-        String  smart_db="~{database_location}"+"/SMART/01_06_2016/SMART.hmm"
-        String  cog_db="~{database_location}"+"/COG/2014/COG.hmm"
-        String  tigrfam_db="~{database_location}"+"/TIGRFAM/v15.0/TIGRFAM.hmm"
-        String  superfam_db="~{database_location}"+"/SuperFamily/v1.75/supfam.hmm"
-        String  pfam_db="~{database_location}"+"/Pfam/37.0/Pfam-A.hmm"
-        String  pfam_claninfo_tsv="~{database_location}"+"/Pfam/37.0/Pfam-A.clans.tsv"
-        String  cath_funfam_db="~{database_location}"+"/Cath-FunFam/v4.2.0/funfam.hmm"
         File    sa_gff
-        String  product_assign_bin="/opt/omics/bin/functional_annotation/assign_product_names_and_create_fa_gff.py"
-        String  product_names_mapping_dir="~{database_location}"+"/Product_Name_Mappings/20250123"
         String  container
     }
 
-    call ko_ec {
+    call ko_ec.ko_ec as ke {
       input:
-        project_id = imgap_project_id,
-        project_type = imgap_project_type,
+        imgap_project_id = imgap_project_id,
+        imgap_project_type = imgap_project_type,
         input_fasta = input_fasta,
-        threads = additional_threads,
-        nr_db = ko_ec_img_nr_db,
-        md5 = ko_ec_md5_mapping,
-        phylo = ko_ec_taxon_to_phylo_mapping,
-        lastal = lastal_bin,
-        selector = selector_bin,
-        container=container
+        additional_threads = additional_threads,
+        database_location = database_location,
+        container = container
     }
 
-    call smart {
+    call smart.smart as sm {
       input:
-        project_id = imgap_project_id,
+        imgap_project_id = imgap_project_id,
         input_fasta = input_fasta,
-        threads = additional_threads,
+        additional_threads = additional_threads,
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
-        smart_db = smart_db,
-        container=container
+        database_location = database_location,
+        container = container
     }
 
-    call cog {
+    call cog.cog as cg {
       input:
-        project_id = imgap_project_id,
+        imgap_project_id = imgap_project_id,
         input_fasta = input_fasta,
-        threads = additional_threads,
+        additional_threads = additional_threads,
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
-        cog_db = cog_db,
-        container=container
+        database_location = database_location,
+        container = container
     }
 
-    call tigrfam {
+    call tigrfam.tigrfam as tf {
       input:
-        project_id = imgap_project_id,
+        imgap_project_id = imgap_project_id,
         input_fasta = input_fasta,
-        threads = additional_threads,
+        additional_threads = additional_threads,
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
-        tigrfam_db = tigrfam_db,
-        container=container
+        database_location = database_location,
+        container = container
     }
 
-    call superfam {
+    call superfam.superfam as sf {
       input:
-        project_id = imgap_project_id,
+        imgap_project_id = imgap_project_id,
         input_fasta = input_fasta,
-        threads = additional_threads,
+        additional_threads = additional_threads,
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
-        superfam_db = superfam_db,
-        container=container
+        database_location = database_location,
+        container = container
     }
 
-    call pfam {
+    call pfam.pfam as pf {
       input:
-        project_id = imgap_project_id,
+        imgap_project_id = imgap_project_id,
         input_fasta = input_fasta,
-        threads = additional_threads,
+        additional_threads = additional_threads,
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
-        pfam_db = pfam_db,
-        pfam_claninfo_tsv = pfam_claninfo_tsv,
-        container=container
+        database_location = database_location,
+        container = container
     }
 
-    call cath_funfam {
+    call cath_funfam.cath_funfam as cf {
       input:
-        project_id = imgap_project_id,
+        imgap_project_id = imgap_project_id,
         input_fasta = input_fasta,
-        threads = additional_threads,
+        additional_threads = additional_threads,
         par_hmm_inst = par_hmm_inst,
         approx_num_proteins = approx_num_proteins,
-        cath_funfam_db = cath_funfam_db,
-        container=container
+        database_location = database_location,
+        container = container
     }
 
-
-    call product_name {
+    call product_name.product_name as pn {
       input:
-        project_id = imgap_project_id,
+        imgap_project_id = imgap_project_id,
         sa_gff = sa_gff,
-        product_assign = product_assign_bin,
-        map_dir = product_names_mapping_dir,
-        ko_ec_gff = ko_ec.gff,
-        smart_gff = smart.gff,
-        cog_gff = cog.gff,
-        tigrfam_gff = tigrfam.gff,
-        supfam_gff = superfam.gff,
-        pfam_gff = pfam.gff,
-        cath_funfam_gff = cath_funfam.gff,
- #       signalp_gff = signalp.gff,
- #       tmhmm_gff = tmhmm.gff,
-        container=container
+        database_location = database_location,
+        ko_ec_gff = ke.gff,
+        smart_gff = sm.gff,
+        cog_gff = cg.gff,
+        tigrfam_gff = tf.gff,
+        supfam_gff = sf.gff,
+        pfam_gff = pf.gff,
+        cath_funfam_gff = cf.gff,
+        container = container
     }
 
   output {
-    File gff = product_name.gff
-    File product_name_tsv = product_name.tsv
-    File ko_tsv = ko_ec.ko_tsv
-    File ec_tsv = ko_ec.ec_tsv
-    File phylo_tsv = ko_ec.phylo_tsv
-    File ko_ec_gff = ko_ec.gff
-    File last_blasttab = ko_ec.last_blasttab
-    File lineage_tsv = ko_ec.lineage_tsv
-    File cog_gff = cog.gff
-    File pfam_gff = pfam.gff
-    File tigrfam_gff = tigrfam.gff
-    File supfam_gff = superfam.gff
-    File smart_gff = smart.gff
-    File cath_funfam_gff = cath_funfam.gff
-    File cog_domtblout = cog.domtblout
-    File pfam_domtblout = pfam.domtblout
-    File tigrfam_domtblout = tigrfam.domtblout
-    File supfam_domtblout = superfam.domtblout
-    File smart_domtblout = smart.domtblout
-    File cath_funfam_domtblout = cath_funfam.domtblout
-    String lastal_version = ko_ec.lastal_ver
-    String img_nr_db_version = ko_ec.img_nr_db_ver
-    String hmmsearch_smart_version = smart.hmmsearch_smart_ver
-    String smart_db_version = smart.smart_db_ver
-    String hmmsearch_cog_version = cog.hmmsearch_cog_ver
-    String cog_db_version = cog.cog_db_ver
-    String hmmsearch_tigrfam_version = tigrfam.hmmsearch_tigrfam_ver
-    String tigrfam_db_version = tigrfam.tigrfam_db_ver
-    String hmmsearch_superfam_version = superfam.hmmsearch_superfam_ver
-    String superfam_db_version = superfam.superfam_db_ver
-    String hmmsearch_pfam_version = pfam.hmmsearch_pfam_ver
-    String pfam_db_version = pfam.pfam_db_ver
-    String hmmsearch_cath_funfam_version = cath_funfam.hmmsearch_cath_funfam_ver
-    String cath_funfam_db_version = cath_funfam.cath_funfam_db_ver
-  }
-
-}
-
-task ko_ec {
-    input {
-        String project_id
-        String prefix=sub(project_id, ":", "_")
-        String project_type
-        Int    threads = 2
-        File   input_fasta
-        String nr_db
-        String   md5
-        String   phylo
-        Int    top_hits = 5
-        Int    min_ko_hits = 2
-        Float  aln_length_ratio = 0.7
-        String lastal
-        String selector
-        String container
-        String lastal_version_file = "lastal_version.txt"
-        String img_nr_db_version_file = "img_db_version.txt"
-    }
-  command <<<
-    set -euo pipefail
-    ~{lastal} -m 180 -f blasttab+ -P ~{threads} ~{nr_db} ~{input_fasta} 1> ~{prefix}_proteins.img_nr.last.blasttab
-    ~{selector} -l ~{aln_length_ratio} -m ~{min_ko_hits} -n ~{top_hits} \
-                ~{project_type} ~{md5} ~{phylo} \
-                ~{prefix}_ko.tsv ~{prefix}_ec.tsv \
-                ~{prefix}_gene_phylogeny.tsv ~{prefix}_ko_ec.gff \
-                ~{prefix}_proteins.img_nr.last.blasttab && \
-    python /opt/omics/bin/functional_annotation/create_scaffold_lineage.py ~{prefix}_gene_phylogeny.tsv ~{prefix}_scaffold_lineage.tsv
-
-   #get version information
-   lastal_version="`~{lastal} -V`"
-   echo $lastal_version > ~{lastal_version_file}
-   img_nr_db_version="IMG-NR $(basename $(realpath $(dirname ~{nr_db})))"
-   echo $img_nr_db_version  > ~{img_nr_db_version_file}
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "256G"
-    docker: container
-  }
-
-  output {
-    File last_blasttab = "~{prefix}_proteins.img_nr.last.blasttab"
-    File ko_tsv = "~{prefix}_ko.tsv"
-    File ec_tsv = "~{prefix}_ec.tsv"
-    File phylo_tsv = "~{prefix}_gene_phylogeny.tsv"
-    File gff = "~{prefix}_ko_ec.gff"
-    File lineage_tsv = "~{prefix}_scaffold_lineage.tsv"
-    String lastal_ver = read_string(lastal_version_file)
-    String img_nr_db_ver = read_string(img_nr_db_version_file)
+    File   gff = pn.gff
+    File   product_name_tsv = pn.tsv
+    File   ko_tsv = ke.ko_tsv
+    File   ec_tsv = ke.ec_tsv
+    File   phylo_tsv = ke.phylo_tsv
+    File   ko_ec_gff = ke.gff
+    File   last_blasttab = ke.last_blasttab
+    File   lineage_tsv = ke.lineage_tsv
+    File   cog_gff = cg.gff
+    File   pfam_gff = pf.gff
+    File   tigrfam_gff = tf.gff
+    File   supfam_gff = sf.gff
+    File   smart_gff = sm.gff
+    File   cath_funfam_gff = cf.gff
+    File   cog_domtblout = cg.domtblout
+    File   pfam_domtblout = pf.domtblout
+    File   tigrfam_domtblout = tf.domtblout
+    File   supfam_domtblout = sf.domtblout
+    File   smart_domtblout = sm.domtblout
+    File   cath_funfam_domtblout = cf.domtblout
+    String lastal_version = ke.lastal_ver
+    String img_nr_db_version = ke.img_nr_db_ver
+    String hmmsearch_smart_version = sm.hmmsearch_smart_ver
+    String smart_db_version = sm.smart_db_ver
+    String hmmsearch_cog_version = cg.hmmsearch_cog_ver
+    String cog_db_version = cg.cog_db_ver
+    String hmmsearch_tigrfam_version = tf.hmmsearch_tigrfam_ver
+    String tigrfam_db_version = tf.tigrfam_db_ver
+    String hmmsearch_superfam_version = sf.hmmsearch_superfam_ver
+    String superfam_db_version = sf.superfam_db_ver
+    String hmmsearch_pfam_version = pf.hmmsearch_pfam_ver
+    String pfam_db_version = pf.pfam_db_ver
+    String hmmsearch_cath_funfam_version = cf.hmmsearch_cath_funfam_ver
+    String cath_funfam_db_version = cf.cath_funfam_db_ver
   }
 }
-
-task smart {
-    input {
-        String project_id
-        String prefix=sub(project_id, ":", "_")
-        File   input_fasta
-        String   smart_db
-        Int    threads = 62
-        Int    par_hmm_inst = 15
-        Int    approx_num_proteins = 0
-        Float  min_domain_eval_cutoff = 0.01
-        Float  aln_length_ratio = 0.7
-        Float  max_overlap_ratio = 0.1
-        String base=basename(input_fasta)
-        String container
-        String hmmsearch_version_file = "hmmsearch_version.txt"
-        String smart_db_version_file = "smart_db_version.txt"
-    }
-  command <<<
-     set -euo pipefail
-     cp ~{input_fasta} ~{base}
-     /opt/omics/bin/functional_annotation/hmmsearch_smart.sh ~{base} \
-     ~{smart_db} \
-     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
-     ~{min_domain_eval_cutoff} ~{aln_length_ratio} ~{max_overlap_ratio}
-
-   #get version
-   hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-   echo $hmmsearch_version > ~{hmmsearch_version_file}
-   smart_db_version="SMART $(basename $(realpath $(dirname ~{smart_db})))"
-   echo $smart_db_version > ~{smart_db_version_file}
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
-  }
-
-  output {
-    File gff = "~{prefix}_smart.gff"
-    File domtblout = "~{prefix}_proteins.smart.domtblout"
-    String hmmsearch_smart_ver = read_string(hmmsearch_version_file)
-    String smart_db_ver = read_string(smart_db_version_file)
-  }
-}
-
-task cog {
-    input {
-        String project_id
-        String prefix=sub(project_id, ":", "_")
-        File   input_fasta
-        String   cog_db
-        Int    threads = 62
-        Int    par_hmm_inst = 15
-        Int    approx_num_proteins = 0
-        Float  min_domain_eval_cutoff = 0.01
-        Float  aln_length_ratio = 0.7
-        Float  max_overlap_ratio = 0.1
-        String base=basename(input_fasta)
-        String container
-        String hmmsearch_version_file = "hmmsearch_version.txt"
-        String cog_db_version_file = "cog_db_version.txt"
-    }
-  command <<<
-     set -euo pipefail
-     cp ~{input_fasta} ~{base}
-     /opt/omics/bin/functional_annotation/hmmsearch_cogs.sh ~{base} \
-     ~{cog_db} \
-     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
-     ~{min_domain_eval_cutoff} ~{aln_length_ratio} ~{max_overlap_ratio}
-     
-    #get versions
-   hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3`"
-   echo $hmmsearch_version > ~{hmmsearch_version_file}
-   cog_db_version="COG $(basename $(realpath $(dirname ~{cog_db})))"
-   echo $cog_db_version > ~{cog_db_version_file}
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
-  }
-
-  output {
-    File gff = "~{prefix}_cog.gff"
-    File domtblout = "~{prefix}_proteins.cog.domtblout"
-    String hmmsearch_cog_ver = read_string(hmmsearch_version_file)
-    String cog_db_ver = read_string(cog_db_version_file)
-  }
-}
-
-task tigrfam {
-    input {
-      String project_id
-      String prefix=sub(project_id, ":", "_")
-      File   input_fasta
-      String   tigrfam_db
-      Int    threads = 62
-      Int    par_hmm_inst = 15
-      Int    approx_num_proteins = 0
-      Float  aln_length_ratio = 0.7
-      Float  max_overlap_ratio = 0.1
-      String base=basename(input_fasta)
-      String container
-      String hmmsearch_version_file = "hmmsearch_version.txt"
-      String tigrfam_db_version_file = "tigrfam_db_version.txt"
-    }
-  command <<<
-     set -euo pipefail
-     cp ~{input_fasta} ~{base}
-     /opt/omics/bin/functional_annotation/hmmsearch_tigrfams.sh ~{base} \
-     ~{tigrfam_db} \
-     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
-     ~{aln_length_ratio} ~{max_overlap_ratio}
-
-   #    #get versions
-   hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-   echo $hmmsearch_version > ~{hmmsearch_version_file}
-   tigrfam_db_version="TIGRFAM $(basename $(realpath $(dirname ~{tigrfam_db})))"
-   echo $tigrfam_db_version > ~{tigrfam_db_version_file}
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
-  }
-
-  output {
-    File gff = "~{prefix}_tigrfam.gff"
-    File domtblout = "~{prefix}_proteins.tigrfam.domtblout"
-    String hmmsearch_tigrfam_ver = read_string(hmmsearch_version_file)
-    String tigrfam_db_ver = read_string(tigrfam_db_version_file)
-
-  }
-}
-
-task superfam {
-    input {
-        String project_id
-        String prefix=sub(project_id, ":", "_")
-        File   input_fasta
-        String   superfam_db
-        Int    threads = 62
-        Int    par_hmm_inst = 15
-        Int    approx_num_proteins = 0
-        Float  min_domain_eval_cutoff = 0.01
-        Float  aln_length_ratio = 0.7
-        Float  max_overlap_ratio = 0.1
-        String base=basename(input_fasta)
-        String container
-        String hmmsearch_version_file =  "hmmsearch_version.txt"
-        String superfam_db_version_file = "superfam_db_version.txt"
-    }
-  command <<<
-     set -euo pipefail
-     cp ~{input_fasta} ~{base}
-    #Usage: hmmsearch_supfams.sh <proteins_fasta> <supfam_hmm_db> <number_of_additional_threads (default: 0)> <number_of_parallel_hmmsearch_instances (default: 0)> <approximate_number_of_total_proteins (default: 0)> <min_domain_evalue_cutoff (default 0.01)> <min_aln_length_ratio (default 0.7)> <max_overlap_ratio (default 0.1)> 
-
-     /opt/omics/bin/functional_annotation/hmmsearch_supfams.sh ~{base} \
-     ~{superfam_db} \
-     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
-     ~{min_domain_eval_cutoff} ~{aln_length_ratio} ~{max_overlap_ratio}
- 
-     hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-     echo $hmmsearch_version > ~{hmmsearch_version_file}
-     superfam_db_version="SuperFamily $(basename $(realpath $(dirname ~{superfam_db})))"
-     echo $superfam_db_version > ~{superfam_db_version_file}
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
-  }
-
-  output {
-    File gff = "~{prefix}_supfam.gff"
-    File domtblout = "~{prefix}_proteins.supfam.domtblout"
-    String hmmsearch_superfam_ver = read_string(hmmsearch_version_file)
-    String superfam_db_ver = read_string(superfam_db_version_file)
-  }
-}
-
-task pfam {
-    input {
-        String project_id
-        String prefix=sub(project_id, ":", "_")
-        File   input_fasta
-        String   pfam_db
-        String   pfam_claninfo_tsv
-        Int    threads = 62
-        Int    par_hmm_inst = 15
-        Int    approx_num_proteins = 0
-        String base=basename(input_fasta)
-        String container
-        String hmmsearch_version_file = "hmmsearch_version.txt"
-        String pfam_db_version_file = "pfam_db_version.txt"
-    }
-  command <<<
-     set -euo pipefail
-     cp ~{input_fasta} ~{base}
-     
-    #Usage: hmmsearch_pfams.sh <proteins_fasta> <pfam_hmm_db> <pfam_claninfo_tsv> <number_of_additional_threads (default: 0)>
-     /opt/omics/bin/functional_annotation/hmmsearch_pfams.sh ~{base} \
-     ~{pfam_db} ~{pfam_claninfo_tsv} \
-     ~{threads} ~{par_hmm_inst} ~{approx_num_proteins}
-
-     hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-     echo $hmmsearch_version > ~{hmmsearch_version_file}
-     pfam_db_version="Pfam $(basename $(realpath $(dirname ~{pfam_db})))"
-     echo $pfam_db_version > ~{pfam_db_version_file}
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
-  }
-
-  output {
-    File gff = "~{prefix}_pfam.gff"
-    File domtblout = "~{prefix}_proteins.pfam.domtblout"
-    String hmmsearch_pfam_ver = read_string(hmmsearch_version_file)
-    String pfam_db_ver = read_string(pfam_db_version_file)
-  }
-}
-
-task cath_funfam {
-    input {
-        String project_id
-        String prefix=sub(project_id, ":", "_")
-        File   input_fasta
-        String   cath_funfam_db
-        Int    threads=62
-        Int    par_hmm_inst=15
-        Int    approx_num_proteins=0
-        Float  min_domain_eval_cutoff = 0.01
-        Float  aln_length_ratio = 0.7
-        Float  max_overlap_ratio = 0.1
-        String base=basename(input_fasta)
-        String container
-        String hmmsearch_version_file = "hmmsearch_version.txt"
-        String cath_funfam_db_version_file = "cath_funfam_db_version.txt"
-    }
-  command <<<
-     set -euo pipefail
-     cp ~{input_fasta} ~{base}
-     /opt/omics/bin/functional_annotation/hmmsearch_cath_funfams.sh  ~{base} \
-     ~{cath_funfam_db} ~{threads} ~{par_hmm_inst} ~{approx_num_proteins} \
-     ~{min_domain_eval_cutoff} ~{aln_length_ratio} ~{max_overlap_ratio}
-
-     hmmsearch_version="`hmmsearch -h | grep HMMER | cut -d' ' -f2,3 `"
-     echo $hmmsearch_version > ~{hmmsearch_version_file}
-     cath_funfam_db_version="Cath-Funfam $(basename $(realpath $(dirname ~{cath_funfam_db})))"
-     echo $cath_funfam_db_version > ~{cath_funfam_db_version_file}
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
-  }
-  
-  output {
-      File gff = "~{prefix}_cath_funfam.gff"
-      File domtblout = "~{prefix}_proteins.cath_funfam.domtblout"
-      String hmmsearch_cath_funfam_ver = read_string(hmmsearch_version_file)
-      String cath_funfam_db_ver = read_string(cath_funfam_db_version_file)
-  }
-}
-
-task run_signalp {
-    input {
-        String project_id
-        String prefix=sub(project_id, ":", "_")
-        File   input_fasta
-        String gram_stain
-        String signalp
-        String container
-    }
-  command <<<
-    set -euo pipefail
-    signalp_version=$(~{signalp} -V)
-    ~{signalp} -t ~{gram_stain} -f short ~{input_fasta} | \
-    grep -v '^#' | \
-    awk -v sv="$signalp_version" -v ot="~{gram_stain}" \
-        '$10 == "Y" {print $1"\t"sv"\tcleavage_site\t"$3-1"\t"$3"\t"$2\
-        "\t.\t.\tD-score="$9";network="$12";organism_type="ot}' > ~{prefix}_cleavage_sites.gff
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
-  }
-
-  output {
-    File gff = "~{prefix}_cleavage_sites.gff"
-  }
-}
-
-task tmhmm {
-    input {
-        String project_id
-        String prefix=sub(project_id, ":", "_")
-        File   input_fasta
-        String model
-        String decode
-        String decode_parser
-        String container
-    }
-
-  command <<<
-    set -euo pipefail
-    tool_and_version=$(~{decode} -v 2>&1 | head -1)
-    background="0.081 0.015 0.054 0.061 0.040 0.068 0.022 0.057 0.056 0.093 0.025"
-    background="$background 0.045 0.049 0.039 0.057 0.068 0.058 0.067 0.013 0.032"
-    sed 's/\*/X/g' ~{input_fasta} | \
-    ~{decode} -N 1 -background $background -PrintNumbers \
-    ~{model} 2> /dev/null | ~{decode_parser} "$tool_and_version" > ~{prefix}_tmh.gff
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
-  }
-
-  output {
-    File gff = "~{prefix}_tmh.gff"
-  }
-}
-
-task product_name {
-    input {
-        String project_id
-        String prefix=sub(project_id, ":", "_")
-        File   sa_gff
-        String product_assign
-        String map_dir
-        File  ko_ec_gff
-        File  smart_gff
-        File  cog_gff
-        File  tigrfam_gff
-        File  supfam_gff
-        File  pfam_gff
-        File  cath_funfam_gff
-        #  File  signalp_gff
-        #  File  tmhmm_gff
-        String container
-    }
-  command <<<
-    set -euo pipefail
-    ~{product_assign} ~{"-k " + ko_ec_gff} ~{"-s " + smart_gff} ~{"-c " + cog_gff} \
-                      ~{"-t " + tigrfam_gff} ~{"-u " + supfam_gff} ~{"-p " + pfam_gff} \
-                      ~{"-f " + cath_funfam_gff}  \
-                      ~{map_dir} ~{sa_gff}
-    mv ../inputs/*/*.gff .
-    mv ../inputs/*/*.tsv .
-  >>>
-
-  runtime {
-    time: "1:00:00"
-    memory: "86G"
-    docker: container
-  }
-
-  output {
-    File gff = "~{prefix}_functional_annotation.gff"
-    File tsv = "~{prefix}_product_names.tsv"
-  }
-}
-
